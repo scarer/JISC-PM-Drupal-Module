@@ -1,0 +1,45 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+function jiscpmtask_install() {
+  drupal_install_schema('jiscpmtask');
+  variable_set('node_options_jiscpmtask', array('status'));
+}
+
+function jiscpmtask_disable() {
+  drupal_set_message(t('Nodes of type "Task" have not been deleted on disabling jiscpm Task. Please note that they will now have reduced functionality, and will not be protected by jiscpm Task access controls.'), 'warning');
+}
+
+function jiscpmtask_uninstall() {
+  drupal_uninstall_schema('jiscpmtask');
+}
+
+function jiscpmtask_schema() {
+  $schema['jiscpmtask'] = array(
+    'fields'        => array(
+      'task_nid'            => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'         => array('type' => 'int'),
+	  'stepno' 				=> array('type' => 'int'),
+	  'taskcategory' 		=> array('type' => 'text'),
+	  'taskstatus' 			=> array('type' => 'text'),
+	  'taskpriority' 		=> array('type' => 'text'),
+	  'weight' 				=> array('type' => 'text'),
+      'datebegin'           => array('type' => 'int'),
+      'dateend'             => array('type' => 'int'),
+	  'durationunit' 		=> array('type' => 'int'),
+	  'duration' 			=> array('type' => 'float'),
+	  'pricemode' 			=> array('type' => 'text'),
+	  'price' 			    => array('type' => 'float'),
+	  'currency' 			=> array('type' => 'text'),
+      'assigned_uid'        => array('type' => 'int'),
+    ),
+    'primary key' => array('task_nid'),
+  );
+
+  return $schema;
+}
+

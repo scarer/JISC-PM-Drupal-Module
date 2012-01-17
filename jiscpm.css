@@ -1,0 +1,177 @@
+/* $Id: jiscpm.css,v 1.5.4.16 2009/11/27 21:24:00 magnity Exp $ */
+table tr.odd .form-item, tr.even .form-item
+{
+white-space:pre-line;
+}
+table.formgroup {
+width: auto;
+margin: 0;
+clear: both;
+}
+
+table.formgroup tr td {
+padding-left: 0px;
+padding-right: 5px;
+}
+
+table.formgroup tr td div.form-item{
+margin-top: 0px;
+margin-bottom: 5px;
+}
+
+tbody {
+border:none !important;
+}
+
+th.jiscpm_list_operations {
+text-align: right;
+white-space: nowrap;
+padding: 0.3em 0.5em;
+}
+
+td.jiscpm_list_operations {
+text-align: right;
+white-space: nowrap;
+}
+
+div.jiscpm_popup {
+display:none;
+z-index: 100;
+border: 1px solid black;
+background-color: #fff;
+}
+
+div.jiscpm_popup_inner {
+text-align: center;
+}
+
+div.jiscpm_popup_inner form div div.form-item {
+margin: 0;
+}
+
+div.jiscpm_popup_inner form div input.form-submit {
+margin: 5px 0 0 0;
+}
+
+div.jiscpm_popup_title {
+float: left;
+text-align: center;
+color: #fff;
+width: 100%;
+background-color: #5294C1;
+}
+
+div.jiscpm_popup_inner {
+clear: both;
+}
+
+div.jiscpm_list_form_report {
+display:none;
+width: 0px;
+height: 0px;
+}
+
+div.jiscpm_quick_shortcuts {
+clear: both;
+}
+
+ul.jiscpm_quick_shortcuts {
+list-style-type: none;
+margin: 0;
+}
+
+ul.jiscpm_quick_shortcuts li {
+background: transparent;
+background-color: #5294C1;
+display: inline;
+float: left;
+padding: 0;
+margin: 0 1pt 1pt 0;
+}
+
+ul.jiscpm_quick_shortcuts li a {
+display: block;
+width: 20px;
+height: 20px;
+text-align: center;
+font-weight: bold;
+color: #ffffff;
+}
+
+form.jiscpmcomponent_node_form #edit-preview {
+  display: none;
+}
+
+tr.formgroup {
+  background-color: #ffffff !important;
+  border: none !important;
+}
+
+dt.jiscpmcomponent {
+padding-left: 40px;
+padding-top: 10px;
+height: 40px;
+}
+
+dt.jiscpmcomponent a {
+font-weight: bold;
+margin-right: 5px;
+}
+
+dt#jiscpmorganizations {
+background: transparent url(images/organizations.png) no-repeat top left;
+}
+
+dt#jiscpmprojects {
+background: transparent url(images/projects.png) no-repeat top left;
+}
+
+dt#jiscpmtasks {
+background: transparent url(images/tasks.png) no-repeat top left;
+}
+
+dt#jiscpmtickets {
+background: transparent url(images/tickets.png) no-repeat top left;
+}
+
+dt#jiscpmpeople {
+background: transparent url(images/people.png) no-repeat top left;
+}
+
+dt#jiscpmteams {
+background: transparent url(images/teams.png) no-repeat top left;
+}
+
+dt#jiscpmknowledgebase {
+background: transparent url(images/knowledgebase.png) no-repeat top left;
+}
+
+dt#jiscpmtimetrackings {
+background: transparent url(images/timetrackings.png) no-repeat top left;
+}
+
+dt#jiscpmnotes {
+background: transparent url(images/notes.png) no-repeat top left;
+}
+
+dt#jiscpminvoices {
+background: transparent url(images/invoices.png) no-repeat top left;
+}
+
+dt#jiscpmexpenses {
+background: transparent url(images/expenses.png) no-repeat top left;
+}
+
+dt#jiscpmattributes {
+background: transparent url(images/attributes.png) no-repeat top left;
+}
+
+dt#jiscpmconfiguration {
+background: transparent url(images/configuration.png) no-repeat top left;
+}
+
+li.jiscpm_add a {
+    padding-left: 20px;
+    padding-bottom: 2px;
+    background:url(icons/category_feature_request.png)  no-repeat;
+}

@@ -1,0 +1,241 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+function theme_jiscpmppr_list($header, $pprs) {
+  drupal_add_css(drupal_get_path('module', 'jiscpm') .'/jiscpm.css', 'module');
+
+  $rows = array();
+  foreach ($pprs as $key => $ppr) {
+    $rows[] = array(
+      jiscpm_icon('pprcategory_'. $ppr->pprcategory, $ppr->pprcategory),
+      l($ppr->organization_title, 'node/'. $ppr->organization_nid),
+      l($ppr->title, 'node/'. $ppr->nid) . theme('mark', node_mark($ppr->nid, $ppr->changed)),
+      jiscpm_icon('status_'. $ppr->pprstatus, $ppr->pprstatus),
+      jiscpm_icon('priority_'. $ppr->pprpriority, $ppr->pprpriority),
+      array(
+        'data' => jiscpm_icon_edit_node($ppr, $_GET) .'&nbsp;'. jiscpm_icon_delete_node($ppr, $_GET),
+        'class' => 'jiscpm_list_operations',
+      ),
+    );
+  }
+  $o  = theme('table', $header, $rows);
+  return $o;
+}
+
+function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
+  drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm-node.css', 'module');
+  
+  $node = node_prepare($node, $teaser);
+  
+  $node->content['links'] = array(
+    '#prefix' => '<div class="jiscpmlinks"><dl>',
+    '#suffix' => '</dl></div>',
+    '#weight' => -25,
+  );
+  
+  $node->content['links']['expenses'] = theme('jiscpm_link', 'jiscpmppr', 'jiscpmexpense', $node->nid, 1);
+  $node->content['links']['notes'] = theme('jiscpm_link', 'jiscpmppr', 'jiscpmnote', $node->nid, 2);
+  $node->content['links']['tasks'] = theme('jiscpm_link', 'jiscpmppr', 'jiscpmtask', $node->nid, 3);
+  $node->content['links']['tickets'] = theme('jiscpm_link', 'jiscpmppr', 'jiscpmticket', $node->nid, 4);  
+  $node->content['links']['timetrackings'] = theme('jiscpm_link', 'jiscpmppr', 'jiscpmtimetracking', $node->nid, 5);
+  
+  $node->content['group1'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
+  );
+
+  $node->content['group2'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
+  );
+
+//load project
+  $project = node_load($node->pprs[0]['project_nid']);
+  $node->content['group2']['pprproject'] = array(
+    '#prefix' => '<div class="pprproject">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Project'), l($project->title, 'node/' . $project->nid)),
+    '#weight' => 1,
+  );
+
+  $node->content['group2']['pprsummaryobjectives'] = array(
+    '#prefix' => '<div class="pprstatus">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Summary of objectives'), jiscpmattribute_value('ppr status', $node->pprs[0]['ppr_summary_objectives'])),
+    '#weight' => 2,
+  );
+
+  $node->content['group2']['pprbenefitsachieved'] = array(
+    '#prefix' => '<div class="pprbenefitsachieved">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Benefits achieved'), jiscpmattribute_value('ppr benefits achieved', $node->pprs[0]['ppr_benefits_achieved'])),
+    '#weight' => 3,
+  );
+
+  $node->content['group5'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -16,
+  );
+  
+  $node->content['group5']['pprbenefitsnotachieved'] = array(
+    '#prefix' => '<div class="pprbenefitsnotachieved">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Benefits not achieved'), jiscpmattribute_value('ppr benefits not achieved', $node->pprs[0]['ppr_benefits_not_achieved'])),
+    '#weight' => 1,
+  );
+  
+  $node->content['group6'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -16,
+  ); 
+  
+  $node->content['group6']['pprnegativebenefitsfactors'] = array(
+    '#prefix' => '<div class="pprnegativebenefitsfactors">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Negative Factors that led to benefits not being achieved'), jiscpmattribute_value('ppr negative benefits factors not achieved', $node->pprs[0]['ppr_negative_benefits_factors'])),
+    '#weight' => 2,
+  );
+  
+  $node->content['group7'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -16,
+  ); 
+  
+  $node->content['group7']['pprunderestimatedtasks'] = array(
+    '#prefix' => '<div class="pprunderestimatedtasks">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Underestimated tasks'), jiscpmattribute_value('ppr underestimated tasks', $node->pprs[0]['ppr_underestimated_tasks'])),
+    '#weight' => 2,
+  );
+  
+  $node->content['group8'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -16,
+  ); 
+  
+  $node->content['group8']['pprnegativetimefactors'] = array(
+    '#prefix' => '<div class="pprnegativetimefactors">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Negative time factors'), jiscpmattribute_value('ppr negative time factors', $node->pprs[0]['ppr_negative_time_factors'])),
+    '#weight' => 2,
+  );
+    
+  $node->content['group9'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -16,
+  ); 
+  
+  $node->content['group9']['pprunderestimatedcosts'] = array(
+    '#prefix' => '<div class="pprunderestimatedcosts">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Underestimated costs'), jiscpmattribute_value('ppr underestimated costs', $node->pprs[0]['ppr_underestimated_costs'])),
+    '#weight' => 2,
+  );
+  
+  $node->content['group10'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group10') : -16,
+  ); 
+  
+  $node->content['group10']['pproverestimatedcosts'] = array(
+    '#prefix' => '<div class="pproverestimatedcosts">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Overestimated costs'), jiscpmattribute_value('ppr overestimated costs', $node->pprs[0]['ppr_overestimated_costs'])),
+    '#weight' => 2,
+  );
+  
+  $node->content['group11'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group11') : -16,
+  ); 
+  
+  $node->content['group11']['pprnegativequalityfactors'] = array(
+    '#prefix' => '<div class="pprnegativequalityfactors">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Factors that led to a loss in quality of project outcomes'), jiscpmattribute_value('ppr negative quality factors', $node->pprs[0]['ppr_negative_quality_factors'])),
+    '#weight' => 2,
+  );
+  
+  $node->content['group12'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group12') : -16,
+  ); 
+  
+  $node->content['group12']['pprdeliveredoutputs'] = array(
+    '#prefix' => '<div class="pprdeliveredoutputs">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Delivered outputs'), jiscpmattribute_value('ppr delivered outputs', $node->pprs[0]['ppr_delivered_outputs'])),
+    '#weight' => 2,
+  );
+  $node->content['group13'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group13') : -16,
+  ); 
+  
+  $node->content['group13']['pprunexpectedoutcomes'] = array(
+    '#prefix' => '<div class="pprunexpectedoutcomes">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Unexpected outcomes'), jiscpmattribute_value('ppr unexpected outcomes', $node->pprs[0]['ppr_unexpected_outcomes'])),
+    '#weight' => 2,
+  );
+  $node->content['group14'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group14') : -16,
+  ); 
+  
+  $node->content['group14']['pprlessonslearned'] = array(
+    '#prefix' => '<div class="pprlessonslearned">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Lessons learned'), jiscpmattribute_value('ppr lessons learned', $node->pprs[0]['ppr_lessons_learned'])),
+    '#weight' => 2,
+  );
+  $node->content['group15'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group15') : -16,
+  ); 
+  
+  $node->content['group15']['pprrecommendationsforproject'] = array(
+    '#prefix' => '<div class="pprrecommendationsforproject">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Recommendations for project'), jiscpmattribute_value('ppr recommendations for project', $node->pprs[0]['ppr_recommendations_for_project'])),
+    '#weight' => 2,
+  );
+  $node->content['group16'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group16') : -16,
+  ); 
+  
+  $node->content['group16']['pprrecommendationsforfutureprojects'] = array(
+    '#prefix' => '<div class="pprrecommendationsforfutureprojects">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Recommendations for future projects'), jiscpmattribute_value('ppr recommendations for future projects', $node->pprs[0]['ppr_recommendations_for_future_projects'])),
+    '#weight' => 2,
+  );
+  $node->content['body_field'] = array(
+    '#prefix' => '<div class="jiscpmbody">',
+    '#suffix' => '</div>',
+    '#value' => theme('jiscpm_view_item', t('Description'), $node->content['body']['#value']),
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'body_field') : -18,
+  );
+  unset($node->content['body']);
+  
+  return $node;
+}

@@ -1,0 +1,26 @@
+/* $Id: $ */
+
+JISC PM module for Drupal 6.x
+
+INSTALLATION:
+
+1) Copy this 'jiscpm' directory into the /sites/all/modules directory of your Drupal installation.
+(Multisite installations may wish to use a different directory - see http://drupal.org/node/53705)
+
+2) Enable jiscpm (and whatever submodules of jiscpm that you wish), by visiting http://example.com/admin/build/modules. You will (almost) always need 'jiscpm', 'jiscpm Attribute' and 'jiscpm project'.
+
+
+CONFIGURATION:
+
+- Set up permissions: Initially, it is recommended that you allow full access for your administrative role, and allow more once you are familiar with the system.
+
+- There are a number of settings forms linked from http://example.com/admin/settings/jiscpm. After installation, you should visit these pages and 
+
+- jiscpm Attribute: This module gives additional settings for allowed field values, and values you can search for on the lists. In later versions of jiscpm, this may become part of the standard settings forms.
+
+
+DISABLING / UNINSTALL:
+
+1) Visit http://example.com/admin/build/modules in your web-browser and deselect the modules that you wish to disable. To uninstall, select the uninstall tab and follow the on screen instructions.
+
+2) Warnings may appear on disabling stating that nodes have not been deleted. This is because several of the jiscpm modules use the existing Drupal node system to store information. Therefore, on disabling the module, these nodes are not deleted. It is suggested that you may wish to delete these manually by visiting http://example.com/admin/content/node and filtering by the stated content type.

@@ -1,0 +1,10 @@
+; $Id: $
+
+name = JISC PM Team
+description = "Allows recording of teams made up of users in Drupal."
+core = 6.x
+package = JISC Project Management
+
+dependencies[] = jiscpm
+dependencies[] = jiscpmproject
+

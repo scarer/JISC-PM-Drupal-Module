@@ -1,0 +1,135 @@
+<?php
+// $Id:  $
+
+/**
+ * @file
+ */
+
+function jiscpmattribute_help($path, $arg) {
+  $output = '';
+
+  switch ($path) {
+    case "admin/help#jiscpmattribute":
+      $output = '<p>'.  t("Provides attributes support for jiscpm") .'</p>';
+      break;
+  }
+
+  return $output;
+}
+
+
+function jiscpmattribute_menu() {
+  
+  $items['jiscpm/dashboard/attributes'] = array(
+    'title' => 'Attributes',
+    'description' => 'jiscpm Attributes',
+    'page callback' => 'jiscpmattribute_list',
+    'access arguments' => array('jiscpm: access administration pages'),
+    'file' => 'jiscpmattribute.admin.inc',
+    'type' => MENU_NORMAL_ITEM);
+  
+  $items['jiscpm/attributes/add'] = array(
+    'title' => 'Add a new attribute',
+    'description' => 'jiscpm Attributes',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jiscpmattribute_add'),
+    'access arguments' => array('jiscpm: access administration pages'),
+    'file' => 'jiscpmattribute.admin.inc',
+    'type' => MENU_CALLBACK);
+  
+  $items['jiscpm/attributes/edit/%'] = array(
+    'title' => 'Edit an attribute',
+    'description' => 'jiscpm Attributes',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jiscpmattribute_edit', 3),
+    'access arguments' => array('jiscpm: access administration pages'),
+    'file' => 'jiscpmattribute.admin.inc',
+    'type' => MENU_CALLBACK);
+  
+  $items['jiscpm/attributes/delete/%'] = array(
+    'title' => 'Delete an attribute',
+    'description' => 'jiscpm Attributes',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jiscpmattribute_delete', 3),
+    'access arguments' => array('jiscpm: access administration pages'),
+    'file' => 'jiscpmattribute.admin.inc',
+    'type' => MENU_CALLBACK);
+  
+  $items['jiscpm/attributes/domain/autocomplete'] = array(
+    'title' => 'List of attributes',
+    'description' => 'jiscpm Attributes',
+    'page callback' => '_jiscpmattribute_domain_autocomplete',
+    'page arguments' => array(4),
+    'access arguments' => array('jiscpm: access administration pages'),
+    'file' => 'jiscpmattribute.admin.inc',
+    'type' => MENU_CALLBACK);
+  
+  return $items;
+}
+
+
+function jiscpmattribute_theme() {
+  return array(
+    'jiscpmattribute_list' => array(
+      'file'      => 'jiscpmattribute.theme.inc',
+      'arguments' => array('form'),
+    ),
+  );
+}
+
+
+function jiscpmattribute_access($op, $item=NULL, $account=NULL) {
+  if (empty($account)) {
+    global $user;
+    $account = $user;
+  }
+
+  if ($op == 'create') {
+    return user_access('jiscpm: access administration pages');
+  }
+
+  if ($op == 'delete') {
+    return user_access('jiscpm: access administration pages');
+  }
+
+  if ($op == 'update') {
+    return user_access('jiscpm: access administration pages');
+  }
+  
+  return FALSE;
+}
+
+
+function jiscpmattribute_attributes_bydomain($domain) {
+  static $attributes_cache = array();
+  $attributes = array();
+
+  if (array_key_exists($domain, $attributes_cache)) return $attributes_cache[$domain];
+
+  $s = "SELECT * FROM {jiscpmattribute} WHERE LOWER(domain) LIKE LOWER('%s') AND isactive=1 ORDER BY weight, avalue";
+  $r = db_query($s, $domain);
+  $attributes['values'] = array();
+  while ($attribute = db_fetch_object($r)) {
+    // The variable is deliberately passed through t() for translatability
+    $attributes['values'][$attribute->akey] = t($attribute->avalue);
+    if($attribute->isdefault) $attributes['default'] = $attribute->akey;
+  }
+  if(is_array($attributes['values']) && !array_key_exists('default', $attributes)) {
+    $v = array_flip($attributes['values']);
+    $attributes['default'] = array_shift($v);
+  }
+
+  $attributes_cache[$domain] = $attributes;
+  return $attributes;
+}
+
+
+function jiscpmattribute_value($domain, $key) {
+  $attributes_array = jiscpmattribute_attributes_bydomain($domain);
+  $attributes = $attributes_array['values'];
+  if (array_key_exists($key, $attributes)) {
+    return $attributes[$key];
+  }
+  
+  return $key;
+}

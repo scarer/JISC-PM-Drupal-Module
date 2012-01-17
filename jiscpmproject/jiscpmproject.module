@@ -1,0 +1,2621 @@
+<?php
+// $Id$
+/* TO DO:
+*/
+/**
+ * Implement hook_menu().
+ */
+function jiscpmproject_menu() {
+  $items = array();
+  $items['jiscpm/dashboard/projects'] = array(
+    'title' => 'Projects',
+    'description' => 'JISC PM Projects',
+    'page callback' => 'jiscpmproject_list',
+    'access arguments' => array('jiscpm project: access'),
+    'file' => 'jiscpmproject.admin.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+  $items['jiscpmproject_relationship/js/%'] = array(
+    'page callback' => 'jiscpmproject_relationship_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  $items['jiscpmproject_phase/js/%'] = array(
+    'page callback' => 'jiscpmproject_phase_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  $items['jiscpmproject_stakeholder/js/%'] = array(
+    'page callback' => 'jiscpmproject_stakeholder_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  $items['jiscpmproject_factor/js/%'] = array(
+    'page callback' => 'jiscpmproject_factor_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  $items['jiscpmproject_assumption/js/%'] = array(
+    'page callback' => 'jiscpmproject_assumption_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  $items['jiscpmproject_constraint/js/%'] = array(
+    'page callback' => 'jiscpmproject_constraint_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  $items['jiscpmproject_goal/js/%'] = array(
+    'page callback' => 'jiscpmproject_goal_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  $items['jiscpmproject_milestone/js/%'] = array(
+    'page callback' => 'jiscpmproject_milestone_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  return $items;
+}
+/**
+ * @function
+ * Implementation of hook_init
+ */
+function jiscpmproject_init() {
+  /*$settings = array(
+    'jiscpm' => array(
+      'organization_projects_url' => url('jiscpm/organization_projects_js/')
+    ),
+  );
+  drupal_add_js($settings, 'setting');*/
+
+  drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
+  drupal_add_js(drupal_get_path('module', 'jiscpmproject') .'/jiscpmproject.js', 'module', 'header', FALSE);
+}
+
+/**
+ * Implement hook_perm().
+ */
+function jiscpmproject_perm() {
+  return array('edit own jiscpmproject', 'edit jiscpmproject', 'create jiscpmproject');
+}
+
+
+/**
+ * Implement hook_access().
+ */
+function jiscpmproject_access($op, $node, $account = NULL) {
+  global $user;
+  if (empty($account)) {
+    $account = $user;
+  }
+
+  if ($op != 'create') {
+    $node = (object)$node;
+  }
+  if ($op == 'create') {
+    if (user_access('create jiscpmproject')) {
+      return TRUE;
+    }
+  }
+  elseif ($op == 'update' || $op == 'delete') {
+    if (user_access('edit jiscpmproject')) {
+      return TRUE;
+    }
+    elseif (user_access('edit own jiscpmproject') && $account->uid == $node->uid) {
+      return TRUE;
+    }
+  }
+}
+function jiscpmproject_content_extra_fields($type_name) {
+  if ($type_name == 'jiscpmproject') {
+    return array(
+      'group1' => array('label' => 'Title', 'weight' => -20),
+      'group2' => array('label' => 'Introduction', 'weight' => -19),
+      'group3' => array('label' => 'Relationships', 'weight' => -18),
+      'group4' => array('label' => 'Phases', 'weight' => -17),
+      'group5' => array('label' => 'Stakeholders', 'weight' => -16),
+      'group6' => array('label' => 'Factors', 'weight' => -15),
+      'group7' => array('label' => 'Assumptions', 'weight' => -14),
+      'group8' => array('label' => 'Constraints', 'weight' => -13),
+      'group9' => array('label' => 'Goals', 'weight' => -12),
+      'group10' => array('label' => 'Project Category', 'weight' => -11),
+      'group11' => array('label' => 'Project Status', 'weight' => -10),
+      'group12' => array('label' => 'Project Priority', 'weight' => -9),
+      'group13' => array('label' => 'Date Begin', 'weight' => -8),
+      'group14' => array('label' => 'Date End', 'weight' => -7),
+      'group15' => array('label' => 'Project Manager', 'weight' => -6),
+      'group16' => array('label' => 'Client', 'weight' => -5),
+      'group17' => array('label' => 'Scope', 'weight' => -4),
+
+    );
+  }
+}
+
+/**
+ * Implement hook_insert().
+ */
+function jiscpmproject_insert($node) {
+  _jiscpmproject_beforesave($node);
+  //insert the project relationships
+  //check to see if data is valid
+  //TO DO: Insert reverse relationship reference and update relationship reference
+  if ($node->relationships != NULL || $node->relationships != 0 || $node->relationships != '')
+  {
+	foreach ($node->relationships as $relationship) 
+	{
+		db_query("INSERT INTO {jiscpmproject_relationship} (project_nid, relationship_nid, relationship_description) VALUES(%d, %s, '%s')", $node->nid, $relationship['relationship_nid'], $relationship['relationship_description']);
+	    //insert reverse relationship reference
+	    //db_query("INSERT INTO {jiscpmproject_relationship} (project_nid, relationship_nid, relationship_description) VALUES(%s, %d, '%s')", $relationship['relationship_nid'], $node->nid, $relationship['relationship_description']);
+	}
+  }
+  if ($node->phases != NULL || $node->phases != 0 || $node->phases != '')
+  {
+	foreach ($node->phases as $phase) {
+		$checkstring1 = explode(' ', $phase['phase_datebegin']);
+	    //drupal_set_message($checkstring);
+	    if ($checkstring1[1] == NULL || $checkstring1[1] == '')
+	    {
+	    
+	    }
+	    else
+	    {
+		  $phase['phase_datebegin'] = strtotime($phase['phase_datebegin']);
+		}
+		$checkstring2 = explode(' ', $phase['phase_dateend']);
+	    //drupal_set_message($checkstring);
+	    if ($checkstring1[1] == NULL || $checkstring1[1] == '')
+	    {
+	    
+	    }
+	    else
+	    {
+		  $phase['phase_dateend'] = strtotime($phase['phase_dateend']);
+		}
+		db_query("INSERT INTO {jiscpmproject_phase} (project_nid, phase_title, phase_scope, phase_datebegin, phase_dateend) VALUES(%d, '%s', '%s',%s, %s)", $node->nid, $phase['phase_title'], $phase['phase_scope'] , $phase['phase_datebegin'], $phase['phase_dateend']);
+	}
+  }
+  if ($node->stakeholders != NULL || $node->stakeholders != 0 || $node->stakeholders != '')
+  {
+	foreach ($node->stakeholders as $stakeholder) {
+		db_query("INSERT INTO {jiscpmproject_stakeholder} (stakeholder_uid, project_nid, stakeholder_stake_in_project, stakeholder_management_strategy, stakeholder_potential_impact, 
+		stakeholder_expectations, stakeholder_attitudes_risks) 
+		VALUES(%s, %d, '%s', '%s', '%s', '%s', '%s')", $stakeholder['stakeholder_uid'], $node->nid, $stakeholder['stakeholder_stake_in_project'], $stakeholder['stakeholder_management_strategy'] , 
+		$stakeholder['stakeholder_potential_impact'], $stakeholder['stakeholder_expectations'], $stakeholder['stakeholder_attitudes_risks']);
+	}
+  }
+  //insert values for critical success factors
+  if ($node->factors != NULL || $node->factors != 0 || $node->factors != '')
+	{
+	foreach ($node->factors as $factor) {
+		db_query("INSERT INTO {jiscpmproject_factor} (project_nid, factor_title, factor_description) VALUES(%d, '%s', '%s')", $node->nid, $factor['factor_title'], $factor['factor_description']);
+	}
+  }
+  //insert values for project assumptions
+  if ($node->assumptions != NULL || $node->assumptions != 0 || $node->assumptions != '')
+  {
+	foreach ($node->assumptions as $assumption) {
+		db_query("INSERT INTO {jiscpmproject_assumption} (project_nid, assumption_title, assumption_description) VALUES(%d, '%s', '%s')", $node->nid, $assumption['assumption_title'], $assumption['assumption_description']);
+	}
+  }
+  //insert values for project constraints
+  if ($node->constraints != NULL || $node->constraints != 0 || $node->constraints != '')
+  {
+	foreach ($node->constraints as $constraint) {
+		db_query("INSERT INTO {jiscpmproject_constraint} (project_nid, constraint_title, constraint_description) VALUES(%d, '%s', '%s')", $node->nid, $constraint['constraint_title'], $constraint['constraint_description']);
+	}
+  }
+  //insert values for project goals
+  if ($node->goals != NULL || $node->goals != 0 || $node->goals != '')
+  {
+	foreach ($node->goals as $goal) {
+		db_query("INSERT INTO {jiscpmproject_goal} (project_nid, goal_title, goal_objectives) VALUES(%d, '%s', '%s')", $node->nid, $goal['goal_title'], $goal['goal_objectives']);
+	}
+  }
+  if ($node->milestones != NULL || $node->milestones != 0 || $node->milestones != '')
+  {
+	foreach ($node->milestones as $milestone) {
+	    $checkstring = explode(' ', $milestone['milestone_deliverydate']);
+	    //drupal_set_message($checkstring);
+	    if ($checkstring[1] == NULL || $checkstring[1] == '')
+	    {
+	    
+	    }
+	    else
+	    {
+		  $milestone['milestone_deliverydate'] = strtotime($milestone['milestone_deliverydate']);
+		}
+		db_query("INSERT INTO {jiscpmproject_milestone} (project_nid, milestone_title, milestone_deliverydate) VALUES(%d, '%s', %s)", $node->nid, $milestone['milestone_title'], $milestone['milestone_deliverydate']);
+	}
+  }
+  //insert the jiscpmproject node
+  db_query("INSERT INTO {jiscpmproject} (nid, vid, project_manager_uid, client_uid, projectstatus, projectcategory, projectpriority, datebegin, dateend, organisational_scope, logical_scope, out_of_scope) 
+  VALUES(%d, %d, %s, %s, '%s', '%s', '%s', %s, %s, '%s', '%s', '%s')", 
+  $node->nid, $node->vid, $node->project_manager_uid, $node->client_uid, $node->projectstatus, $node->projectcategory, $node->projectpriority, $node->datebegin, $node->dateend, $node->organisational_scope, $node->logical_scope, $node->out_of_scope);
+}
+
+/**
+ * Updates the relationship listing.
+ */
+function jiscpmproject_update($node) {
+  if ($node->revision) {
+    jiscpmproject_insert($node);
+  }
+  else {
+    db_query("DELETE FROM {jiscpmproject} WHERE nid = %d AND vid = %d", $node->nid, $node->vid);
+    db_query('DELETE FROM {jiscpmproject_relationship} WHERE project_nid = %d', $node->nid);
+    db_query("DELETE FROM {jiscpmproject_phase} WHERE project_nid = %d", $node->nid);
+    db_query("DELETE FROM {jiscpmproject_stakeholder} WHERE project_nid = %d", $node->nid);
+    db_query('DELETE FROM {jiscpmproject_factor} WHERE project_nid = %d', $node->nid);
+    db_query('DELETE FROM {jiscpmproject_constraint} WHERE project_nid = %d', $node->nid);
+    db_query('DELETE FROM {jiscpmproject_goal} WHERE project_nid = %d', $node->nid);
+    db_query('DELETE FROM {jiscpmproject_assumption} WHERE project_nid = %d', $node->nid);
+    db_query('DELETE FROM {jiscpmproject_milestone} WHERE project_nid = %d', $node->nid);
+    jiscpmproject_insert($node);
+  }
+}
+
+/**
+ * Deletes an jiscpmproject node from the database.
+ */
+function jiscpmproject_delete(&$node) {
+  db_query("DELETE FROM {jiscpmproject} WHERE nid = %d", $node->nid);
+  db_query("DELETE FROM {jiscpmproject_relationship} WHERE project_nid = %d", $node->nid);
+  db_query("DELETE FROM {jiscpmproject_phase} WHERE project_nid = %d", $node->nid);
+  db_query("DELETE FROM {jiscpmproject_stakeholder} WHERE project_nid = %d", $node->nid);
+  db_query('DELETE FROM {jiscpmproject_factor} WHERE project_nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmproject_constraint} WHERE project_nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmproject_goal} WHERE project_nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmproject_assumption} WHERE project_nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmproject_milestone} WHERE project_nid = %d', $node->nid);
+}
+
+/* function that's called before the node is saved */
+function _jiscpmproject_beforesave(&$node) {
+      $node->datebegin = strtotime($node->datebegin);
+      $node->dateend = strtotime($node->dateend);
+}
+
+/**
+ * Implement hook_load().
+ */
+function jiscpmproject_load($node) {
+  $result_jr = db_query('SELECT relationship_id, relationship_nid, relationship_description FROM {jiscpmproject_relationship} WHERE project_nid = %d', $node->nid);
+  $node->relationships = array();
+  while ($row_jr = db_fetch_object($result_jr)) {
+    $relationship = array(
+      'relationship_id' => $row_jr->relationship_id,
+      'relationship_nid' => $row_jr->relationship_nid,
+      'relationship_description' => $row_jr->relationship_description,
+    );
+   
+    $node->relationships[] = $relationship;
+  }
+  $result_two = db_query('SELECT jp.phase_title, jp.phase_scope, jp.phase_datebegin, jp.phase_dateend FROM {jiscpmproject_phase} jp WHERE jp.project_nid = %d ORDER BY jp.phase_dateend ASC', $node->nid);
+  $node->phases = array();
+  while ($row_two = db_fetch_object($result_two)) {
+   $phase = array(
+      'phase_title' => $row_two->phase_title,
+      'phase_scope' => $row_two->phase_scope,
+      'phase_datebegin'=> $row_two->phase_datebegin,
+      'phase_dateend' => $row_two->phase_dateend,
+    );
+    $node->phases[] = $phase;
+  }
+  $results = db_query('SELECT js.stakeholder_uid, js.stakeholder_stake_in_project, js.stakeholder_management_strategy, js.stakeholder_potential_impact, js.stakeholder_expectations, js.stakeholder_attitudes_risks FROM {jiscpmproject_stakeholder} js WHERE js.project_nid = %d', $node->nid);
+  $node->stakeholders = array();
+  while ($rows = db_fetch_object($results)) {
+   $stakeholder = array(
+      'stakeholder_uid' => $rows->stakeholder_uid,
+      'stakeholder_stake_in_project' => $rows->stakeholder_stake_in_project,
+      'stakeholder_management_strategy' => $rows->stakeholder_management_strategy,
+      'stakeholder_potential_impact' => $rows->stakeholder_potential_impact,
+      'stakeholder_expectations' => $rows->stakeholder_expectations,
+      'stakeholder_attitudes_risks' => $rows->stakeholder_attitudes_risks,
+    );
+    $node->stakeholders[] = $stakeholder;
+  }
+  $result_jpf = db_query('SELECT jpf.factor_title, jpf.factor_description FROM {jiscpmproject_factor} jpf WHERE jpf.project_nid = %d', $node->nid);
+  $node->factors = array();
+  while ($row_jpf = db_fetch_object($result_jpf)) {
+    $factor = array(
+      'factor_title' => $row_jpf->factor_title,
+      'factor_description' => $row_jpf->factor_description,
+    );
+   
+    $node->factors[] = $factor;
+  }
+  $result_ja = db_query('SELECT ja.assumption_title, ja.assumption_description FROM {jiscpmproject_assumption} ja WHERE ja.project_nid = %d', $node->nid);
+  $node->assumptions = array();
+  while ($row_ja = db_fetch_object($result_ja)) {
+    $assumption = array(
+      'assumption_title' => $row_ja->assumption_title,
+      'assumption_description' => $row_ja->assumption_description,
+    );
+   
+    $node->assumptions[] = $assumption;
+  }
+  $result_jc = db_query('SELECT jc.constraint_title, jc.constraint_description FROM {jiscpmproject_constraint} jc WHERE jc.project_nid = %d', $node->nid);
+  $node->constraints = array();
+  while ($row_jc = db_fetch_object($result_jc)) {
+    $constraint = array(
+      'constraint_title' => $row_jc->constraint_title,
+      'constraint_description' => $row_jc->constraint_description,
+    );
+   
+    $node->constraints[] = $constraint;
+  }
+  $result_jg = db_query('SELECT jg.goal_title, jg.goal_objectives FROM {jiscpmproject_goal} jg WHERE jg.project_nid = %d', $node->nid);
+  $node->goals = array();
+  while ($row_jg = db_fetch_object($result_jg)) {
+    $goal = array(
+      'goal_title' => $row_jg->goal_title,
+      'goal_objectives' => $row_jg->goal_objectives,
+    );
+   
+    $node->goals[] = $goal;
+  }
+  $result_jm = db_query('SELECT milestone_title, milestone_deliverydate FROM {jiscpmproject_milestone} WHERE project_nid = %d ORDER BY milestone_deliverydate ASC', $node->nid);
+  $node->milestones = array();
+  while ($row_jm = db_fetch_object($result_jm)) {
+    $milestone = array(
+      'milestone_title' => $row_jm->milestone_title,
+      'milestone_deliverydate' => $row_jm->milestone_deliverydate,
+    );
+   
+    $node->milestones[] = $milestone;
+  }
+  $result_pro = db_query('SELECT project_manager_uid, client_uid, projectstatus, projectcategory, projectpriority, datebegin, dateend, organisational_scope, logical_scope, out_of_scope FROM {jiscpmproject} WHERE vid = %d', $node->vid);
+  $node->jiscpmprojects = array();
+  while ($row_pro = db_fetch_object($result_pro)) {
+    $jiscpmproject = array(
+      'project_manager_uid' => $row_pro->project_manager_uid,
+      'client_uid' => $row_pro->client_uid,
+      'projectstatus' => $row_pro->projectstatus,
+      'projectcategory' => $row_pro->projectcategory,
+      'projectpriority' => $row_pro->projectpriority,
+      'datebegin' => $row_pro->datebegin,
+      'dateend' => $row_pro->dateend,
+      'organisational_scope' => $row_pro->organisational_scope,
+      'logical_scope' => $row_pro->logical_scope,
+      'out_of_scope' => $row_pro->out_of_scope,
+    );
+   
+    $node->jiscpmprojects[] = $jiscpmproject;
+  }
+  $result_t = db_query('SELECT n.title, n.nid, t.team_description FROM {node} n JOIN {jiscpmteam} t 
+  ON n.nid = t.vid WHERE t.project_nid = %d', $node->nid);
+  $node->teams = array();
+  while ($row_t = db_fetch_object($result_t)) {
+    $team = array(
+      'team_title' => $row_t->title,
+      'team_nid' => $row_t->nid,
+      'team_description' => $row_t->team_description,
+    );
+   
+    $node->teams[] = $team;
+  }
+  return $node;
+}
+
+/**
+ * Implement hook_nodeapi().
+ */
+function jiscpmproject_nodeapi(&$node, $op, $teaser, $page) {
+  switch ($op) {
+    case 'prepare':
+      if(!$node->nid) {
+        $status_list = jiscpmattribute_attributes_bydomain('Project status');
+        $node->projectstatus = $status_list['default'];
+        $priority_list = jiscpmattribute_attributes_bydomain('Project priority');
+        $node->projectpriority = $priority_list['default'];
+
+      }
+      break;
+    case 'delete revision':
+      db_query('DELETE FROM {jiscpmproject} WHERE nid = %d AND vid = %d', $node->nid, $node->vid);
+      db_query('DELETE FROM {jiscpmproject_relationship} WHERE project_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmproject_phase} WHERE project_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmproject_stakeholder} WHERE project_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmproject_factor} WHERE project_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmproject_constraint} WHERE project_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmproject_milestone} WHERE project_nid = %d', $node->nid);
+      break;
+  }
+}
+
+/**
+ * Implement hook_view().
+ */
+function jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
+  $node = node_prepare($node, $teaser);
+  $content = $node->content['body']['#value'];
+    $breadcrumb = array();
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('Projects'), 'jiscpm/dashboard/projects');
+  drupal_set_breadcrumb($breadcrumb);
+  // @TODO: render and theme relationship listing.
+  return theme('jiscpmproject_view', $node, $teaser, $page);
+}
+function jiscpmproject_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'jiscpmproject'),
+  );
+}
+
+
+
+/**
+ * Implement hook_node_info().
+ */
+function jiscpmproject_node_info() {
+  return array(
+    'jiscpmproject' => array(
+      'name' => t('JISCPM Project'),
+      'module' => 'jiscpmproject',
+      'description' => t('Create a JISC PM project.'),
+      'title_label' => t('JISC PM project name'),
+      'body_label' => t('Description'),
+    ),
+  );
+}
+
+/**
+ * Implement hook_form().
+ */
+function jiscpmproject_form(&$node, $form_state) {
+  $type = node_get_types('type', $node);
+  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';
+
+  /* get all users from the database for referencing */
+  $r = db_query("SELECT u.uid, u.name FROM {users} u ORDER BY u.name");
+  $people = array();
+  $people[-1] = '--SELECT A PERSON--';
+  while ($person = db_fetch_object($r)) {
+    $people[$person->uid] = check_plain($person->name);
+  }
+  $form['group1'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
+  );
+  // Title.
+  $form['group1']['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Project name'),
+    '#default_value' => check_plain($node->title),
+    '#required' => TRUE,
+  );
+  $form['group2'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -19,
+  );
+  // Body field.
+  $form['group2']['body_field'] = node_body_field($node, 'Introduction', $type->min_word_count);
+
+  /* adds functionality for adding project relationships */
+  $projects = array();
+  $results = db_query("SELECT n.title, n.nid FROM {node} n WHERE n.type = 'jiscpmproject'");
+  while ($row = db_fetch_object($results))
+  {
+  	$projects[$row->nid] = check_plain($row->title);
+  }
+  
+  $form['relationship_wrapper'] = array(
+	'#tree' => FALSE,
+	'#weight' => 5,
+	'#prefix' => '<h2>Related Projects</h2><div class="clear-block" id="jiscpmproject-relationship-wrapper">',
+	'#suffix' => '</div>',
+
+	);
+
+	// Get number of relationships.
+	$relationship_count = empty($node->relationships) ? 0 : count($node->relationships);
+
+	// If a new relationship added, add to list and update the relationship count.
+	if (isset($form_state['new_relationship'])) {
+	if (!isset($node->relationships)) {
+		$node->relationships = array();
+	}
+	$node->relationships = array_merge($node->relationships, array($form_state['new_relationship']));
+	$relationship_count++;
+	}
+
+	// If a relationship removed, remove from list and update the relationship count.
+	$remove_delta = -1;
+	if (!empty($form_state['remove_delta'])) {
+	$remove_delta = $form_state['remove_delta'] - 1;
+	unset($node->relationships[$remove_delta]);
+	// Re-number the values.
+	$node->relationships = array_values($node->relationships);
+	$relationship_count--;
+	}
+
+	// Container to display existing relationships.
+	$form['relationship_wrapper']['relationships'] = array(
+	'#prefix' => '<div id="jiscpmproject-relationships">',
+	'#suffix' => '</div>',
+	'#theme' => 'jiscpmproject_relationship_table',
+	);
+
+	// Add the existing relationships to the form.
+	for ($delta = 0; $delta < $relationship_count; $delta++) {
+	$relationship_nid = isset($node->relationships[$delta]['relationship_nid']) ? $node->relationships[$delta]['relationship_nid'] : '';
+	$relationship_description = isset($node->relationships[$delta]['relationship_description']) ? $node->relationships[$delta]['relationship_description'] : '';
+	// Display existing relationships using helper function jiscpmproject_relationship_display_form().
+	$form['relationship_wrapper']['relationships'][$delta] = jiscpmproject_relationship_display_form($delta, $relationship_nid, $relationship_description);
+	}
+
+
+	// Add new relationships
+	$form['relationship_wrapper']['add_relationship'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Add another relationship'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+	'#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Define the form fields for the new relationship title and relationship_description's name.
+	$form['relationship_wrapper']['add_relationship']['new_relationship'] = array(
+	'#tree' => TRUE,
+	'#theme' => 'jiscpmproject_add_relationship_form',
+	);
+	$form['relationship_wrapper']['add_relationship']['new_relationship']['new_relationship_nid'] = array(
+	'#type' => 'select',
+	'#title' => t('Project that is related'),
+	'#options' => $projects,
+	'#weight' => 0,
+	);
+	$form['relationship_wrapper']['add_relationship']['new_relationship']['new_relationship_description'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Relationship description'),
+	'#weight' => 1,
+	);
+
+	// We name our button 'jiscpmproject_relationship_more' to avoid conflicts with other modules using
+	// AHAH-enabled buttons with the id 'more'.
+	$form['relationship_wrapper']['add_relationship']['jiscpmproject_relationship_more'] = array(
+	'#type' => 'submit',
+	'#value' => t('Add relationship'),
+	'#weight' => 1,
+	'#submit' => array('jiscpmproject_relationship_add_more_submit'),
+	'#ahah' => array(
+		'path' => 'jiscpmproject_relationship/js/0',
+		'wrapper' => 'jiscpmproject-relationships',
+		'method' => 'replace',
+		'effect' => 'fade',
+	),
+	);
+  
+  /* ajax functionality for project phases */
+   $form['phase_wrapper'] = array(
+    '#tree' => FALSE,
+    '#weight' => 13,
+    '#prefix' => '<h2>Project Phases</h2><div class="clear-block" id="jiscpmproject-phase-wrapper">',
+    '#suffix' => '</div>',
+  );
+
+  // Get number of phases.
+  $phase_count = empty($node->phases) ? 0 : count($node->phases);
+
+  // If a new phase added, add to list and update the phase count.
+  if (isset($form_state['new_phase'])) {
+    if (!isset($node->phases)) {
+      $node->phases = array();
+    }
+    $node->phases = array_merge($node->phases, array($form_state['new_phase']));
+    $phase_count++;
+  }
+
+  // If a phase removed, remove from list and update the phase count.
+  $remove_delta = -1;
+  if (!empty($form_state['remove_delta'])) {
+    $remove_delta = $form_state['remove_delta'] - 1;
+    unset($node->phases[$remove_delta]);
+    // Re-number the values.
+    $node->phases = array_values($node->phases);
+    $phase_count--;
+  }
+
+  // Container to display existing phases.
+  $form['phase_wrapper']['phases'] = array(
+    '#prefix' => '<div id="jiscpmproject-phases">',
+    '#suffix' => '</div>',
+    '#theme' => 'jiscpmproject_phase_table',
+  );
+
+  // Add the existing phases to the form.
+  for ($delta = 0; $delta < $phase_count; $delta++) {
+    $phase_title = isset($node->phases[$delta]['phase_title']) ? $node->phases[$delta]['phase_title'] : '';
+    $phase_scope = isset($node->phases[$delta]['phase_scope']) ? $node->phases[$delta]['phase_scope'] : '';
+    $phase_datebegin = isset($node->phases[$delta]['phase_datebegin']) ? $node->phases[$delta]['phase_datebegin'] : '';
+    $phase_dateend = isset($node->phases[$delta]['phase_dateend']) ? $node->phases[$delta]['phase_dateend'] : '';
+    // Display existing phases using helper function jiscpmproject_phase_display_form().
+    $form['phase_wrapper']['phases'][$delta] = jiscpmproject_phase_display_form($delta, $phase_title, $phase_scope, $phase_datebegin, $phase_dateend);
+  }
+
+
+  // Add new phases
+  $form['phase_wrapper']['add_phase'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add another phase'),
+    '#tree' => FALSE,
+    '#weight' => -16,
+    '#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+  );
+
+  // Define the form fields for the new phase title and phase_scope's name.
+  $form['phase_wrapper']['add_phase']['new_phase'] = array(
+    '#tree' => TRUE,
+    '#theme' => 'jiscpmproject_add_phase_form',
+  );
+  $form['phase_wrapper']['add_phase']['new_phase']['new_phase_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Phase title'),
+    '#weight' => 0,
+  );
+  $form['phase_wrapper']['add_phase']['new_phase']['new_phase_scope'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Phase Scope'),
+    '#weight' => 1,
+  );
+  //drupal_set_message('arg 0 = ' . arg(0));
+  //drupal_set_message('arg 1 = ' . arg(1));
+    /* project date start */
+  if (arg(0) == 'node' && arg(1) == 'add')
+  {
+    if (module_exists('date_api') && module_exists('date_popup')) {
+    $form['phase_wrapper']['add_phase']['new_phase']['new_phase_datebegin'] = array(
+      '#type' => 'date_popup',
+      '#title' => t('Date begin'),
+      '#date_format' =>  'Y-m-d',
+      '#default_value' => date('Y-m-d'),
+    );
+  }
+  }
+  else
+  {
+  if (module_exists('date_api') && module_exists('date_popup')) {
+    $form['phase_wrapper']['add_phase']['new_phase']['new_phase_datebegin'] = array(
+      '#type' => 'date_popup',
+      '#title' => t('Date begin'),
+      '#date_format' =>  'Y-m-d',
+      '#default_value' => date('Y-m-d'),
+    );
+  }
+  }
+  if (arg(0) == 'node' && arg(1) == 'add')
+  {
+    if (module_exists('date_api') && module_exists('date_popup')) {
+    $form['phase_wrapper']['add_phase']['new_phase']['new_phase_dateend'] = array(
+      '#type' => 'date_popup',
+      '#title' => t('Date end'),
+      '#date_format' =>  'Y-m-d',
+      '#default_value' => date('Y-m-d'),
+    );
+  }
+  }
+  else
+  {
+ /* project date end */
+  if (module_exists('date_api') && module_exists('date_popup')) {
+    $form['phase_wrapper']['add_phase']['new_phase']['new_phase_dateend'] = array(
+      '#type' => 'date_popup',
+      '#title' => t('Date end'),
+      '#date_format' =>  'Y-m-d',
+      '#default_value' => date('Y-m-d'),
+    );
+  }
+  }
+  // We name our button 'jiscpmproject_phase_more' to avoid conflicts with other modules using
+  // AHAH-enabled buttons with the id 'more'.
+  $form['phase_wrapper']['add_phase']['jiscpmproject_phase_more'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add phase'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_phase_add_more_submit'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_phase/js/0',
+      'wrapper' => 'jiscpmproject-phases',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  
+  /* end ajax functionality for project phases */
+  /* ajax functionality for stakeholders */
+  $form['stakeholder_wrapper'] = array(
+	'#tree' => FALSE,
+	'#weight' => 10,
+	'#prefix' => '<h2>Project Stakeholders</h2><div class="clear-block" id="jiscpmproject-stakeholder-wrapper">',
+	'#suffix' => '</div>',
+	);
+
+	// Get number of stakeholders.
+	$stakeholder_count = empty($node->stakeholders) ? 0 : count($node->stakeholders);
+
+	// If a new stakeholder added, add to list and update the stakeholder count.
+	if (isset($form_state['new_stakeholder'])) {
+	if (!isset($node->stakeholders)) {
+		$node->stakeholders = array();
+	}
+	$node->stakeholders = array_merge($node->stakeholders, array($form_state['new_stakeholder']));
+	$stakeholder_count++;
+	}
+
+	// If a stakeholder removed, remove from list and update the stakeholder count.
+	$remove_delta = -1;
+	if (!empty($form_state['remove_delta'])) {
+	$remove_delta = $form_state['remove_delta'] - 1;
+	unset($node->stakeholders[$remove_delta]);
+	// Re-number the values.
+	$node->stakeholders = array_values($node->stakeholders);
+	$stakeholder_count--;
+	}
+
+	// Container to display existing stakeholders.
+	$form['stakeholder_wrapper']['stakeholders'] = array(
+	'#prefix' => '<div id="jiscpmproject-stakeholders">',
+	'#suffix' => '</div>',
+	'#theme' => 'jiscpmproject_stakeholder_table',
+	);
+
+	// Add the existing stakeholders to the form.
+	for ($delta = 0; $delta < $stakeholder_count; $delta++) {
+	$stakeholder_uid = isset($node->stakeholders[$delta]['stakeholder_uid']) ? $node->stakeholders[$delta]['stakeholder_uid'] : '';
+	$stakeholder_stake_in_project = isset($node->stakeholders[$delta]['stakeholder_stake_in_project']) ? $node->stakeholders[$delta]['stakeholder_stake_in_project'] : '';
+	$stakeholder_management_strategy = isset($node->stakeholders[$delta]['stakeholder_management_strategy']) ? $node->stakeholders[$delta]['stakeholder_management_strategy'] : '';
+	$stakeholder_potential_impact = isset($node->stakeholders[$delta]['stakeholder_potential_impact']) ? $node->stakeholders[$delta]['stakeholder_potential_impact'] : '';
+	$stakeholder_expectations = isset($node->stakeholders[$delta]['stakeholder_expectations']) ? $node->stakeholders[$delta]['stakeholder_expectations'] : '';
+	$stakeholder_attitudes_risks = isset($node->stakeholders[$delta]['stakeholder_attitudes_risks']) ? $node->stakeholders[$delta]['stakeholder_attitudes_risks'] : '';
+	// Display existing stakeholders using helper function jiscpmproject_stakeholder_display_form().
+	$form['stakeholder_wrapper']['stakeholders'][$delta] = jiscpmproject_stakeholder_display_form($delta, $stakeholder_uid, $stakeholder_stake_in_project, $stakeholder_management_strategy,
+	$stakeholder_potential_impact, $stakeholder_expectations, $stakeholder_attitudes_risks);
+	}
+
+
+	// Add new stakeholders
+	$form['stakeholder_wrapper']['add_stakeholder'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Add another stakeholder'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+    '#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Define the form fields for the new stakeholder title and stakeholder_stake_in_project's name.
+	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder'] = array(
+	'#tree' => TRUE,
+	'#theme' => 'jiscpmproject_add_stakeholder_form',
+	);
+	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_uid'] = array(
+	'#type' => 'select',
+	'#title' => t('Stakeholder'),
+	'#options' => $people,
+	'#weight' => 0,
+	);
+	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_stake_in_project'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Stake in project'),
+	'#weight' => 1,
+	);
+    $form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_management_strategy'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Management strategy'),
+	'#weight' => 2,
+	);
+	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_potential_impact'] = array(
+	'#type' => 'select',
+	'#title' => t('Potential impact'),
+	'#options' => array(
+	 'Very Low' => t('Very low'),
+     'Low' => t('Low'),
+     'Low - Medium' => t('Low - Medium'),
+     'Medium' => t('Medium'),
+     'Medium - High' => t('Medium - High'),
+     'High' => t('High'),
+     'Very High' => t('Very High'),
+	),
+	'#weight' => 3,
+	);
+	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_expectations'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Expectations'),
+	'#weight' => 4,
+	);
+    $form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_attitudes_risks'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Perceived attitudes and/or risks'),
+	'#weight' => 1,
+	);
+
+	// We name our button 'jiscpmproject_stakeholder_more' to avoid conflicts with other modules using
+	// AHAH-enabled buttons with the id 'more'.
+	$form['stakeholder_wrapper']['add_stakeholder']['jiscpmproject_stakeholder_more'] = array(
+	'#type' => 'submit',
+	'#value' => t('Add stakeholder'),
+	'#weight' => 1,
+	'#submit' => array('jiscpmproject_stakeholder_add_more_submit'),
+	'#ahah' => array(
+		'path' => 'jiscpmproject_stakeholder/js/0',
+		'wrapper' => 'jiscpmproject-stakeholders',
+		'method' => 'replace',
+		'effect' => 'fade',
+	),
+	);
+  /* end ajax functionality for stakeholders /
+  
+  /* ajax functionality for critical success factors */
+  $form['factor_wrapper'] = array(
+	'#tree' => FALSE,
+	'#weight' => 3,
+	'#prefix' => '<h2>Critical Success Factors</h2><div class="clear-block" id="jiscpmproject-factor-wrapper">',
+	'#suffix' => '</div>',
+	);
+
+	// Get number of factors.
+	$factor_count = empty($node->factors) ? 0 : count($node->factors);
+
+	// If a new factor added, add to list and update the factor count.
+	if (isset($form_state['new_factor'])) {
+	if (!isset($node->factors)) {
+		$node->factors = array();
+	}
+	$node->factors = array_merge($node->factors, array($form_state['new_factor']));
+	$factor_count++;
+	}
+
+	// If a factor removed, remove from list and update the factor count.
+	$remove_delta = -1;
+	if (!empty($form_state['remove_delta'])) {
+	$remove_delta = $form_state['remove_delta'] - 1;
+	unset($node->factors[$remove_delta]);
+	// Re-number the values.
+	$node->factors = array_values($node->factors);
+	$factor_count--;
+	}
+
+	// Container to display existing factors.
+	$form['factor_wrapper']['factors'] = array(
+	'#prefix' => '<div id="jiscpmproject-factors">',
+	'#suffix' => '</div>',
+	'#theme' => 'jiscpmproject_factor_table',
+	);
+
+	// Add the existing factors to the form.
+	for ($delta = 0; $delta < $factor_count; $delta++) {
+	$factor_title = isset($node->factors[$delta]['factor_title']) ? $node->factors[$delta]['factor_title'] : '';
+	$factor_description = isset($node->factors[$delta]['factor_description']) ? $node->factors[$delta]['factor_description'] : '';
+	// Display existing factors using helper function jiscpmproject_factor_display_form().
+	$form['factor_wrapper']['factors'][$delta] = jiscpmproject_factor_display_form($delta, $factor_title, $factor_description);
+	}
+	// Add new factors
+	$form['factor_wrapper']['add_factor'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Add another factor'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+	'#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Define the form fields for the new factor title and factor_description's name.
+	$form['factor_wrapper']['add_factor']['new_factor'] = array(
+	'#tree' => TRUE,
+	'#theme' => 'jiscpmproject_add_factor_form',
+	);
+	$form['factor_wrapper']['add_factor']['new_factor']['new_factor_title'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Critical success factor title'),
+	'#weight' => 0,
+	);
+	$form['factor_wrapper']['add_factor']['new_factor']['new_factor_description'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Critical success factor description'),
+	'#weight' => 1,
+	);
+
+	// We name our button 'jiscpmproject_factor_more' to avoid conflicts with other modules using
+	// AHAH-enabled buttons with the id 'more'.
+	$form['factor_wrapper']['add_factor']['jiscpmproject_factor_more'] = array(
+	'#type' => 'submit',
+	'#value' => t('Add factor'),
+	'#weight' => 1,
+	'#submit' => array('jiscpmproject_factor_add_more_submit'),
+	'#ahah' => array(
+		'path' => 'jiscpmproject_factor/js/0',
+		'wrapper' => 'jiscpmproject-factors',
+		'method' => 'replace',
+		'effect' => 'fade',
+	),
+	);
+  /* end ajax functionality for critical success factors */
+  /* ajax functionality for project assumptions */
+  $form['assumption_wrapper'] = array(
+	'#tree' => FALSE,
+	'#weight' => 8,
+	'#prefix' => '<h2>Project Assumptions</h2><div class="clear-block" id="jiscpmproject-assumption-wrapper">',
+	'#suffix' => '</div>',
+	'#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Get number of assumptions.
+	$assumption_count = empty($node->assumptions) ? 0 : count($node->assumptions);
+
+	// If a new assumption added, add to list and update the assumption count.
+	if (isset($form_state['new_assumption'])) {
+	if (!isset($node->assumptions)) {
+		$node->assumptions = array();
+	}
+	$node->assumptions = array_merge($node->assumptions, array($form_state['new_assumption']));
+	$assumption_count++;
+	}
+
+	// If a assumption removed, remove from list and update the assumption count.
+	$remove_delta = -1;
+	if (!empty($form_state['remove_delta'])) {
+	$remove_delta = $form_state['remove_delta'] - 1;
+	unset($node->assumptions[$remove_delta]);
+	// Re-number the values.
+	$node->assumptions = array_values($node->assumptions);
+	$assumption_count--;
+	}
+
+	// Container to display existing assumptions.
+	$form['assumption_wrapper']['assumptions'] = array(
+	'#prefix' => '<div id="jiscpmproject-assumptions">',
+	'#suffix' => '</div>',
+	'#theme' => 'jiscpmproject_assumption_table',
+	);
+
+	// Add the existing assumptions to the form.
+	for ($delta = 0; $delta < $assumption_count; $delta++) {
+	$assumption_title = isset($node->assumptions[$delta]['assumption_title']) ? $node->assumptions[$delta]['assumption_title'] : '';
+	$assumption_description = isset($node->assumptions[$delta]['assumption_description']) ? $node->assumptions[$delta]['assumption_description'] : '';
+	// Display existing assumptions using helper function jiscpmproject_assumption_display_form().
+	$form['assumption_wrapper']['assumptions'][$delta] = jiscpmproject_assumption_display_form($delta, $assumption_title, $assumption_description);
+	}
+
+
+	// Add new assumptions
+	$form['assumption_wrapper']['add_assumption'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Add another assumption'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+	'#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Define the form fields for the new assumption title and assumption_description's name.
+	$form['assumption_wrapper']['add_assumption']['new_assumption'] = array(
+	'#tree' => TRUE,
+	'#theme' => 'jiscpmproject_add_assumption_form',
+	);
+	$form['assumption_wrapper']['add_assumption']['new_assumption']['new_assumption_title'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Project assumption'),
+	'#weight' => 0,
+	);
+	$form['assumption_wrapper']['add_assumption']['new_assumption']['new_assumption_description'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Assumption description'),
+	'#weight' => 1,
+	);
+
+	// We name our button 'jiscpmproject_assumption_more' to avoid conflicts with other modules using
+	// AHAH-enabled buttons with the id 'more'.
+	$form['assumption_wrapper']['add_assumption']['jiscpmproject_assumption_more'] = array(
+	'#type' => 'submit',
+	'#value' => t('Add assumption'),
+	'#weight' => 1,
+	'#submit' => array('jiscpmproject_assumption_add_more_submit'),
+	'#ahah' => array(
+		'path' => 'jiscpmproject_assumption/js/0',
+		'wrapper' => 'jiscpmproject-assumptions',
+		'method' => 'replace',
+		'effect' => 'fade',
+	),
+	);
+  /* end ajax functionality for project assumptions */
+  /* ajax functionality for project constraints */
+  $form['constraint_wrapper'] = array(
+	'#tree' => FALSE,
+	'#weight' => 7,
+	'#prefix' => '<h2>Project Constraints</h2><div class="clear-block" id="jiscpmproject-constraint-wrapper">',
+	'#suffix' => '</div>',
+	);
+
+	// Get number of constraints.
+	$constraint_count = empty($node->constraints) ? 0 : count($node->constraints);
+
+	// If a new constraint added, add to list and update the constraint count.
+	if (isset($form_state['new_constraint'])) {
+	if (!isset($node->constraints)) {
+		$node->constraints = array();
+	}
+	$node->constraints = array_merge($node->constraints, array($form_state['new_constraint']));
+	$constraint_count++;
+	}
+
+	// If a constraint removed, remove from list and update the constraint count.
+	$remove_delta = -1;
+	if (!empty($form_state['remove_delta'])) {
+	$remove_delta = $form_state['remove_delta'] - 1;
+	unset($node->constraints[$remove_delta]);
+	// Re-number the values.
+	$node->constraints = array_values($node->constraints);
+	$constraint_count--;
+	}
+
+	// Container to display existing constraints.
+	$form['constraint_wrapper']['constraints'] = array(
+	'#prefix' => '<div id="jiscpmproject-constraints">',
+	'#suffix' => '</div>',
+	'#theme' => 'jiscpmproject_constraint_table',
+	);
+
+	// Add the existing constraints to the form.
+	for ($delta = 0; $delta < $constraint_count; $delta++) {
+	$constraint_title = isset($node->constraints[$delta]['constraint_title']) ? $node->constraints[$delta]['constraint_title'] : '';
+	$constraint_description = isset($node->constraints[$delta]['constraint_description']) ? $node->constraints[$delta]['constraint_description'] : '';
+	// Display existing constraints using helper function jiscpmproject_constraint_display_form().
+	$form['constraint_wrapper']['constraints'][$delta] = jiscpmproject_constraint_display_form($delta, $constraint_title, $constraint_description);
+	}
+
+	// Add new constraints
+	$form['constraint_wrapper']['add_constraint'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Add another constraint'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+	'#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Define the form fields for the new constraint title and constraint_description's name.
+	$form['constraint_wrapper']['add_constraint']['new_constraint'] = array(
+	'#tree' => TRUE,
+	'#theme' => 'jiscpmproject_add_constraint_form',
+	);
+	$form['constraint_wrapper']['add_constraint']['new_constraint']['new_constraint_title'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Constraint'),
+	'#weight' => 0,
+	);
+	$form['constraint_wrapper']['add_constraint']['new_constraint']['new_constraint_description'] = array(
+	'#type' => 'textarea',
+	'#title' => t('constraint description'),
+	'#weight' => 1,
+	);
+
+	// We name our button 'jiscpmproject_constraint_more' to avoid conflicts with other modules using
+	// AHAH-enabled buttons with the id 'more'.
+	$form['constraint_wrapper']['add_constraint']['jiscpmproject_constraint_more'] = array(
+	'#type' => 'submit',
+	'#value' => t('Add constraint'),
+	'#weight' => 1,
+	'#submit' => array('jiscpmproject_constraint_add_more_submit'),
+	'#ahah' => array(
+		'path' => 'jiscpmproject_constraint/js/0',
+		'wrapper' => 'jiscpmproject-constraints',
+		'method' => 'replace',
+		'effect' => 'fade',
+	),
+	);
+  /* end ajax functionality for project constraints */
+  /* ajax functionality for goals and associated objectives */
+  $form['goal_wrapper'] = array(
+	'#tree' => FALSE,
+	'#weight' => 2,
+	'#prefix' => '<h2>Project Goals and Objectives</h2><div class="clear-block" id="jiscpmproject-goal-wrapper">',
+	'#suffix' => '</div>',
+	);
+
+	// Get number of goals.
+	$goal_count = empty($node->goals) ? 0 : count($node->goals);
+
+	// If a new goal added, add to list and update the goal count.
+	if (isset($form_state['new_goal'])) {
+	if (!isset($node->goals)) {
+		$node->goals = array();
+	}
+	$node->goals = array_merge($node->goals, array($form_state['new_goal']));
+	$goal_count++;
+	}
+
+	// If a goal removed, remove from list and update the goal count.
+	$remove_delta = -1;
+	if (!empty($form_state['remove_delta'])) {
+	$remove_delta = $form_state['remove_delta'] - 1;
+	unset($node->goals[$remove_delta]);
+	// Re-number the values.
+	$node->goals = array_values($node->goals);
+	$goal_count--;
+	}
+
+	// Container to display existing goals.
+	$form['goal_wrapper']['goals'] = array(
+	'#prefix' => '<div id="jiscpmproject-goals">',
+	'#suffix' => '</div>',
+	'#theme' => 'jiscpmproject_goal_table',
+	);
+
+	// Add the existing goals to the form.
+	for ($delta = 0; $delta < $goal_count; $delta++) {
+	$goal_title = isset($node->goals[$delta]['goal_title']) ? $node->goals[$delta]['goal_title'] : '';
+	$goal_objectives = isset($node->goals[$delta]['goal_objectives']) ? $node->goals[$delta]['goal_objectives'] : '';
+	// Display existing goals using helper function jiscpmproject_goal_display_form().
+	$form['goal_wrapper']['goals'][$delta] = jiscpmproject_goal_display_form($delta, $goal_title, $goal_objectives);
+	}
+
+
+	// Add new goals
+	$form['goal_wrapper']['add_goal'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Add another goal'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+	'#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Define the form fields for the new goal title and goal_objectives's name.
+	$form['goal_wrapper']['add_goal']['new_goal'] = array(
+	'#tree' => TRUE,
+	'#theme' => 'jiscpmproject_add_goal_form',
+	);
+	$form['goal_wrapper']['add_goal']['new_goal']['new_goal_title'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Goal'),
+	'#weight' => 0,
+	);
+	$form['goal_wrapper']['add_goal']['new_goal']['new_goal_objectives'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Objectives of goal'),
+	'#weight' => 1,
+	);
+
+	// We name our button 'jiscpmproject_goal_more' to avoid conflicts with other modules using
+	// AHAH-enabled buttons with the id 'more'.
+	$form['goal_wrapper']['add_goal']['jiscpmproject_goal_more'] = array(
+	'#type' => 'submit',
+	'#value' => t('Add goal'),
+	'#weight' => 1,
+	'#submit' => array('jiscpmproject_goal_add_more_submit'),
+	'#ahah' => array(
+		'path' => 'jiscpmproject_goal/js/0',
+		'wrapper' => 'jiscpmproject-goals',
+		'method' => 'replace',
+		'effect' => 'fade',
+	),
+	);
+  /* end ajax functionality for goals and associated objectives */
+  /* ajax functionality for Project Milestones */
+  $form['milestone_wrapper'] = array(
+    '#tree' => FALSE,
+    '#weight' => 14,
+    '#prefix' => '<h2>Project Milestones</h2><div class="clear-block" id="jiscpmproject-milestone-wrapper">',
+    '#suffix' => '</div>',
+  );
+
+  // Get number of milestones.
+  $milestone_count = empty($node->milestones) ? 0 : count($node->milestones);
+
+  // If a new milestone added, add to list and update the milestone count.
+  if (isset($form_state['new_milestone'])) {
+    if (!isset($node->milestones)) {
+      $node->milestones = array();
+    }
+    $node->milestones = array_merge($node->milestones, array($form_state['new_milestone']));
+    $milestone_count++;
+  }
+
+  // If a milestone removed, remove from list and update the milestone count.
+  $remove_delta = -1;
+  if (!empty($form_state['remove_delta'])) {
+    $remove_delta = $form_state['remove_delta'] - 1;
+    unset($node->milestones[$remove_delta]);
+    // Re-number the values.
+    $node->milestones = array_values($node->milestones);
+    $milestone_count--;
+  }
+
+  // Container to display existing milestones.
+  $form['milestone_wrapper']['milestones'] = array(
+    '#prefix' => '<div id="jiscpmproject-milestones">',
+    '#suffix' => '</div>',
+    '#theme' => 'jiscpmproject_milestone_table',
+  );
+
+  // Add the existing milestones to the form.
+  for ($delta = 0; $delta < $milestone_count; $delta++) {
+    $milestone_title = isset($node->milestones[$delta]['milestone_title']) ? $node->milestones[$delta]['milestone_title'] : '';
+    $milestone_deliverydate = isset($node->milestones[$delta]['milestone_deliverydate']) ? $node->milestones[$delta]['milestone_deliverydate'] : '';
+    // Display existing milestones using helper function jiscpmproject_milestone_display_form().
+    $form['milestone_wrapper']['milestones'][$delta] = jiscpmproject_milestone_display_form($delta, $milestone_title, $milestone_deliverydate);
+  }
+
+
+  // Add new milestones
+  $form['milestone_wrapper']['add_milestone'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add another milestone'),
+    '#tree' => FALSE,
+    '#weight' => -16,
+    '#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+  );
+
+  // Define the form fields for the new milestone title and milestone_scope's name.
+  $form['milestone_wrapper']['add_milestone']['new_milestone'] = array(
+    '#tree' => TRUE,
+    '#theme' => 'jiscpmproject_add_milestone_form',
+  );
+  $form['milestone_wrapper']['add_milestone']['new_milestone']['new_milestone_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('milestone title'),
+    '#weight' => 0,
+  );
+    /* project date start */
+  if (module_exists('date_api') && module_exists('date_popup')) {
+    $form['milestone_wrapper']['add_milestone']['new_milestone']['new_milestone_deliverydate'] = array(
+      '#type' => 'date_popup',
+      '#title' => t('Delivery Date'),
+      '#date_format' =>  'Y-m-d',
+      '#default_value' => date('Y-m-d'),
+    );
+  }
+  
+  // We name our button 'jiscpmproject_milestone_more' to avoid conflicts with other modules using
+  // AHAH-enabled buttons with the id 'more'.
+  $form['milestone_wrapper']['add_milestone']['jiscpmproject_milestone_more'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add milestone'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_milestone_add_more_submit'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_milestone/js/0',
+      'wrapper' => 'jiscpmproject-milestones',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  /* end ajax functionality for Project Milestones */
+  $form['group10'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group10') : -11,
+  );
+  /* project category */
+  $category_list = jiscpmattribute_attributes_bydomain('Project category');
+  $form['group10']['projectcategory'] = array(
+    '#type' => 'select',
+    '#title' => t('Category'),
+    '#default_value' => check_plain($node->jiscpmprojects[0]['projectcategory']),
+    '#options' => $category_list['values'],
+  );
+  $form['group11'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group11') : -10,
+  );
+  /* project status */
+  $status_list = jiscpmattribute_attributes_bydomain('Project status');
+  $form['projectstatus'] = array(
+    '#type' => 'select',
+    '#title' => t('Status'),
+    '#default_value' => check_plain($node->jiscpmprojects[0]['projectstatus']),
+    '#options' => $status_list['values'],
+  );
+  $form['group12'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group12') : -9,
+  );
+  /* project priority */
+  $priority_list = jiscpmattribute_attributes_bydomain('Project priority');
+  $form['projectpriority'] = array(
+    '#type' => 'select',
+    '#title' => t('Priority'),
+    '#default_value' => check_plain($node->jiscpmprojects[0]['projectpriority']),
+    '#options' => $priority_list['values'],
+  );
+  /* project date start */
+  if ($node->jiscpmprojects[0]['datebegin'] != '' || $node->jiscpmprojects[0]['datebegin'] != NULL || $node->jiscpmprojects[0]['datebegin'] != 0)
+  {
+	if (module_exists('date_api') && module_exists('date_popup')) {
+		$form['datebegin'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Date begin'),
+			'#date_format' =>	 'Y-m-d',
+			'#default_value' => date('Y-m-d', $node->jiscpmprojects[0]['datebegin']),
+		);
+	}
+  }else
+  {
+  if (module_exists('date_api') && module_exists('date_popup')) {
+		$form['datebegin'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Date begin'),
+			'#date_format' =>	 'Y-m-d',
+			'#default_value' => date('Y-m-d'),
+		);
+	}
+  }
+ /* project date end */
+ if ($node->jiscpmprojects[0]['dateend'] != '' || $node->jiscpmprojects[0]['dateend'] != NULL || $node->jiscpmprojects[0]['dateend'] != 0)
+  {
+	if (module_exists('date_api') && module_exists('date_popup')) {
+		$form['dateend'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Date end'),
+			'#date_format' =>	 'Y-m-d',
+			'#default_value' => date('Y-m-d', $node->jiscpmprojects[0]['dateend']),
+		);
+	}
+  }
+  else
+  {
+  	if (module_exists('date_api') && module_exists('date_popup')) {
+		$form['dateend'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Date end'),
+			'#date_format' =>	 'Y-m-d',
+			'#default_value' => date('Y-m-d'),
+		);
+	}
+  }
+
+  $form['project_manager_uid'] = array(
+    '#type' => 'select',
+    '#title' => t('Project Manager'),
+    '#options' => $people,
+    '#default_value' => check_plain($node->jiscpmprojects[0]['project_manager_uid']),
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+  
+  /* client */
+  $form['client_uid'] = array(
+    '#type' => 'select',
+    '#title' => t('Client'),
+    '#options' => $people,
+    '#default_value' => check_plain($node->jiscpmprojects[0]['client_uid']),
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+  
+  /* project scope */
+  $form['scope']= array(
+    '#prefix' => '<h2>Project Scope</h2>',
+    '#type' => 'fieldset',
+    '#title' => t('Scope'),
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
+	'#weight' => 4,
+  	);
+   $form['scope']['organisational_scope'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Organisational scope'),
+    '#default_value' => check_markup($node->jiscpmprojects[0]['organisational_scope'], $format= FILTER_FORMAT_DEFAULT, $check = TRUE),
+  );
+  /* logical scope */
+   $form['scope']['logical_scope'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Logical scope'),
+    '#default_value' => check_markup($node->jiscpmprojects[0]['logical_scope'], $format = FILTER_FORMAT_DEFAULT, $check = TRUE),
+  );
+  /* out of scope */
+   $form['scope']['out_of_scope'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Out of scope'),
+    '#default_value' => check_markup($node->jiscpmprojects[0]['out_of_scope'], $format = FILTER_FORMAT_DEFAULT, $check = TRUE),
+  );
+  return $form;
+}
+
+/**
+ * Submit handler for 'Add relationship' button on node form.
+ */
+function jiscpmproject_relationship_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmproject_relationship_more']) {
+    $new_relationship = array();
+    $new_relationship['relationship_nid'] = $form_state['values']['new_relationship']['new_relationship_nid'];
+    $new_relationship['relationship_description'] = $form_state['values']['new_relationship']['new_relationship_description'];
+    $form_state['new_relationship'] = $new_relationship;
+  }
+}
+
+/**
+ * Submit handler for 'Add phase' button on node form.
+ */
+function jiscpmproject_phase_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmproject_phase_more']) {
+    $new_phase = array();
+    $new_phase['phase_title'] = $form_state['values']['new_phase']['new_phase_title'];
+    $new_phase['phase_scope'] = $form_state['values']['new_phase']['new_phase_scope'];
+    $new_phase['phase_datebegin'] = $form_state['values']['new_phase']['new_phase_datebegin'];
+    $new_phase['phase_dateend'] = $form_state['values']['new_phase']['new_phase_dateend'];
+    $form_state['new_phase'] = $new_phase;
+  }
+}
+
+/**
+ * Submit handler for 'Add stakeholder' button on node form.
+ */
+function jiscpmproject_stakeholder_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmproject_stakeholder_more']) {
+    $new_stakeholder = array();
+    $new_stakeholder['stakeholder_uid'] = $form_state['values']['new_stakeholder']['new_stakeholder_uid'];
+    $new_stakeholder['stakeholder_stake_in_project'] = $form_state['values']['new_stakeholder']['new_stakeholder_stake_in_project'];
+    $new_stakeholder['stakeholder_management_strategy'] = $form_state['values']['new_stakeholder']['new_stakeholder_management_strategy'];
+    $new_stakeholder['stakeholder_potential_impact'] = $form_state['values']['new_stakeholder']['new_stakeholder_potential_impact'];
+    $new_stakeholder['stakeholder_expectations'] = $form_state['values']['new_stakeholder']['new_stakeholder_expectations'];
+    $new_stakeholder['stakeholder_attitudes_risks'] = $form_state['values']['new_stakeholder']['new_stakeholder_attitudes_risks'];
+    $form_state['new_stakeholder'] = $new_stakeholder;
+  }
+}
+/**
+ * Submit handler for 'Add factor' button on node form.
+ */
+function jiscpmproject_factor_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmproject_factor_more']) {
+    $new_factor = array();
+    $new_factor['factor_title'] = $form_state['values']['new_factor']['new_factor_title'];
+    $new_factor['factor_description'] = $form_state['values']['new_factor']['new_factor_description'];
+    $form_state['new_factor'] = $new_factor;
+  }
+}
+
+ /**
+ * Submit handler for 'Add assumption' button on node form.
+ */
+function jiscpmproject_assumption_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmproject_assumption_more']) {
+    $new_assumption = array();
+    $new_assumption['assumption_title'] = $form_state['values']['new_assumption']['new_assumption_title'];
+    $new_assumption['assumption_description'] = $form_state['values']['new_assumption']['new_assumption_description'];
+    $form_state['new_assumption'] = $new_assumption;
+  }
+}
+ /**
+ * Submit handler for 'Add constraint' button on node form.
+ */
+function jiscpmproject_constraint_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmproject_constraint_more']) {
+    $new_constraint = array();
+    $new_constraint['constraint_title'] = $form_state['values']['new_constraint']['new_constraint_title'];
+    $new_constraint['constraint_description'] = $form_state['values']['new_constraint']['new_constraint_description'];
+    $form_state['new_constraint'] = $new_constraint;
+  }
+}
+/**
+ * Submit handler for 'Add goal' button on node form.
+ */
+function jiscpmproject_goal_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmproject_goal_more']) {
+    $new_goal = array();
+    $new_goal['goal_title'] = $form_state['values']['new_goal']['new_goal_title'];
+    $new_goal['goal_objectives'] = $form_state['values']['new_goal']['new_goal_objectives'];
+    $form_state['new_goal'] = $new_goal;
+  }
+}
+ /**
+ * Submit handler for 'Add milestone' button on node form.
+ */
+function jiscpmproject_milestone_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmproject_milestone_more']) {
+    $new_milestone = array();
+    $new_milestone['milestone_title'] = $form_state['values']['new_milestone']['new_milestone_title'];
+    $new_milestone['milestone_deliverydate'] = $form_state['values']['new_milestone']['new_milestone_deliverydate'];
+    $form_state['new_milestone'] = $new_milestone;
+  }
+}
+/**
+ * Submit handler for 'Remove' button on node form.
+ */
+function jiscpmproject_remove_row_submit($form, &$form_state) {
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+}
+
+function jiscpmproject_relationship_js($delta = 0) {
+  $form = jiscpmproject_ajax_form_handler($delta);
+
+  // Render the new output.
+  $relationship_form = $form['relationship_wrapper']['relationships'];
+  // Prevent duplicate wrappers.
+  unset($relationship_form['#prefix'], $relationship_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($relationship_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+function jiscpmproject_phase_js($delta = 0) {
+  $form = jiscpmproject_ajax_form_handler($delta);
+
+  // Render the new output.
+  $phase_form = $form['phase_wrapper']['phases'];
+  // Prevent duplicate wrappers.
+  unset($phase_form['#prefix'], $phase_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($phase_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+function jiscpmproject_stakeholder_js($delta = 0) {
+  $form = jiscpmproject_ajax_form_handler($delta);
+
+  // Render the new output.
+  $phase_form = $form['stakeholder_wrapper']['stakeholders'];
+  // Prevent duplicate wrappers.
+  unset($phase_form['#prefix'], $phase_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($phase_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+function jiscpmproject_factor_js($delta = 0) {
+  $form = jiscpmproject_ajax_form_handler($delta);
+
+  // Render the new output.
+  $factor_form = $form['factor_wrapper']['factors'];
+  // Prevent duplicate wrappers.
+  unset($factor_form['#prefix'], $factor_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($factor_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+function jiscpmproject_assumption_js($delta = 0) {
+  $form = jiscpmproject_ajax_form_handler($delta);
+
+  // Render the new output.
+  $assumption_form = $form['assumption_wrapper']['assumptions'];
+  // Prevent duplicate wrappers.
+  unset($assumption_form['#prefix'], $assumption_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($assumption_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+function jiscpmproject_constraint_js($delta = 0) {
+  $form = jiscpmproject_ajax_form_handler($delta);
+
+  // Render the new output.
+  $constraint_form = $form['constraint_wrapper']['constraints'];
+  // Prevent duplicate wrappers.
+  unset($constraint_form['#prefix'], $constraint_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($constraint_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+function jiscpmproject_goal_js($delta = 0) {
+  $form = jiscpmproject_ajax_form_handler($delta);
+
+  // Render the new output.
+  $goal_form = $form['goal_wrapper']['goals'];
+  // Prevent duplicate wrappers.
+  unset($goal_form['#prefix'], $goal_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($goal_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+function jiscpmproject_milestone_js($delta = 0) {
+  $form = jiscpmproject_ajax_form_handler($delta);
+
+  // Render the new output.
+  $milestone_form = $form['milestone_wrapper']['milestones'];
+  // Prevent duplicate wrappers.
+  unset($milestone_form['#prefix'], $milestone_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($milestone_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+/**
+ * AJAX form handler.
+ */
+function jiscpmproject_ajax_form_handler($delta = 0) {
+  // The form is generated in an include file which we need to include manually.
+  include_once 'modules/node/node.pages.inc';
+  $form_state = array('storage' => NULL, 'submitted' => FALSE);
+  $form_build_id = $_POST['form_build_id'];
+
+  // Get the form from the cache.
+  $form = form_get_cache($form_build_id, $form_state);
+  $args = $form['#parameters'];
+  $form_id = array_shift($args);
+
+  // We need to process the form, prepare for that by setting a few internals.
+  $form_state['post'] = $form['#post'] = $_POST;
+  $form['#programmed'] = $form['#redirect'] = FALSE;
+
+  // Set up our form state variable, needed for removing relationships.
+  $form_state['remove_delta'] = $delta;
+
+  // Build, validate and if possible, submit the form.
+  drupal_process_form($form_id, $form, $form_state);
+  // If validation fails, force form submission.
+  if (form_get_errors()) {
+    form_execute_handlers('submit', $form, $form_state);
+  }
+
+  // This call recreates the form relying solely on the form_state that the
+  // drupal_process_form set up.
+  $form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
+
+  return $form;
+}
+
+/**
+ * Implement hook_theme().
+ */
+function jiscpmproject_theme() {
+  return array(
+    'jiscpmproject_relationship_table' => array(
+      'arguments' => array('form'),
+    ),
+    'jiscpmproject_phase_table' => array(
+      'arguments' => array('form'),
+    ),
+    'jiscpmproject_stakeholder_table' => array(
+      'arguments' => array('form'),
+    ),
+    'jiscpmproject_factor_table' => array(
+      'arguments' => array('form'),
+    ),
+    'jiscpmproject_assumption_table' => array(
+      'arguments' => array('form'),
+    ),
+    'jiscpmproject_constraint_table' => array(
+      'arguments' => array('form'),
+    ),
+    'jiscpmproject_goal_table' => array(
+      'arguments' => array('form'),
+    ),
+    'jiscpmproject_list' => array(
+      'file'      => 'jiscpmproject.theme.inc',
+      'arguments' => array('header', 'projects'),
+    ),
+    'jiscpmproject_view' => array(
+      'file'      => 'jiscpmproject.theme.inc',
+      'arguments' => array('node', 'teaser', 'page'),
+    ),
+    'jiscpmproject_milestone_table' => array(
+      'arguments' => array('form'),
+    ),
+  );
+}
+/* outputs the project relationship table for display on the node form */
+function theme_jiscpmproject_relationship_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Title'),
+    t('Relationship description'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['relationship_nid_text']['#title'],
+      $form[$key]['relationship_description_text']['#title'],
+      $form[$key]['remove_relationship']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['relationship_nid']) . drupal_render($form[$key]['relationship_nid_text']), 'class' => 'relationship-title'),
+        array('data' => drupal_render($form[$key]['relationship_description']) . drupal_render($form[$key]['relationship_description_text']), 'class' => 'relationship-description'),
+        array('data' => drupal_render($form[$key]['remove_relationship']), 'class' => 'remove-relationship'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+
+/* outputs the phase table for display on the node form */
+function theme_jiscpmproject_phase_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Title'),
+    t('Phase Scope'),
+    t('Begin'),
+    t('End'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['phase_title_text']['#title'],
+      $form[$key]['phase_scope_text']['#title'],
+      $form[$key]['phase_datebegin_text']['#title'],
+      $form[$key]['phase_dateend_text']['#title'],
+      $form[$key]['remove_phase']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['phase_title']) . drupal_render($form[$key]['phase_title_text']), 'class' => 'phase-title'),
+        array('data' => drupal_render($form[$key]['phase_scope']) . drupal_render($form[$key]['phase_scope_text']), 'class' => 'phase-scope'),
+        array('data' => drupal_render($form[$key]['phase_datebegin']) . drupal_render($form[$key]['phase_datebegin_text']), 'class' => 'phase-datebegin'),
+        array('data' => drupal_render($form[$key]['phase_dateend']) . drupal_render($form[$key]['phase_dateend_text']), 'class' => 'phase-dateend'),
+        array('data' => drupal_render($form[$key]['remove_phase']), 'class' => 'remove-phase'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+/* outputs the project stakeholder table for display on the node form */
+function theme_jiscpmproject_stakeholder_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Name'),
+    t('Stake in project'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['stakeholder_uid_text']['#title'],
+      $form[$key]['stakeholder_stake_in_project_text']['#title'],
+      $form[$key]['remove_stakeholder']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['stakeholder_uid']) . drupal_render($form[$key]['stakeholder_uid_text']), 'class' => 'stakeholder-title'),
+        array('data' => drupal_render($form[$key]['stakeholder_stake_in_project']) . drupal_render($form[$key]['stakeholder_stake_in_project_text']), 'class' => 'stakeholder-stake-in-project'),
+        array('data' => drupal_render($form[$key]['remove_stakeholder']), 'class' => 'remove-stakeholder'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+
+/* outputs the project factor table for display on the node form */
+function theme_jiscpmproject_factor_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Title'),
+    t('Factor description'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['factor_title_text']['#title'],
+      $form[$key]['factor_description_text']['#title'],
+      $form[$key]['remove_factor']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['factor_title']) . drupal_render($form[$key]['factor_title_text']), 'class' => 'factor-title'),
+        array('data' => drupal_render($form[$key]['factor_description']) . drupal_render($form[$key]['factor_description_text']), 'class' => 'factor-description'),
+        array('data' => drupal_render($form[$key]['remove_factor']), 'class' => 'remove-factor'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+/* outputs the project assumption table for display on the node form */
+function theme_jiscpmproject_assumption_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Assumption'),
+    t('Assumption description'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['assumption_title_text']['#title'],
+      $form[$key]['assumption_description_text']['#title'],
+      $form[$key]['remove_assumption']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['assumption_title']) . drupal_render($form[$key]['assumption_title_text']), 'class' => 'assumption-title'),
+        array('data' => drupal_render($form[$key]['assumption_description']) . drupal_render($form[$key]['assumption_description_text']), 'class' => 'assumption-description'),
+        array('data' => drupal_render($form[$key]['remove_assumption']), 'class' => 'remove-assumption'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+/* outputs the project constraint table for display on the node form */
+function theme_jiscpmproject_constraint_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Constraint'),
+    t('Constraint description'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['constraint_title_text']['#title'],
+      $form[$key]['constraint_description_text']['#title'],
+      $form[$key]['remove_constraint']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['constraint_title']) . drupal_render($form[$key]['constraint_title_text']), 'class' => 'constraint-title'),
+        array('data' => drupal_render($form[$key]['constraint_description']) . drupal_render($form[$key]['constraint_description_text']), 'class' => 'constraint-description'),
+        array('data' => drupal_render($form[$key]['remove_constraint']), 'class' => 'remove-constraint'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+/* outputs the project goal table for display on the node form */
+function theme_jiscpmproject_goal_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Goal'),
+    t('Objectives'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['goal_title_text']['#title'],
+      $form[$key]['goal_objectives_text']['#title'],
+      $form[$key]['remove_goal']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['goal_title']) . drupal_render($form[$key]['goal_title_text']), 'class' => 'goal-title'),
+        array('data' => drupal_render($form[$key]['goal_objectives']) . drupal_render($form[$key]['goal_objectives_text']), 'class' => 'goal-objectives'),
+        array('data' => drupal_render($form[$key]['remove_goal']), 'class' => 'remove-goal'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+/* outputs the project milestone table for display on the node form */
+function theme_jiscpmproject_milestone_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Milestone'),
+    t('Delivery date'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['milestone_title_text']['#title'],
+      $form[$key]['milestone_deliverydate_text']['#title'],
+      $form[$key]['remove_milestone']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['milestone_title']) . drupal_render($form[$key]['milestone_title_text']), 'class' => 'milestone-title'),
+        array('data' => drupal_render($form[$key]['milestone_deliverydate']) . drupal_render($form[$key]['milestone_deliverydate_text']), 'class' => 'milestone-deliverydate'),
+        array('data' => drupal_render($form[$key]['remove_milestone']), 'class' => 'remove-milestone'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+
+/**
+ * Helper function to define populated form field elements for jiscpmproject relationship node form.
+ */
+function jiscpmproject_relationship_display_form($delta, $relationship_nid, $relationship_description) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // relationship title.
+  $form['relationship_nid'] = array(
+    '#type' => 'hidden',
+    '#value' => $relationship_nid,
+    '#parents' => array('relationships', $delta, 'relationship_nid'),
+  );
+  $form['relationship_nid_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('relationships', $delta, 'relationship_nid'),
+    '#value' => $relationship_nid,
+  );
+
+  // relationship_description.
+  $form['relationship_description'] = array(
+    '#type' => 'hidden',
+    '#value' => $relationship_description,
+    '#parents' => array('relationships', $delta, 'relationship_description'),
+  );
+  $form['relationship_description_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('relationships', $delta, 'relationship_description'),
+    '#value' => $relationship_description,
+  );
+
+  // Remove button.
+  $form['remove_relationship'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_relationship_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_remove_row_submit'),
+    '#parents' => array('relationships', $delta, 'remove_relationship'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_relationship/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmproject-relationships',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Helper function to define populated form field elements for jiscpmproject phase node form.
+ */
+function jiscpmproject_phase_display_form($delta, $phase_title, $phase_scope, $phase_datebegin, $phase_dateend) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // phase title.
+  $form['phase_title'] = array(
+    '#type' => 'hidden',
+    '#value' => $phase_title,
+    '#parents' => array('phases', $delta, 'phase_title'),
+  );
+  $form['phase_title_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('phases', $delta, 'phase_title'),
+    '#value' => $phase_title,
+  );
+
+  // phase_scope.
+  $form['phase_scope'] = array(
+    '#type' => 'hidden',
+    '#value' => $phase_scope,
+    '#parents' => array('phases', $delta, 'phase_scope'),
+  );
+  $form['phase_scope_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Phase Scope'),
+    '#weight' => 2,
+    '#parents' => array('phases', $delta, 'phase_scope'),
+    '#value' => $phase_scope,
+  );
+  
+  // phase_scope.
+  $form['phase_datebegin'] = array(
+    '#type' => 'hidden',
+    '#value' => $phase_datebegin,
+    '#parents' => array('phases', $delta, 'phase_datebegin'),
+  );
+  $form['phase_datebegin_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Phase begin'),
+    '#weight' => 2,
+    '#parents' => array('phases', $delta, 'phase_datebegin'),
+    '#value' => $phase_datebegin,
+  );
+  
+  // phase_scope.
+  $form['phase_dateend'] = array(
+    '#type' => 'hidden',
+    '#value' => $phase_dateend,
+    '#parents' => array('phases', $delta, 'phase_dateend'),
+  );
+  $form['phase_dateend_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Phase end'),
+    '#weight' => 2,
+    '#parents' => array('phases', $delta, 'phase_dateend'),
+    '#value' => $phase_dateend,
+  );
+
+  // Remove button.
+  $form['remove_phase'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_phase_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_remove_row_submit'),
+    '#parents' => array('phases', $delta, 'remove_phase'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_phase/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmproject-phases',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Helper function to define populated form field elements for jiscpmproject stakeholder node form.
+ */
+function jiscpmproject_stakeholder_display_form($delta, $stakeholder_uid, $stakeholder_stake_in_project, $stakeholder_management_strategy,
+	$stakeholder_potential_impact, $stakeholder_expectations, $stakeholder_attitudes_risks) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // phase title.
+  $form['stakeholder_uid'] = array(
+    '#type' => 'hidden',
+    '#value' => $stakeholder_uid,
+    '#parents' => array('stakeholders', $delta, 'stakeholder_uid'),
+  );
+  $form['stakeholder_uid_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('stakeholders', $delta, 'stakeholder_uid'),
+    '#value' => $stakeholder_uid,
+  );
+
+  // phase_scope.
+  $form['stakeholder_stake_in_project'] = array(
+    '#type' => 'hidden',
+    '#value' => $stakeholder_stake_in_project,
+    '#parents' => array('stakeholders', $delta, 'stakeholder_stake_in_project'),
+  );
+  $form['stakeholder_stake_in_project_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Stake in Project'),
+    '#weight' => 2,
+    '#parents' => array('stakeholders', $delta, 'stakeholder_stake_in_project'),
+    '#value' => $stakeholder_stake_in_project,
+  );
+
+  // Remove button.
+  $form['remove_stakeholder'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_stakeholder_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_remove_row_submit'),
+    '#parents' => array('stakeholders', $delta, 'remove_stakeholder'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_stakeholder/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmproject-stakeholders',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Helper function to define populated form field elements for jiscpmproject factor node form.
+ */
+function jiscpmproject_factor_display_form($delta, $factor_title, $factor_description) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // factor title.
+  $form['factor_title'] = array(
+    '#type' => 'hidden',
+    '#value' => check_plain($factor_title),
+    '#parents' => array('factors', $delta, 'factor_title'),
+  );
+  $form['factor_title_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('factors', $delta, 'factor_title'),
+    '#value' => check_plain($factor_title),
+  );
+
+  // factor_description.
+  $form['factor_description'] = array(
+    '#type' => 'hidden',
+    '#value' => $factor_description,
+    '#parents' => array('factors', $delta, 'factor_description'),
+  );
+  $form['factor_description_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('factors', $delta, 'factor_description'),
+    '#value' => $factor_description,
+  );
+
+  // Remove button.
+  $form['remove_factor'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_factor_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_remove_row_submit'),
+    '#parents' => array('factors', $delta, 'remove_factor'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_factor/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmproject-factors',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Helper function to define populated form field elements for jiscpmproject assumption node form.
+ */
+function jiscpmproject_assumption_display_form($delta, $assumption_title, $assumption_description) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // assumption title.
+  $form['assumption_title'] = array(
+    '#type' => 'hidden',
+    '#value' => check_plain($assumption_title),
+    '#parents' => array('assumptions', $delta, 'assumption_title'),
+  );
+  $form['assumption_title_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('assumptions', $delta, 'assumption_title'),
+    '#value' => check_plain($assumption_title),
+  );
+
+  // assumption_description.
+  $form['assumption_description'] = array(
+    '#type' => 'hidden',
+    '#value' => $assumption_description,
+    '#parents' => array('assumptions', $delta, 'assumption_description'),
+  );
+  $form['assumption_description_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('assumptions', $delta, 'assumption_description'),
+    '#value' => $assumption_description,
+  );
+
+  // Remove button.
+  $form['remove_assumption'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_assumption_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_remove_row_submit'),
+    '#parents' => array('assumptions', $delta, 'remove_assumption'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_assumption/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmproject-assumptions',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Helper function to define populated form field elements for jiscpmproject constraint node form.
+ */
+function jiscpmproject_constraint_display_form($delta, $constraint_title, $constraint_description) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // constraint title.
+  $form['constraint_title'] = array(
+    '#type' => 'hidden',
+    '#value' => check_plain($constraint_title),
+    '#parents' => array('constraints', $delta, 'constraint_title'),
+  );
+  $form['constraint_title_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('constraints', $delta, 'constraint_title'),
+    '#value' => check_plain($constraint_title),
+  );
+
+  // constraint_description.
+  $form['constraint_description'] = array(
+    '#type' => 'hidden',
+    '#value' => $constraint_description,
+    '#parents' => array('constraints', $delta, 'constraint_description'),
+  );
+  $form['constraint_description_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('constraints', $delta, 'constraint_description'),
+    '#value' => $constraint_description,
+  );
+
+  // Remove button.
+  $form['remove_constraint'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_constraint_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_remove_row_submit'),
+    '#parents' => array('constraints', $delta, 'remove_constraint'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_constraint/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmproject-constraints',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+/**
+ * Helper function to define populated form field elements for jiscpmproject goal node form.
+ */
+function jiscpmproject_goal_display_form($delta, $goal_title, $goal_objectives) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // goal title.
+  $form['goal_title'] = array(
+    '#type' => 'hidden',
+    '#value' => check_plain($goal_title),
+    '#parents' => array('goals', $delta, 'goal_title'),
+  );
+  $form['goal_title_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('goals', $delta, 'goal_title'),
+    '#value' => check_plain($goal_title),
+  );
+
+  // goal_objectives.
+  $form['goal_objectives'] = array(
+    '#type' => 'hidden',
+    '#value' => $goal_objectives,
+    '#parents' => array('goals', $delta, 'goal_objectives'),
+  );
+  $form['goal_objectives_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('goals', $delta, 'goal_objectives'),
+    '#value' => $goal_objectives,
+  );
+
+  // Remove button.
+  $form['remove_goal'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_goal_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_remove_row_submit'),
+    '#parents' => array('goals', $delta, 'remove_goal'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_goal/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmproject-goals',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+/**
+ * Helper function to define populated form field elements for jiscpmproject milestone node form.
+ */
+function jiscpmproject_milestone_display_form($delta, $milestone_title, $milestone_deliverydate) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // milestone title.
+  $form['milestone_title'] = array(
+    '#type' => 'hidden',
+    '#value' => check_plain($milestone_title),
+    '#parents' => array('milestones', $delta, 'milestone_title'),
+  );
+  $form['milestone_title_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('milestones', $delta, 'milestone_title'),
+    '#value' => check_plain($milestone_title),
+  );
+
+  // milestone_deliverydate.
+  $form['milestone_deliverydate'] = array(
+    '#type' => 'hidden',
+    '#value' => $milestone_deliverydate,
+    '#parents' => array('milestones', $delta, 'milestone_deliverydate'),
+  );
+  $form['milestone_deliverydate_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Delivery Date'),
+    '#weight' => 2,
+    '#parents' => array('milestones', $delta, 'milestone_deliverydate'),
+    '#value' => $milestone_deliverydate,
+  );
+
+  // Remove button.
+  $form['remove_milestone'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_milestone_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmproject_remove_row_submit'),
+    '#parents' => array('milestones', $delta, 'remove_milestone'),
+    '#ahah' => array(
+      'path' => 'jiscpmproject_milestone/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmproject-milestones',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+
+/*
+* Implementation of hook_validate. Check to see that project does not end before it starts.
+*/
+function jiscpmproject_validate($node) {
+  if (isset($node->dateend) && isset($node->datebegin)) {
+    if ($node->datebegin > $node->dateend) {
+      form_set_error('dateend', t('A project may not end before it starts.'));
+    }
+  }
+}
+
+

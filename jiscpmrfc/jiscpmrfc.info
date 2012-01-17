@@ -1,0 +1,9 @@
+; $Id:  $
+name = JISC PM RFC
+description = "Allows recording of requests for change based on jiscpm Projects"
+dependencies[] = jiscpm 
+dependencies[] = jiscpmattribute
+dependencies[] = jiscpmproject
+package = JISC Project Management
+core = 6.x
+

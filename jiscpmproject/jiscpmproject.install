@@ -1,0 +1,129 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+function jiscpmproject_install() {
+  drupal_install_schema('jiscpmproject');
+  variable_set('node_options_jiscpmproject', array('status'));
+}
+
+function jiscpmproject_disable() {
+  drupal_set_message(t('Nodes of type "Project" have not been deleted on disabling jiscpm Project. Please note that they will now have reduced functionality, and will not be protected by jiscpm Project access controls.'), 'warning');
+}
+
+function jiscpmproject_uninstall() {
+  drupal_uninstall_schema('jiscpmproject');
+
+}
+
+function jiscpmproject_schema() {
+  /*main schema for jiscpmprojects*/
+  $schema['jiscpmproject'] = array(
+    'fields'                => array(
+      'nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_id'    => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'project_manager_uid'    => array('type' => 'int'),
+      'client_uid'    => array('type' => 'int'),
+      'projectstatus'       => array('type' => 'varchar', 'length' => 20),
+      'projectcategory'     => array('type' => 'varchar', 'length' => 20),
+      'projectpriority'     => array('type' => 'varchar', 'length' => 20),
+      'datebegin'           => array('type' => 'int', 'default' => 0),
+      'dateend'             => array('type' => 'int', 'default' => 0),
+      'organisational_scope' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'logical_scope' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'out_of_scope' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('project_id'),
+  );
+  /*schema for jiscpmproject stakeholders */
+  $schema['jiscpmproject_stakeholder'] = array(
+    'fields'                => array(
+      'stakeholder_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'stakeholder_uid' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'project_nid'    => array('type' => 'int'),
+      'stakeholder_stake_in_project' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'stakeholder_management_strategy' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'stakeholder_potential_impact' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'stakeholder_expectations' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'stakeholder_attitudes_risks' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('stakeholder_id'),
+  );
+  /* schema for jiscpmproject milestones */
+   $schema['jiscpmproject_milestone'] = array(
+    'fields'                => array(
+      'milestone_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'project_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'milestone_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'milestone_deliverydate'             => array('type' => 'int', 'default' => 0),
+    ),
+    'primary key' => array('milestone_id'),
+  );
+  /* schema for jiscpmproject phases */
+  $schema['jiscpmproject_phase'] = array(
+    'fields'                => array(
+      'phase_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'project_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'phase_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'phase_scope' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'phase_datebegin'           => array('type' => 'int', 'default' => 0),
+      'phase_dateend'             => array('type' => 'int', 'default' => 0),
+    ),
+    'primary key' => array('phase_id'),
+  );
+  /* schema for jiscpmproject project relationships */
+  $schema['jiscpmproject_relationship'] = array(
+    'fields'                => array(
+      'relationship_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'project_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'relationship_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'relationship_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('relationship_id'),
+  );
+  /* schema for jiscpmproject project constraints */
+  $schema['jiscpmproject_constraint'] = array(
+    'fields'                => array(
+      'constraint_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'project_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'constraint_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'constraint_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('constraint_id'),
+  );
+  /* schema for jiscpmproject project goals and objectives */
+  $schema['jiscpmproject_goal'] = array(
+    'fields'                => array(
+      'goal_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'project_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'goal_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'goal_objectives' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('goal_id'),
+  );
+  /* schema for jiscpmproject critical success factors */
+  $schema['jiscpmproject_factor'] = array(
+    'fields'                => array(
+      'factor_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'project_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'factor_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'factor_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('factor_id'),
+  );
+  /* schema for jiscpmproject project assumptions */
+  $schema['jiscpmproject_assumption'] = array(
+    'fields'                => array(
+      'assumption_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'project_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'assumption_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'assumption_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('assumption_id'),
+  );
+  return $schema;
+}

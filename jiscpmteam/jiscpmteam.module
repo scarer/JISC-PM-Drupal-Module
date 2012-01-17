@@ -1,0 +1,559 @@
+<?php
+// $Id$
+/* TO DO:
+*/
+/**
+ * Implement hook_menu().
+ */
+function jiscpmteam_menu() {
+  $items = array();
+  $items['jiscpm/dashboard/teams'] = array(
+    'title' => 'Teams',
+    'description' => 'jiscpm teams',
+    'page callback' => 'jiscpmteam_list',
+    'access arguments' => array('jiscpm team: access'),
+    'file' => 'jiscpmteam.admin.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+  $items['jiscpmteam_member/js/%'] = array(
+    'page callback' => 'jiscpmteam_member_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  return $items;
+}
+/**
+ * @function
+ * Implementation of hook_init
+ */
+function jiscpmteam_init() {
+  /*$settings = array(
+    'jiscpm' => array(
+      'organization_teams_url' => url('jiscpm/organization_teams_js/')
+    ),
+  );
+  drupal_add_js($settings, 'setting');*/
+
+  drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
+  //drupal_add_js(drupal_get_path('module', 'jiscpmteam') .'/jiscpmteam.js', 'module', 'header', FALSE);
+}
+
+/**
+ * Implement hook_perm().
+ */
+function jiscpmteam_perm() {
+  return array('edit own jiscpmteam', 'edit jiscpmteam', 'create jiscpmteam');
+}
+
+
+/**
+ * Implement hook_access().
+ */
+function jiscpmteam_access($op, $node, $account = NULL) {
+  global $user;
+  if (empty($account)) {
+    $account = $user;
+  }
+
+  if ($op != 'create') {
+    $node = (object)$node;
+  }
+  if ($op == 'create') {
+    if (user_access('create jiscpmteam')) {
+      return TRUE;
+    }
+  }
+  elseif ($op == 'update' || $op == 'delete') {
+    if (user_access('edit jiscpmteam')) {
+      return TRUE;
+    }
+    elseif (user_access('edit own jiscpmteam') && $account->uid == $node->uid) {
+      return TRUE;
+    }
+  }
+}
+function jiscpmteam_content_extra_fields($type_name) {
+  if ($type_name == 'jiscpmteam') {
+    return array(
+      'group1' => array('label' => 'Title', 'weight' => -20),
+      'group2' => array('label' => 'Introduction', 'weight' => -19),
+      'group3' => array('label' => 'Members', 'weight' => -18),
+      'group4' => array('label' => 'Description', 'weight' => -17),
+
+
+    );
+  }
+}
+
+/**
+ * Implement hook_insert().
+ */
+function jiscpmteam_insert($node) {
+  //insert the team members
+  //check to see if data is valid
+  if ($node->members != NULL || $node->members != 0 || $node->members != '')
+  {
+	foreach ($node->members as $member) 
+	{
+		db_query("INSERT INTO {jiscpmteam_members} (team_nid, member_uid, member_description) VALUES(%d, %s, '%s')", $node->nid, $member['member_uid'], $member['member_description']);
+	}
+  }
+  
+  //insert the jiscpmteam node
+  db_query("INSERT INTO {jiscpmteam} (nid, vid, project_nid, team_description) 
+  VALUES(%d, %d, %s, '%s')", 
+  $node->nid, $node->vid, $node->project_nid, $node->team_description);
+}
+
+/**
+ * Updates the member listing.
+ */
+function jiscpmteam_update($node) {
+  if ($node->revision) {
+    jiscpmteam_insert($node);
+  }
+  else {
+    db_query("DELETE FROM {jiscpmteam} WHERE nid = %d AND vid = %d", $node->nid, $node->vid);
+    db_query('DELETE FROM {jiscpmteam_members} WHERE team_nid = %d', $node->nid);
+    jiscpmteam_insert($node);
+  }
+}
+
+/**
+ * Deletes an jiscpmteam node from the database.
+ */
+function jiscpmteam_delete(&$node) {
+  db_query("DELETE FROM {jiscpmteam} WHERE nid = %d", $node->nid);
+  db_query("DELETE FROM {jiscpmteam_members} WHERE team_nid = %d", $node->nid);
+}
+
+/**
+ * Impl ement hook_load().
+ */
+function jiscpmteam_load($node) {
+  $result_m = db_query('SELECT member_uid, member_description FROM {jiscpmteam_members} WHERE team_nid = %d', $node->nid);
+  $node->members = array();
+  while ($row_m = db_fetch_object($result_m)) {
+    $member = array(
+      'member_uid' => $row_m->member_uid,
+      'member_description' => $row_m->member_description,
+    );
+   
+    $node->members[] = $member;
+  }
+  
+  $result_pro = db_query('SELECT project_nid, team_description FROM {jiscpmteam} WHERE vid = %d', $node->vid);
+  $node->jiscpmteams = array();
+  while ($row_pro = db_fetch_object($result_pro)) {
+    $jiscpmteam = array(
+      'project_nid' => $row_pro->project_nid,
+      'team_description' => $row_pro->team_description,
+    );
+   
+    $node->jiscpmteams[] = $jiscpmteam;
+  }
+  return $node;
+}
+
+/**
+ * Implement hook_nodeapi().
+ */
+function jiscpmteam_nodeapi(&$node, $op, $teaser, $page) {
+  switch ($op) {
+    case 'prepare':
+      if(!$node->nid) {
+      }
+      break;
+    case 'delete revision':
+      db_query('DELETE FROM {jiscpmteam} WHERE nid = %d AND vid = %d', $node->nid, $node->vid);
+      db_query('DELETE FROM {jiscpmteam_members} WHERE team_nid = %d', $node->nid);
+      break;
+  }
+}
+
+/**
+ * Implement hook_view().
+ */
+function jiscpmteam_view($node, $teaser = FALSE, $page = FALSE) {
+  $node = node_prepare($node, $teaser);
+  $content = $node->content['body']['#value'];
+  // @TODO: render and theme member listing.
+  return theme('jiscpmteam_view', $node, $teaser, $page);
+}
+function jiscpmteam_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'jiscpmteam'),
+  );
+}
+
+
+
+/**
+ * Implement hook_node_info().
+ */
+function jiscpmteam_node_info() {
+  return array(
+    'jiscpmteam' => array(
+      'name' => t('JISCPM Team'),
+      'module' => 'jiscpmteam',
+      'description' => t('Create a JISC PM Team.'),
+      'title_label' => t('JISC PM team name'),
+      'body_label' => t('Description'),
+    ),
+  );
+}
+
+/**
+ * Implement hook_form().
+ */
+function jiscpmteam_form(&$node, $form_state) {
+  $type = node_get_types('type', $node);
+  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';
+
+  /* get all users from the database for referencing */
+  $r = db_query("SELECT u.uid, u.name FROM {users} u ORDER BY u.name");
+  $people = array();
+  $people[0] = 'n/a';
+  while ($person = db_fetch_object($r)) {
+    $people[$person->uid] = check_plain($person->name);
+  }
+  $form['group1'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
+  );
+  // Title.
+  $form['group1']['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Team Name'),
+    '#default_value' => check_plain($node->title),
+    '#required' => TRUE,
+  );
+  $form['group2'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -19,
+  );
+  // Body field.
+  //$form['group2']['body_field'] = node_body_field($node, 'Introduction', $type->min_word_count);
+
+  /* adds functionality for adding team members */
+  $users = array();
+  $results = db_query("SELECT u.name, u.uid FROM {users} u");
+  while ($row = db_fetch_object($results))
+  {
+  	$users[$row->uid] = check_plain($row->name);
+  }
+  if ($users != NULL || $users != '' || $users != 0)
+  {
+  
+  $form['member_wrapper'] = array(
+	'#tree' => FALSE,
+	'#weight' => 5,
+	'#prefix' => '<h2>Members</h2><div class="clear-block" id="jiscpmteam-member-wrapper">',
+	'#suffix' => '</div>',
+
+	);
+
+	// Get number of members.
+	$member_count = empty($node->members) ? 0 : count($node->members);
+
+	// If a new member added, add to list and update the member count.
+	if (isset($form_state['new_member'])) {
+	if (!isset($node->members)) {
+		$node->members = array();
+	}
+	$node->members = array_merge($node->members, array($form_state['new_member']));
+	$member_count++;
+	}
+
+	// If a member removed, remove from list and update the member count.
+	$remove_delta = -1;
+	if (!empty($form_state['remove_delta'])) {
+	$remove_delta = $form_state['remove_delta'] - 1;
+	unset($node->members[$remove_delta]);
+	// Re-number the values.
+	$node->members = array_values($node->members);
+	$member_count--;
+	}
+
+	// Container to display existing members.
+	$form['member_wrapper']['members'] = array(
+	'#prefix' => '<div id="jiscpmteam-members">',
+	'#suffix' => '</div>',
+	'#theme' => 'jiscpmteam_member_table',
+	);
+
+	// Add the existing members to the form.
+	for ($delta = 0; $delta < $member_count; $delta++) {
+	$member_uid = isset($node->members[$delta]['member_uid']) ? $node->members[$delta]['member_uid'] : '';
+	$member_description = isset($node->members[$delta]['member_description']) ? $node->members[$delta]['member_description'] : '';
+	// Display existing members using helper function jiscpmteam_member_display_form().
+	$form['member_wrapper']['members'][$delta] = jiscpmteam_member_display_form($delta, $member_uid, $member_description);
+	}
+
+
+	// Add new members
+	$form['member_wrapper']['add_member'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Add another member'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+	'#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Define the form fields for the new member title and member_description's name.
+	$form['member_wrapper']['add_member']['new_member'] = array(
+	'#tree' => TRUE,
+	'#theme' => 'jiscpmteam_add_member_form',
+	);
+	$form['member_wrapper']['add_member']['new_member']['new_member_uid'] = array(
+	'#type' => 'select',
+	'#title' => t('A Team Member'),
+	'#options' => $users,
+	'#weight' => 0,
+	);
+	$form['member_wrapper']['add_member']['new_member']['new_member_description'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Team Member description'),
+	'#weight' => 1,
+	);
+
+	// We name our button 'jiscpmteam_member_more' to avoid conflicts with other modules using
+	// AHAH-enabled buttons with the id 'more'.
+	$form['member_wrapper']['add_member']['jiscpmteam_member_more'] = array(
+	'#type' => 'submit',
+	'#value' => t('Add member'),
+	'#weight' => 1,
+	'#submit' => array('jiscpmteam_member_add_more_submit'),
+	'#ahah' => array(
+		'path' => 'jiscpmteam_member/js/0',
+		'wrapper' => 'jiscpmteam-members',
+		'method' => 'replace',
+		'effect' => 'fade',
+	),
+	);
+  }
+  $projects = array();
+  $results_n = db_query("SELECT n.nid, n.title FROM {node} n WHERE n.type = 'jiscpmproject'");
+  while ($row_n = db_fetch_object($results_n))
+  {
+  	$projects[$row_n->nid] = check_plain($row_n->title);
+  }
+  /* project */
+  $form['project_nid'] = array(
+    '#type' => 'select',
+    '#title' => t('Project'),
+    '#options' => $projects,
+    '#default_value' => $node->jiscpmteams[0]['project_nid'],
+    '#required' => TRUE,
+  );
+  /* description of team */
+   $form['team_description'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Description of Team'),
+    '#default_value' => check_plain($node->jiscpmteams[0]['team_description']),
+  );
+  
+  return $form;
+}
+
+/**
+ * Submit handler for 'Add member' button on node form.
+ */
+function jiscpmteam_member_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmteam_member_more']) {
+    $new_member = array();
+    $new_member['member_uid'] = check_plain($form_state['values']['new_member']['new_member_uid']);
+    $new_member['member_description'] = check_plain($form_state['values']['new_member']['new_member_description']);
+    $form_state['new_member'] = $new_member;
+  }
+}
+/**
+ * AJAX form handler.
+ */
+function jiscpmteam_ajax_form_handler($delta = 0) {
+  // The form is generated in an include file which we need to include manually.
+  include_once 'modules/node/node.pages.inc';
+  $form_state = array('storage' => NULL, 'submitted' => FALSE);
+  $form_build_id = $_POST['form_build_id'];
+
+  // Get the form from the cache.
+  $form = form_get_cache($form_build_id, $form_state);
+  $args = $form['#parameters'];
+  $form_id = array_shift($args);
+
+  // We need to process the form, prepare for that by setting a few internals.
+  $form_state['post'] = $form['#post'] = $_POST;
+  $form['#programmed'] = $form['#redirect'] = FALSE;
+
+  // Set up our form state variable, needed for removing staff_costs.
+  $form_state['remove_delta'] = $delta;
+
+  // Build, validate and if possible, submit the form.
+  drupal_process_form($form_id, $form, $form_state);
+  // If validation fails, force form submission.
+  if (form_get_errors()) {
+    form_execute_handlers('submit', $form, $form_state);
+  }
+
+  // This call recreates the form relying solely on the form_state that the
+  // drupal_process_form set up.
+  $form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
+
+  return $form;
+}
+
+
+/**
+ * Submit handler for 'Remove' button on node form.
+ */
+function jiscpmteam_remove_row_submit($form, &$form_state) {
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+}
+
+function jiscpmteam_member_js($delta = 0) {
+  $form = jiscpmteam_ajax_form_handler($delta);
+
+  // Render the new output.
+  $member_form = $form['member_wrapper']['members'];
+  // Prevent duplicate wrappers.
+  unset($member_form['#prefix'], $member_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($member_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+
+/**
+ * Implement hook_theme().
+ */
+function jiscpmteam_theme() {
+  return array(
+    'jiscpmteam_member_table' => array(
+      'arguments' => array('form'),
+    ),
+    'jiscpmteam_list' => array(
+      'file'      => 'jiscpmteam.theme.inc',
+      'arguments' => array('header', 'projects'),
+    ),
+    'jiscpmteam_view' => array(
+      'file'      => 'jiscpmteam.theme.inc',
+      'arguments' => array('node', 'teaser', 'page'),
+    ),
+  );
+}
+/* outputs the team member table for display on the node form */
+function theme_jiscpmteam_member_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Title'),
+    t('member description'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['member_uid_text']['#title'],
+      $form[$key]['member_description_text']['#title'],
+      $form[$key]['remove_member']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['member_uid']) . drupal_render($form[$key]['member_uid_text']), 'class' => 'member-title'),
+        array('data' => drupal_render($form[$key]['member_description']) . drupal_render($form[$key]['member_description_text']), 'class' => 'member-description'),
+        array('data' => drupal_render($form[$key]['remove_member']), 'class' => 'remove-member'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+
+/**
+ * Helper function to define populated form field elements for jiscpmteam member node form.
+ */
+function jiscpmteam_member_display_form($delta, $member_uid, $member_description) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // member title.
+  $form['member_uid'] = array(
+    '#type' => 'hidden',
+    '#value' => $member_uid,
+    '#parents' => array('members', $delta, 'member_uid'),
+  );
+  $form['member_uid_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('members', $delta, 'member_uid'),
+    '#value' => $member_uid,
+  );
+
+  // member_description.
+  $form['member_description'] = array(
+    '#type' => 'hidden',
+    '#value' => $member_description,
+    '#parents' => array('members', $delta, 'member_description'),
+  );
+  $form['member_description_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('members', $delta, 'member_description'),
+    '#value' => $member_description,
+  );
+
+  // Remove button.
+  $form['remove_member'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_member_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmteam_remove_row_submit'),
+    '#parents' => array('members', $delta, 'remove_member'),
+    '#ahah' => array(
+      'path' => 'jiscpmteam_member/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmteam-members',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+

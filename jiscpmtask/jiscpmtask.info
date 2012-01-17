@@ -1,0 +1,10 @@
+; $Id: $
+name = JISC PM Task
+description = "Allows recording of tasks for jiscpm Projects"
+dependencies[] = jiscpm 
+dependencies[] = jiscpmattribute
+dependencies[] = jiscpmproject
+package = JISC Project Management
+core = 6.x
+
+

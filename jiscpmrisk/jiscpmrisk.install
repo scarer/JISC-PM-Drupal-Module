@@ -1,0 +1,40 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+function jiscpmrisk_install() {
+  drupal_install_schema('jiscpmrisk');
+}
+
+function jiscpmrisk_disable() {
+  drupal_set_message(t('Nodes of type "risk" have not been deleted on disabling jiscpm risk. Please note that they will now have reduced functionality, and will not be protected by jiscpm risk access controls.'), 'warning');
+}
+
+function jiscpmrisk_uninstall() {
+  drupal_uninstall_schema('jiscpmrisk');
+}
+
+function jiscpmrisk_schema() {
+  $schema['jiscpmrisk'] = array(
+    'fields'                => array(
+      'nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('type' => 'int'),
+      'risk_probability'  => array('type' => 'varchar', 'length' => 100),
+      'risk_impact'  => array('type' => 'varchar', 'length' => 100),
+      'risk_start'  => array('type' => 'int', 'default' => 0),
+      'risk_end'  => array('type' => 'int', 'default' => 0),
+      'risk_residual'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'risk_early_warning_signs'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'risk_owner_uid'  => array('type' => 'varchar', 'length' => 100),
+      'risk_category'  => array('type' => 'varchar', 'length' => 100),
+      'risk_management_approach'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('nid'),
+  );
+
+  return $schema;
+}

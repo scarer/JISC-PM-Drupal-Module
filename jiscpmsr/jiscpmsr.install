@@ -1,0 +1,86 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+function jiscpmsr_install() {
+  drupal_install_schema('jiscpmsr');
+  drupal_install_schema('jiscpmsr_md');
+}
+
+function jiscpmsr_disable() {
+  drupal_set_message(t('Nodes of type "jiscpmsr" have not been deleted on disabling jiscpm sr. Please note that they will now have reduced functionality, and will not be protected by jiscpm sr access controls.'), 'warning');
+}
+
+function jiscpmsr_uninstall() {
+  drupal_uninstall_schema('jiscpmsr');
+  drupal_uninstall_schema('jiscpmsr_md');
+}
+
+function jiscpmsr_schema() {
+  $schema['jiscpmsr'] = array(
+    'fields'                => array(
+      'nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('type' => 'int'),
+      'sr_focus_area'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_product_process'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_overview'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_milestone_report'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_risk_management_report'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_issues_report'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_project_recommendations'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_start'  => array('type' => 'int', 'default' => 0),
+      'sr_end'  => array('type' => 'int', 'default' => 0),
+      'sr_overall_status'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_project_summary'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_objectives_for_next_sr'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_related_project_information'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('nid'),
+  );
+  $schema['jiscpmsr_md'] = array(
+    'fields'                => array(
+      'md_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sr_nid'    => array('type' => 'int'),
+      'milestone_id'    => array('type' => 'int'),
+      'md_title'  => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'md_due_date'  => array('type' => 'int', 'default' => 0),
+      'md_percentage_completed'  => array('type' => 'int', 'default' => 0),
+      'md_deliverable_status'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'md_current_sr'  => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('md_id'),
+  );
+  $schema['jiscpmsr_pm'] = array(
+    'fields'                => array(
+      'pm_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sr_nid'    => array('type' => 'int'),
+      'milestone_id'    => array('type' => 'int'),
+      'pm_success'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'pm_failure'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('pm_id'),
+  );
+  $schema['jiscpmsr_rm'] = array(
+    'fields'                => array(
+      'rm_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sr_nid'    => array('type' => 'int'),
+      'risk_nid'    => array('type' => 'int'),
+      'rm_changes'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('rm_id'),
+  );
+  $schema['jiscpmsr_im'] = array(
+    'fields'                => array(
+      'im_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sr_nid'    => array('type' => 'int'),
+      'issue_nid'    => array('type' => 'int'),
+      'im_resolution'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('im_id'),
+  );
+  return $schema;
+}

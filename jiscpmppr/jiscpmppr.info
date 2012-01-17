@@ -1,0 +1,9 @@
+; $Id:  $
+name = JISC PM Post Project Review
+description = "Allows recording of Post Project Reviews based on jiscpm Projects"
+dependencies[] = jiscpm 
+dependencies[] = jiscpmattribute
+dependencies[] = jiscpmproject
+package = JISC Project Management
+core = 6.x
+

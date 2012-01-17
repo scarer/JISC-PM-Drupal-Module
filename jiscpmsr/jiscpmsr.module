@@ -1,0 +1,956 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+/** 
+ * @function
+ * Implementation of hook_help
+ */
+function jiscpmsr_help($path, $arg) {
+  $o = '';
+
+  switch ($path) {
+    case "admin/help#jiscpmsr":
+      $o = '<p>'.  t("Provides Status Report support for jiscpm") .'</p>';
+      break;
+  }
+
+  return $o;
+}
+
+/**
+ * @function
+ * Implementation of hook_perm
+ */
+function jiscpmsr_perm() {
+  return array(
+    'jiscpm sr: access',
+    'jiscpm sr: add',
+    'jiscpm sr: edit all',
+    'jiscpm sr: edit own',
+    'jiscpm sr: delete all',
+    'jiscpm sr: delete own',
+  );
+}
+
+/**
+ * @function
+ * Implementation of hook_init
+ */
+function jiscpmsr_init() {
+  /*$settings = array(
+    'jiscpm' => array(
+      'organization_srs_url' => url('jiscpm/organization_srs_js/')
+    ),
+  );
+  drupal_add_js($settings, 'setting');
+
+  drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
+  drupal_add_js(drupal_get_path('module', 'jiscpmsr') .'/jiscpmsr.js', 'module', 'header', FALSE);*/
+}
+
+function jiscpmsr_access($op, $node, $account=NULL) {
+  if (empty($account)) {
+    global $user;
+    $account = $user;
+  }
+    
+  if (is_numeric($node)) {
+    $node = node_load($node);
+  }
+  
+  if ($op == 'create') {
+    return user_access('jiscpm sr: add');
+  }
+  
+  if ($op == 'delete') {
+    if (user_access('jiscpm sr: delete all')) 
+    {
+      return TRUE;
+    } else if (user_access('jiscpm sr: delete own') && ($account->uid == $node->uid)) 
+    {
+      return TRUE;
+    } 
+  }
+  
+  if ($op == 'update') {
+    if (user_access('jiscpm sr: edit all')) {
+      return TRUE;
+    } 
+    else if (user_access('jiscpm sr: edit own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    } 
+  }
+  
+  if ($op == 'view') {
+    if (user_access('jiscpm sr: view all')) {
+      return TRUE;
+    } 
+    else if (user_access('jiscpm sr: view own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    } 
+  }
+  return FALSE;
+}
+
+function jiscpmsr_access_sql($sql, $where = array()) {
+  if (user_access('jiscpm sr: view all')) {
+    $where[] = "'jiscpm_access'='jiscpm_access'";
+    return jiscpm_rewrite_sql($sql, $where);
+  }
+
+  global $user;
+
+  $cond = '';
+  if (user_access('jiscpm sr: view own')) {
+    $cond .= 'n.uid='. $user->uid;
+  }
+
+  if (empty($cond)) $cond = '0=1';
+  $where[] = $cond;
+
+  $where[] = "'jiscpm_access'='jiscpm_access'";
+  return jiscpm_rewrite_sql($sql, $where);
+}
+
+
+function jiscpmsr_menu() {
+  $items = array();
+
+  $items['jiscpm/dashboard/srs'] = array(
+    'title' => 'Status Reports',
+    'description' => 'jiscpm status reports',
+    'page callback' => 'jiscpmsr_list',
+    'access arguments' => array('jiscpm sr: access'),
+    'file' => 'jiscpmsr.admin.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+  $items['jiscpm/project_srs_js/%'] = array(
+    'title' => 'Status Reports',
+    'page callback' => '_jiscpmsr_project_srs_js',
+    'page arguments' => array(2),
+    'access arguments' => array('jiscpm sr: access'),
+    'file' => 'jiscpmsr.admin.inc',
+    'type' => MENU_CALLBACK,
+  );
+   $items['jiscpmsr_md/js/%'] = array(
+    'page callback' => 'jiscpmsr_md_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function jiscpmsr_theme() {
+  return array(
+    'jiscpmsr_list' => array(
+      'file'      => 'jiscpmsr.theme.inc',
+      'arguments' => array('header', 'srs'),
+    ),
+    'jiscpmsr_view' => array(
+      'file'      => 'jiscpmsr.theme.inc',
+      'arguments' => array('node', 'teaser', 'page'),
+    ),
+    'jiscpmsr_md_table' => array(
+      'arguments' => array('form'),
+    ),
+  );
+}
+
+function jiscpmsr_node_info() {
+  return array(
+    'jiscpmsr' => array(
+      'name' => t('JISCPM Status Report'),
+      'module' => 'jiscpmsr',
+      'description' => t("A status report for jiscpm."),
+      'title_label' => t("Title"),
+      'body_label' => t("Description"),
+    )
+  );
+}
+
+function jiscpmsr_content_extra_fields($type_name) {
+  if ($type_name == 'jiscpmsr') {
+    return array(
+      'group1' => array('label' => 'Owner', 'weight' => -20),
+      'group2' => array('label' => 'Project title', 'weight' => -19),
+      'group3' => array('label' => 'Probability', 'weight' => -18),
+      'group4' => array('label' => 'Impact', 'weight' => -17),
+      'group5' => array('label' => 'Timescale', 'weight' => -16),
+      'group6' => array('label' => 'Residual sr', 'weight' => -15),
+      'group7' => array('label' => 'Early warning signs', 'weight' => -14),
+      'group8' => array('label' => 'Timescale', 'weight' => -13),
+    );
+  }
+}
+
+
+function jiscpmsr_jiscpmowner_change($owner_uid, $owner_name) {
+  $s = "UPDATE {jiscpmsr} SET owner='%s' WHERE owner_uid =%d AND owner_name <> '%s'";
+  db_query($s, $owner_name, $owner_uid, $owner_name);
+}
+
+function jiscpmsr_form(&$node, $form_state) {
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('JISCPM'), 'jiscpm');
+  $breadcrumb[] = l(t('srs'), 'jiscpm/srs');
+  drupal_set_breadcrumb($breadcrumb);
+  $s_pro = "SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid";
+  $type = node_get_types('type', $node);
+  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';
+
+  $form['group2'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -22,
+  );
+  /* print out project options */
+  $s_pro = db_rewrite_sql($s_pro);
+  $r = db_query($s_pro);
+  $projects = array();
+  while ($project = db_fetch_object($r)) {
+    $projects[$project->nid] = check_plain($project->title);
+    if (!$node->project_nid) $node->project_nid = $project->nid;
+  }
+  $form['group2']['project_nid'] = array(
+    '#type' => 'select',
+    '#title' => t('Project'),
+    '#options' => $projects,
+    '#default_value' => $node->jiscpmsrs[0]['project_nid'],
+    '#process' => array('jiscpm_dependent_select_process'),
+    '#required' => TRUE,
+  );
+  
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => check_plain($type->title_label),
+    '#required' => TRUE,
+    '#default_value' => $node->title,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
+  );
+  
+  $form['group3'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -19,
+  );
+  
+  $form['group3']['sr_focus_area'] = array(
+    '#type' => 'textfield',
+    '#title' =>t('Focus Area'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_focus_area'],
+    '#description' => t('The focus area of the status report. For example, "Obtaining quote from the preferred vendor".'),
+  );
+ $form['group4'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -18,
+  );
+  
+  $form['group4']['sr_product_process'] = array(
+    '#type' => 'textfield',
+    '#title' =>t('Product/Process'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_product_process'],
+    '#description' => t('The product or process that was produced at the end of this stage of the project/programme.'),
+  );
+   $form['group5'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -17,
+  );
+  
+  $form['group5']['sr_overview'] = array(
+    '#type' => 'textarea',
+    '#title' =>t('Status report overview'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_overview'],
+    '#description' => t('A short overview of the project/programme that the status report is addressing.'),
+  );
+   $form['group6'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -16,
+  );
+  
+  $form['group6']['sr_milestone_report'] = array(
+    '#type' => 'textarea',
+    '#title' =>t('Milestone Report'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_milestone_report'],
+    '#description' => t('An overview of the project/programme milestones and how they might have changed or remained constant.'),
+  );
+   $form['group7'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -15,
+  );
+  
+  $form['group7']['sr_risk_management_report'] = array(
+    '#type' => 'textarea',
+    '#title' =>t('Risk Management Report'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_risk_management_report'],
+    '#description' => t('An overview of the project/programme risks and how they might have changed or remained constant.'),
+  );
+   $form['group8'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -14,
+  );
+  
+  $form['group8']['sr_issues_report'] = array(
+    '#type' => 'textarea',
+    '#title' =>t('Issues Report'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_issues_report'],
+    '#description' => t('An overview of the project/programme issues and how they might have changed or remained constant.'),
+  );
+  $form['group9'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -13,
+  );
+ $form['group9']['timescale'] = array(
+ 	'#type' => 'fieldset',
+ 	'#title' => t('Timescale'),
+ 	'#collapsible' => TRUE,
+ 	'#collapsed' => FALSE,
+ );
+ if ($node->sr_start != '' || $node->sr_start != NULL || $node->sr_start != 0)
+  {
+	if (module_exists('date_api') && module_exists('date_popup')) {
+		$form['group9']['timescale']['sr_start'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Reporting Period Start'),
+			'#date_format' =>	 'Y-m-d',
+			'#default_value' => date('Y-m-d', $node->jiscpmsrs[0]['sr_start']),
+		);
+	}
+  }
+  else
+  {
+  if (module_exists('date_api') && module_exists('date_popup')) {
+		$form['group9']['timescale']['sr_start'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Reporting Period Start'),
+			'#date_format' =>	 'Y-m-d',
+			'#default_value' => date('Y-m-d'),
+		);
+	}
+  }
+  if ($node->sr_end != '' || $node->sr_end != NULL || $node->sr_end != 0)
+  {
+	if (module_exists('date_api') && module_exists('date_popup')) {
+		$form['group9']['timescale']['sr_end'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Reporting Period End'),
+			'#date_format' =>	 'Y-m-d',
+			'#default_value' => date('Y-m-d', $node->jiscpmsrs[0]['sr_end']),
+		);
+	}
+  }
+  else
+  {
+  if (module_exists('date_api') && module_exists('date_popup')) {
+		$form['group9']['timescale']['sr_end'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Reporting Period End'),
+			'#date_format' =>	 'Y-m-d',
+			'#default_value' => date('Y-m-d'),
+		);
+	}
+  }
+  $form['group10'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group10') : -12,
+  );
+  
+  $form['group10']['sr_overall_status'] = array(
+    '#type' => 'textarea',
+    '#title' =>t('Overall status of the project'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_overall_status'],
+    '#description' => t('The overall status of the project/programme.'),
+  );
+  $form['group11'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group11') : -11,
+  );
+  
+  $form['group11']['sr_project_summary'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Project Summary'),
+    '#description' =>t('A summary of the current stage of the project/programme.'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_project_summary'],
+  );
+  
+  //insert milestone mds for the last period
+  $milestones = array();
+  $results = db_query("SELECT milestone_id, milestone_title FROM {jiscpmproject_milestone}");
+  while ($row = db_fetch_object($results))
+  {
+  	$milestones[$row->milestone_id] = check_plain($row->milestone_title);
+  }
+
+ $items['jiscpmsr_md/js/%'] = array(
+    'page callback' => 'jiscpmsr_md_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  
+  /* end menu hook */
+  
+  /* hook form */
+  $form['md_wrapper'] = array(
+	'#tree' => FALSE,
+	'#weight' => 5,
+	'#prefix' => '<h2>Milestone mds</h2><div class="clear-block" id="jiscpmsr-md-wrapper">',
+	'#suffix' => '</div>',
+
+	);
+
+	// Get number of mds.
+	$md_count = empty($node->mds) ? 0 : count($node->mds);
+
+	// If a new md added, add to list and update the md count.
+	if (isset($form_state['new_md'])) {
+	if (!isset($node->mds)) {
+		$node->mds = array();
+	}
+	$node->mds = array_merge($node->mds, array($form_state['new_md']));
+	$md_count++;
+	}
+
+	// If a md removed, remove from list and update the md count.
+	$remove_delta = -1;
+	if (!empty($form_state['remove_delta'])) {
+	$remove_delta = $form_state['remove_delta'] - 1;
+	unset($node->mds[$remove_delta]);
+	// Re-number the values.
+	$node->mds = array_values($node->mds);
+	$md_count--;
+	}
+
+	// Container to display existing mds.
+	$form['md_wrapper']['mds'] = array(
+	'#prefix' => '<div id="jiscpmsr-mds">',
+	'#suffix' => '</div>',
+	'#theme' => 'jiscpmsr_md_table',
+	);
+
+	// Add the existing mds to the form.
+	for ($delta = 0; $delta < $md_count; $delta++) {
+	$milestone_id = isset($node->mds[$delta]['milestone_id']) ? $node->mds[$delta]['milestone_id'] : '';
+	$md_title = isset($node->mds[$delta]['md_title']) ? $node->mds[$delta]['md_title'] : '';
+	$md_due_date = isset($node->mds[$delta]['md_due_date']) ? $node->mds[$delta]['md_due_date'] : '';
+	$md_percentage_completed = isset($node->mds[$delta]['md_percentage_completed']) ? $node->mds[$delta]['md_percentage_completed'] : '';
+	$md_deliverable_status = isset($node->mds[$delta]['md_deliverable_status']) ? $node->mds[$delta]['md_deliverable_status'] : '';
+	$md_current_sr = isset($node->mds[$delta]['md_current_sr']) ? $node->mds[$delta]['md_current_sr'] : '';
+	// Display existing mds using helper function jiscpmsr_md_display_form().
+	$form['md_wrapper']['mds'][$delta] = jiscpmsr_md_display_form($delta, $milestone_id, $md_title, $md_due_date, $md_percentage_completed, $md_deliverable_status, $md_current_sr);
+	}
+
+
+	// Add new mds
+	$form['md_wrapper']['add_md'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Add Another Milestone Deliverable'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+	'#collapsed' => TRUE,
+	'#collapsible' => TRUE,
+	);
+
+	// Define the form fields for the new md title and md_title's name.
+	$form['md_wrapper']['add_md']['new_md'] = array(
+	'#tree' => TRUE,
+	'#theme' => 'jiscpmsr_add_md_form',
+	);
+	$form['md_wrapper']['add_md']['new_md']['new_milestone_id'] = array(
+	'#type' => 'select',
+	'#title' => t('A Milestone'),
+	'#options' => $milestones,
+	'#weight' => 0,
+	);
+	$form['md_wrapper']['add_md']['new_md']['new_md_title'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Title'),
+	'#weight' => 1,
+	);
+	if (module_exists('date_api') && module_exists('date_popup')) {
+      $form['md_wrapper']['add_md']['new_md']['new_md_due_date'] = array(
+        '#type' => 'date_popup',
+        '#title' => t('Due Date'),
+        '#date_format' =>  'Y-m-d',
+        '#default_value' => date('Y-m-d'),
+        '#weight' => 1,
+      );
+    }
+	$form['md_wrapper']['add_md']['new_md']['new_md_percentage_completed'] = array(
+	'#type' => 'select',
+	'#title' => t('Percentage Completed'),
+	'#options' => array(
+	'10' => 10,
+	'20' => 20,
+	'30' => 30,
+	'40' => 40,
+	'50' => 50,
+	'60' => 60,
+	'70' => 70,
+	'80' => 80,
+	'90' => 90,
+	'100' => 100,
+	),
+	'#weight' => 2,
+	);
+    $form['md_wrapper']['add_md']['new_md']['new_md_deliverable_status'] = array(
+	'#type' => 'textarea',
+	'#title' => t('Deliverable Status'),
+	'#weight' => 3,
+	);
+	$form['md_wrapper']['add_md']['new_md']['new_md_current_sr'] = array(
+'#type' => 'select',
+	'#title' => t('Current or next status report'),
+	'#options' => array(
+	  'Current' => t('Current Status Report'),
+	  'Next' => t('Next Status Report'),
+	),
+	'#weight' => 4,
+	'#description' => t('Select current if this milestone md belongs to the reporting period featured in this status report. Select next if this md belongs to the next reporting period after this one.'),
+	);
+	// We name our button 'jiscpmsr_md_more' to avoid conflicts with other modules using
+	// AHAH-enabled buttons with the id 'more'.
+	$form['md_wrapper']['add_md']['jiscpmsr_md_more'] = array(
+	'#type' => 'submit',
+	'#value' => t('Add Milestone Deliverable'),
+	'#weight' => 1,
+	'#submit' => array('jiscpmsr_md_add_more_submit'),
+	'#ahah' => array(
+		'path' => 'jiscpmsr_md/js/0',
+		'wrapper' => 'jiscpmsr-mds',
+		'method' => 'replace',
+		'effect' => 'fade',
+	),
+	);
+
+  //insert milestone mds for the next period
+  //insert risk management status
+  //insert issue management status
+  
+  $form['group16'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group16') : -6,
+  );
+  
+  $form['group16']['sr_project_recommendations'] = array(
+    '#type' => 'textarea',
+    '#title' =>t('Project Recommendations'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_project_recommendations'],
+    '#description' => t('A summary of the current recommendations for the project.'),
+  );
+  
+  $form['group17'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group17') : -5,
+  );
+  
+  $form['group17']['sr_objectives_for_next_sr'] = array(
+    '#type' => 'textarea',
+    '#title' =>t('Objectives for the next Status Report'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_objectives_for_next_sr'],
+    '#description' => t('A summary of the objectives expected to be discussed and obtained in the next Status Report.'),
+  );
+    $form['group18'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group18') : -4,
+  );
+  
+  $form['group18']['sr_related_project_information'] = array(
+    '#type' => 'textarea',
+    '#title' =>t('Related Project Information'),
+    '#default_value' => $node->jiscpmsrs[0]['sr_related_project_information'],
+    '#description' => t('A summary of related project information. For example, other projects that may be demanding the time of team members etc.'),
+  );
+
+  return $form;
+}
+
+function jiscpmsr_insert($node) {
+  $node->sr_start = strtotime($node->sr_start);
+  $node->sr_end = strtotime($node->sr_end);
+  db_query("INSERT INTO {jiscpmsr}
+    (vid, nid, project_nid, sr_focus_area, sr_product_process, sr_overview, sr_milestone_report, 
+    sr_risk_management_report, sr_issues_report, sr_project_recommendations, sr_start, sr_end, 
+    sr_overall_status, sr_project_summary, sr_objectives_for_next_sr, sr_related_project_information)
+    VALUES
+    (%d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, %s, '%s', '%s', '%s', '%s')",
+    $node->nid, $node->nid, $node->project_nid, $node->sr_focus_area, $node->sr_product_process,
+    $node->sr_overview, $node->sr_milestone_report, $node->sr_risk_management_report, 
+    $node->sr_issues_report, $node->sr_project_recommendations, $node->sr_start, $node->sr_end,
+    $node->sr_overall_status, $node->sr_project_summary, $node->sr_objectives_for_next_sr, 
+    $node->sr_related_project_information
+    );
+  //insert the milestone mds
+  //check to see if data is valid
+  if ($node->mds != NULL || $node->mds != 0 || $node->mds != '')
+  {
+	foreach ($node->mds as $md) 
+	{
+	    $md['md_due_date'] = strtotime($md['md_due_date']);
+		db_query("INSERT INTO {jiscpmsr_md} (sr_nid, milestone_id, md_title, md_due_date, 
+		md_percentage_completed, md_deliverable_status, md_current_sr) VALUES (%d, %s, '%s', %s, %s,'%s','%s')", 
+		$node->nid, $md['milestone_id'], $md['md_title'], 
+		$md['md_due_date'], $md['md_percentage_completed'], 
+		$md['md_deliverable_status'], $md['md_current_sr']);
+	}
+  }
+}
+
+function jiscpmsr_update($node) {
+  // if this is a new node or we're adding a new revision,
+  if ($node->revision) {
+    jiscpmsr_insert($node);
+  }
+  else {
+    db_query('DELETE FROM {jiscpmsr} WHERE vid = %d', $node->vid);
+    db_query('DELETE FROM {jiscpmsr_md} WHERE sr_nid = %d', $node->nid);
+    jiscpmsr_insert($node);
+  }
+}
+
+function jiscpmsr_nodeapi(&$node, $op, $teaser, $page) {
+  switch ($op) {
+    case 'prepare':
+
+      break;
+    case 'delete revision':
+      // Notice that we're matching a single revision based on the node's vid.
+      db_query('DELETE FROM {jiscpmsr} WHERE vid = %d', $node->vid);
+      db_query('DELETE FROM {jiscpmsr_md} WHERE sr_nid = %d', $node->nid);
+      break;
+  }
+}
+
+function jiscpmsr_delete($node) {
+  // Notice that we're matching all revision, by using the node's nid.
+  db_query('DELETE FROM {jiscpmsr} WHERE nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmsr_md} WHERE sr_nid = %d', $node->nid);
+}
+
+function jiscpmsr_load($node) {
+  $result_r = db_query('SELECT project_nid, sr_focus_area, sr_product_process, sr_overview, 
+  sr_milestone_report, sr_risk_management_report, sr_issues_report, sr_project_recommendations, 
+  sr_start, sr_end, sr_overall_status, sr_project_summary, sr_objectives_for_next_sr, 
+  sr_related_project_information FROM {jiscpmsr} WHERE vid = %d', $node->vid);
+  $node->jiscpmsrs = array();
+  while ($row_r = db_fetch_object($result_r)) {
+    $jiscpmsr = array(
+      'project_nid' => $row_r->project_nid,
+      'sr_focus_area' => $row_r->sr_focus_area,
+      'sr_product_process' => $row_r->sr_product_process,
+      'sr_overview' => $row_r->sr_overview,
+      'sr_milestone_report' => $row_r->sr_milestone_report,
+      'sr_risk_management_report' => $row_r->sr_risk_management_report,
+      'sr_issues_report' => $row_r->sr_issues_report,
+      'sr_project_recommendations' => $row_r->sr_project_recommendations,
+      'sr_start' => $row_r->sr_start,
+      'sr_end' => $row_r->sr_end,
+      'sr_overall_status' => $row_r->sr_overall_status,
+      'sr_project_summary' => $row_r->sr_project_summary,
+      'sr_objectives_for_next_sr' => $row_r->sr_objectives_for_next_sr,
+      'sr_related_project_information' => $row_r->sr_related_project_information,
+    );
+   
+    $node->jiscpmsrs[] = $jiscpmsr;
+  }
+  //load the milestone mds
+  $result_m = db_query('SELECT sr_nid, milestone_id, md_title, md_due_date, md_percentage_completed, 
+md_deliverable_status, md_current_sr FROM {jiscpmsr_md} WHERE sr_nid = %d', $node->nid);
+  $node->mds = array();
+  while ($row_m = db_fetch_object($result_m)) {
+    $md = array(
+      'sr_nid' => $row_m->sr_nid,
+      'milestone_id' => $row_m->milestone_id,
+      'md_title' => $row_m->md_title,
+      'md_due_date' => $row_m->md_due_date,
+      'md_percentage_completed' => $row_m->md_percentage_completed,
+      'md_deliverable_status' => $row_m->md_deliverable_status,
+      'md_current_sr' => $row_m->md_current_sr,
+    );
+   
+    $node->mds[] = $md;
+  }
+  return $node;
+}
+
+  /**
+ * Submit handler for 'Add md' button on node form.
+ */
+function jiscpmsr_md_add_more_submit($form, &$form_state) {
+  $form_state['remove_delta'] = 0;
+
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmsr_md_more']) {
+    $new_md = array();
+    $new_md['milestone_id'] = check_plain($form_state['values']['new_md']['new_milestone_id']);
+    $new_md['md_title'] = check_plain($form_state['values']['new_md']['new_md_title']);
+    $new_md['md_due_date'] = $form_state['values']['new_md']['new_md_due_date'];
+    $new_md['md_percentage_completed'] = check_plain($form_state['values']['new_md']['new_md_percentage_completed']);
+    $new_md['md_deliverable_status'] = check_plain($form_state['values']['new_md']['new_md_deliverable_status']);
+    $new_md['md_current_sr'] = check_plain($form_state['values']['new_md']['new_md_current_sr']);
+    $form_state['new_md'] = $new_md;
+  }
+}
+/**
+ * AJAX form handler.
+ */
+function jiscpmsr_ajax_form_handler($delta = 0) {
+  // The form is generated in an include file which we need to include manually.
+  include_once 'modules/node/node.pages.inc';
+  $form_state = array('storage' => NULL, 'submitted' => FALSE);
+  $form_build_id = $_POST['form_build_id'];
+
+  // Get the form from the cache.
+  $form = form_get_cache($form_build_id, $form_state);
+  $args = $form['#parameters'];
+  $form_id = array_shift($args);
+
+  // We need to process the form, prepare for that by setting a few internals.
+  $form_state['post'] = $form['#post'] = $_POST;
+  $form['#programmed'] = $form['#redirect'] = FALSE;
+
+  // Set up our form state variable, needed for removing staff_costs.
+  $form_state['remove_delta'] = $delta;
+
+  // Build, validate and if possible, submit the form.
+  drupal_process_form($form_id, $form, $form_state);
+  // If validation fails, force form submission.
+  if (form_get_errors()) {
+    form_execute_handlers('submit', $form, $form_state);
+  }
+
+  // This call recreates the form relying solely on the form_state that the
+  // drupal_process_form set up.
+  $form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
+
+  return $form;
+}
+
+
+/**
+ * Submit handler for 'Remove' button on node form.
+ */
+function jiscpmsr_remove_row_submit($form, &$form_state) {
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+}
+
+function jiscpmsr_md_js($delta = 0) {
+  $form = jiscpmsr_ajax_form_handler($delta);
+
+  // Render the new output.
+  $md_form = $form['md_wrapper']['mds'];
+  // Prevent duplicate wrappers.
+  unset($md_form['#prefix'], $md_form['#suffix']);
+
+  $output = theme('status_messages') . drupal_render($md_form);
+
+  // AHAH is not being nice to us and doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  }
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
+
+
+/* outputs the team md table for display on the node form */
+function theme_jiscpmsr_md_table($form) {
+  $rows = array();
+  $headers = array(
+    t('Milestone ID'),
+    t('Title'),
+    t('Due Date'),
+    t('Percentage Completed'),
+    t('Deliverable Status'),
+    t('Current or Next'),
+    '',  // Blank header title for the remove link.
+  );
+
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+      $form[$key]['milestone_id_text']['#title'],
+      $form[$key]['md_title_text']['#title'],
+      $form[$key]['md_due_date_text']['#title'],
+      $form[$key]['md_percentage_completed_text']['#title'],
+      $form[$key]['md_deliverable_status_text']['#title'],
+      $form[$key]['md_current_sr_text']['#title'],
+      $form[$key]['remove_md']['#title']
+    );
+
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['milestone_id']) . drupal_render($form[$key]['milestone_id_text']), 'class' => 'md-id'),
+        array('data' => drupal_render($form[$key]['md_title']) . drupal_render($form[$key]['md_title_text']), 'class' => 'md-title'),
+        array('data' => drupal_render($form[$key]['md_due_date']) . drupal_render($form[$key]['md_due_date_text']), 'class' => 'md-due-date'),
+        array('data' => drupal_render($form[$key]['md_percentage_completed']) . drupal_render($form[$key]['md_percentage_completed_text']), 'class' => 'md-percentage-completed'),
+        array('data' => drupal_render($form[$key]['md_deliverable_status']) . drupal_render($form[$key]['md_deliverable_status_text']), 'class' => 'md-md-status'),
+        array('data' => drupal_render($form[$key]['md_current_sr']) . drupal_render($form[$key]['md_current_sr_text']), 'class' => 'md-current-sr'),
+        array('data' => drupal_render($form[$key]['remove_md']), 'class' => 'remove-md'),
+      ),
+    );
+
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+
+/**
+ * Helper function to define populated form field elements for jiscpmsr md node form.
+ */
+function jiscpmsr_md_display_form($delta, $milestone_id, $md_title, $md_due_date, $md_percentage_completed, $md_deliverable_status, $md_current_sr) {
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+
+  // md title.
+  $form['milestone_id'] = array(
+    '#type' => 'hidden',
+    '#value' => $milestone_id,
+    '#parents' => array('mds', $delta, 'milestone_id'),
+  );
+  $form['milestone_id_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Title'),
+    '#weight' => 1,
+    '#parents' => array('mds', $delta, 'milestone_id'),
+    '#value' => $milestone_id,
+  );
+
+  // md_title.
+  $form['md_title'] = array(
+    '#type' => 'hidden',
+    '#value' => $md_title,
+    '#parents' => array('mds', $delta, 'md_title'),
+  );
+  $form['md_title_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('mds', $delta, 'md_title'),
+    '#value' => $md_title,
+  );
+  // md_due_date.
+  $form['md_due_date'] = array(
+    '#type' => 'hidden',
+    '#value' => $md_due_date,
+    '#parents' => array('mds', $delta, 'md_due_date'),
+  );
+  $form['md_due_date_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('mds', $delta, 'md_due_date'),
+    '#value' => $md_due_date,
+  );
+
+// md_percentage_completed.
+  $form['md_percentage_completed'] = array(
+    '#type' => 'hidden',
+    '#value' => $md_percentage_completed,
+    '#parents' => array('mds', $delta, 'md_percentage_completed'),
+  );
+  $form['md_percentage_completed_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Percentage Completed'),
+    '#weight' => 2,
+    '#parents' => array('mds', $delta, 'md_percentage_completed'),
+    '#value' => $md_percentage_completed,
+  );
+
+// md_deliverable_status.
+  $form['md_deliverable_status'] = array(
+    '#type' => 'hidden',
+    '#value' => $md_deliverable_status,
+    '#parents' => array('mds', $delta, 'md_deliverable_status'),
+  );
+  $form['md_deliverable_status_text'] = array(
+    '#type' => 'item',
+    '#title' => t('md Status'),
+    '#weight' => 2,
+    '#parents' => array('mds', $delta, 'md_deliverable_status'),
+    '#value' => $md_deliverable_status,
+  );
+
+// md_current_sr.
+  $form['md_current_sr'] = array(
+    '#type' => 'hidden',
+    '#value' => $md_current_sr,
+    '#parents' => array('mds', $delta, 'md_current_sr'),
+  );
+  $form['md_current_sr_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Current or next'),
+    '#weight' => 2,
+    '#parents' => array('mds', $delta, 'md_current_sr'),
+    '#value' => $md_current_sr,
+  );
+
+
+  // Remove button.
+  $form['remove_md'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_md_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmsr_remove_row_submit'),
+    '#parents' => array('mds', $delta, 'remove_md'),
+    '#ahah' => array(
+      'path' => 'jiscpmsr_md/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmsr-mds',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  return $form;
+}
+
+function jiscpmsr_view($node, $teaser = FALSE, $page = FALSE) {
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('jiscpm'), 'jiscpm');
+  $breadcrumb[] = l(t('srs'), 'jiscpm/srs');
+  drupal_set_breadcrumb($breadcrumb);
+
+  return theme('jiscpmsr_view', $node, $teaser, $page);
+}
+
+function jiscpmsr_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'jiscpmsr'),
+  );
+}

@@ -1,0 +1,146 @@
+/* $Id: jiscpm-rtl.css,v 1.1.2.1 2009/10/23 11:45:40 magnity Exp $ */
+
+table.formgroup tr td {
+padding-right: 0px;
+padding-left: 5px;
+}
+
+th.jiscpm_list_operations {
+text-align: left;
+}
+
+td.jiscpm_list_operations {
+text-align: left;
+}
+
+div.jiscpm_popup_title {
+float: right;
+}
+
+ul.jiscpm_quick_shortcuts li {
+float: right;
+margin: 0 0 1pt 1pt;
+}
+
+div.jiscpmdashboard {
+float: right;
+}
+
+dt.jiscpmcomponent {
+padding-right: 40px;
+}
+
+dt.jiscpmcomponent a {
+margin-left: 5px;
+}
+
+dt#jiscpmorganizations {
+background: transparent url(images/organizations.png) no-repeat top right;
+}
+
+dt#jiscpmprojects {
+background: transparent url(images/projects.png) no-repeat top right;
+}
+
+dt#jiscpmtasks {
+background: transparent url(images/tasks.png) no-repeat top right;
+}
+
+dt#jiscpmtickets {
+background: transparent url(images/tickets.png) no-repeat top right;
+}
+
+dt#jiscpmpeople {
+background: transparent url(images/people.png) no-repeat top right;
+}
+
+dt#jiscpmteammembers {
+background: transparent url(images/teammembers.png) no-repeat top right;
+}
+
+dt#jiscpmknowledgebase {
+background: transparent url(images/knowledgebase.png) no-repeat top right;
+}
+
+dt#jiscpmtimetrackings {
+background: transparent url(images/timetrackings.png) no-repeat top right;
+}
+
+dt#jiscpmnotes {
+background: transparent url(images/notes.png) no-repeat top right;
+}
+
+dt#jiscpminvoices {
+background: transparent url(images/invoices.png) no-repeat top right;
+}
+
+dt#jiscpmexpenses {
+background: transparent url(images/expenses.png) no-repeat top right;
+}
+
+dt#jiscpmattributes {
+background: transparent url(images/attributes.png) no-repeat top right;
+}
+
+dt#jiscpmconfiguration {
+background: transparent url(images/configuration.png) no-repeat top right;
+}
+
+div.jiscpmcomponent {
+overflow: hidden;
+}
+
+div.jiscpmcomponent #fields {
+float: right;
+}
+
+div.jiscpmcomponent #fields div.label{
+float: right;
+text-align: left;
+clear: right;
+}
+
+div.jiscpmcomponent #fields div.value {
+float: right;
+margin-right: 4px;
+}
+
+div.jiscpmcomponent #links {
+float: left;
+}
+
+div.jiscpmcomponent #links div {
+padding-right: 34px;
+}
+
+div.jiscpmcomponent div.projects {
+background: transparent url(images/projects.png) no-repeat top right;
+}
+
+div.jiscpmcomponent div.people {
+background: transparent url(images/people.png) no-repeat top right;
+}
+
+div.jiscpmcomponent div.tickets {
+background: transparent url(images/tickets.png) no-repeat top right;
+}
+
+div.jiscpmcomponent div.invoices {
+background: transparent url(images/invoices.png) no-repeat top right;
+}
+
+div.jiscpmcomponent div.notes {
+background: transparent url(images/notes.png) no-repeat top right;
+}
+
+div.jiscpmcomponent div.timetrackings {
+background: transparent url(images/timetrackings.png) no-repeat top right;
+}
+
+div.jiscpmcomponent div.print_html {
+background: transparent url(images/html.png) no-repeat top right;
+}
+
+div.jiscpmcomponent div.print_pdf {
+background: transparent url(images/pdf.png) no-repeat top right;
+}

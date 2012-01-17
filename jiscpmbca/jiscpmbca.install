@@ -1,0 +1,141 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+function jiscpmbca_install() {
+  drupal_install_schema('jiscpmbca');
+}
+
+function jiscpmbca_disable() {
+  drupal_set_message(t('Nodes of type "business case assessment" have not been deleted on disabling jiscpm bca. Please note that they will now have reduced functionality, and will not be protected by jiscpm bca access controls.'), 'warning');
+}
+
+function jiscpmbca_uninstall() {
+  drupal_uninstall_schema('jiscpmbca');
+}
+
+function jiscpmbca_schema() {
+  $schema['jiscpmbca'] = array(
+    'fields'                => array(
+      'nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('type' => 'int'),
+      'bca_strategies'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_benefits'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_implications'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_alternatives'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_payback'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_staff_changes'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_hr_related_issues'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_changes_technology'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_process_changes'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_internal_support'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_external_support'  => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array('nid', 'project_nid'),
+  );
+  /* schema for jiscpmbca actions */
+   $schema['jiscpmbca_action'] = array(
+    'fields'                => array(
+      'action_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'action_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'action_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'action_deliverydate'             => array('type' => 'int', 'default' => 0),
+    ),
+    'primary key' => array('action_id'),
+  );
+   /* schema for jiscpmbca staff costs */
+   $schema['jiscpmbca_staff_cost'] = array(
+    'fields'                => array(
+      'staff_cost_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'staff_cost_title' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'staff_cost_quantity' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'staff_cost_hours' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'staff_cost_rate' => array('type' => 'float', 'not null' => TRUE, 'default' => 0),
+    ),
+    'primary key' => array('staff_cost_id'),
+  );
+   /* schema for jiscpmbca training costs */
+   $schema['jiscpmbca_training_cost'] = array(
+    'fields'                => array(
+      'training_cost_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'training_cost_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'training_cost_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'training_cost_total'             => array('type' => 'float', 'default' => 0),
+    ),
+    'primary key' => array('training_cost_id'),
+  );
+   /* schema for jiscpmbca equipment costs */
+   $schema['jiscpmbca_equipment_cost'] = array(
+    'fields'                => array(
+      'equipment_cost_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'equipment_cost_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'equipment_cost_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'equipment_cost_total'             => array('type' => 'float', 'default' => 0),
+    ),
+    'primary key' => array('equipment_cost_id'),
+  );
+   /* schema for jiscpmbca other costs */
+   $schema['jiscpmbca_other_cost'] = array(
+    'fields'                => array(
+      'other_cost_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'other_cost_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'other_cost_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'other_cost_total'             => array('type' => 'float', 'default' => 0),
+    ),
+    'primary key' => array('other_cost_id'),
+  );
+   /* schema for jiscpmbca running costs training*/
+   $schema['jiscpmbca_running_cost_training'] = array(
+    'fields'                => array(
+      'running_cost_training_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'running_cost_training_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_training_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_training_total'             => array('type' => 'float', 'default' => 0),
+    ),
+    'primary key' => array('running_cost_training_id'),
+  );
+   /* schema for jiscpmbca running costs licensing*/
+   $schema['jiscpmbca_running_cost_licensing'] = array(
+    'fields'                => array(
+      'running_cost_licensing_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'running_cost_licensing_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_licensing_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_licensing_total'             => array('type' => 'float', 'default' => 0),
+    ),
+    'primary key' => array('running_cost_licensing_id'),
+  );
+     /* schema for jiscpmbca running costs maintenance*/
+   $schema['jiscpmbca_running_cost_maintenance'] = array(
+    'fields'                => array(
+      'running_cost_maintenance_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'running_cost_maintenance_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_maintenance_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_maintenance_total'             => array('type' => 'float', 'default' => 0),
+    ),
+    'primary key' => array('running_cost_maintenance_id'),
+  );
+   /* schema for jiscpmbca running costs other*/
+   $schema['jiscpmbca_running_cost_other'] = array(
+    'fields'                => array(
+      'running_cost_other_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'running_cost_other_title' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_other_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_other_total'             => array('type' => 'float', 'default' => 0),
+    ),
+    'primary key' => array('running_cost_other_id'),
+  );
+  return $schema;
+}

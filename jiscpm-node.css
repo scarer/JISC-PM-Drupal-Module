@@ -1,0 +1,40 @@
+/* $Id: jiscpm-node.css,v 1.1.2.3 2010/02/18 17:02:45 magnity Exp $ */
+
+/* CSS Attributes used when viewing jiscpm nodes */
+
+dt.print_html {
+  background: transparent url(images/html.png) no-repeat top left;
+}
+
+dt.print_pdf {
+  background: transparent url(images/pdf.png) no-repeat top left;
+}
+
+div.jiscpmfields, div.field, div.jiscpmbody {
+  /*width: 70%;*/
+}
+div.jiscpmbody
+{
+padding-top:20px;
+}
+
+div.jiscpmfields div.label, div.jiscpmbody div.label, div.field div.field-label-inline-first {
+  float: left;
+  width: auto;
+  text-align: left;
+  clear: left;
+  font-weight: bold;
+}
+
+div.jiscpmlinks {
+  float:right;
+  width: 30%;
+}
+
+div.jiscpmbody div.value p {
+  margin: 0;
+}
+
+table#attachments {
+  float: left;
+}

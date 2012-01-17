@@ -1,0 +1,12 @@
+; $Id:  $
+
+; Basic information
+name = JISC PM Attribute
+description = "Provides attributes (allowed field values) for use within jiscpm modules"
+core = 6.x
+package = JISC Project Management
+
+; Dependencies
+dependencies[] = jiscpm
+
+

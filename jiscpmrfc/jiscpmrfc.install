@@ -1,0 +1,33 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+function jiscpmrfc_install() {
+  drupal_install_schema('jiscpmrfc');
+}
+
+function jiscpmrfc_disable() {
+  drupal_set_message(t('Nodes of type "RFC" have not been deleted on disabling jiscpm rfc. Please note that they will now have reduced functionality, and will not be protected by jiscpm rfc access controls.'), 'warning');
+}
+
+function jiscpmrfc_uninstall() {
+  drupal_uninstall_schema('jiscpmrfc');
+}
+
+function jiscpmrfc_schema() {
+  $schema['jiscpmrfc'] = array(
+    'fields'                => array(
+      'nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('type' => 'int'),
+      'rfc_rationale' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'rfc_requestor_uid'  => array('type' => 'varchar', 'length' => 100),
+    ),
+    'primary key' => array('nid'),
+  );
+
+  return $schema;
+}

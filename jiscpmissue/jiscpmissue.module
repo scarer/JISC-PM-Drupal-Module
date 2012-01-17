@@ -1,0 +1,353 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+/** 
+ * @function
+ * Implementation of hook_help
+ */
+function jiscpmissue_help($path, $arg) {
+  $o = '';
+
+  switch ($path) {
+    case "admin/help#jiscpmissue":
+      $o = '<p>'.  t("Provides issues for jiscpm projects and programmes") .'</p>';
+      break;
+  }
+
+  return $o;
+}
+
+/**
+ * @function
+ * Implementation of hook_perm
+ */
+function jiscpmissue_perm() {
+  return array(
+    'jiscpm issue: access',
+    'jiscpm issue: add',
+    'jiscpm issue: edit all',
+    'jiscpm issue: edit own',
+    'jiscpm issue: delete all',
+    'jiscpm issue: delete own',
+  );
+}
+
+/**
+ * @function
+ * Implementation of hook_init
+ */
+function jiscpmissue_init() {
+  /*$settings = array(
+    'jiscpm' => array(
+      'organization_issues_url' => url('jiscpm/organization_issues_js/')
+    ),
+  );
+  drupal_add_js($settings, 'setting');*/
+
+  drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
+  drupal_add_js(drupal_get_path('module', 'jiscpmissue') .'/jiscpmissue.js', 'module', 'header', FALSE);
+}
+
+function jiscpmissue_access($op, $node, $account=NULL) {
+  if (empty($account)) {
+    global $user;
+    $account = $user;
+  }
+    
+  if (is_numeric($node)) {
+    $node = node_load($node);
+  }
+  
+  if ($op == 'create') {
+    return user_access('jiscpm issue: add');
+  }
+  
+  if ($op == 'delete') {
+    if (user_access('jiscpm issue: delete all')) 
+    {
+      return TRUE;
+    } else if (user_access('jiscpm issue: delete own') && ($account->uid == $node->uid)) 
+    {
+      return TRUE;
+    } 
+  }
+  
+  if ($op == 'update') {
+    if (user_access('jiscpm issue: edit all')) {
+      return TRUE;
+    } 
+    else if (user_access('jiscpm issue: edit own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    } 
+  }
+  
+  if ($op == 'view') {
+    if (user_access('jiscpm issue: view all')) {
+      return TRUE;
+    } 
+    else if (user_access('jiscpm issue: view own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    } 
+  }
+  return FALSE;
+}
+
+function jiscpmissue_access_sql($sql, $where = array()) {
+  if (user_access('jiscpm issue: view all')) {
+    $where[] = "'jiscpm_access'='jiscpm_access'";
+    return jiscpm_rewrite_sql($sql, $where);
+  }
+
+  global $user;
+
+  $cond = '';
+  if (user_access('jiscpm issue: view own')) {
+    $cond .= 'n.uid='. $user->uid;
+  }
+
+  if (empty($cond)) $cond = '0=1';
+  $where[] = $cond;
+
+  $where[] = "'jiscpm_access'='jiscpm_access'";
+  return jiscpm_rewrite_sql($sql, $where);
+}
+
+
+function jiscpmissue_menu() {
+  $items = array();
+
+  $items['jiscpm/dashboard/issues'] = array(
+    'title' => 'Issues',
+    'description' => 'jiscpm issues',
+    'page callback' => 'jiscpmissue_list',
+    'access arguments' => array('jiscpm issue: access'),
+    'file' => 'jiscpmissue.admin.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+
+  return $items;
+}
+
+function jiscpmissue_theme() {
+  return array(
+    'jiscpmissue_list' => array(
+      'file'      => 'jiscpmissue.theme.inc',
+      'arguments' => array('header', 'issues'),
+    ),
+    'jiscpmissue_view' => array(
+      'file'      => 'jiscpmissue.theme.inc',
+      'arguments' => array('node', 'teaser', 'page'),
+    ),
+  );
+}
+
+function jiscpmissue_node_info() {
+  return array(
+    'jiscpmissue' => array(
+      'name' => t('JISCPM Issue'),
+      'module' => 'jiscpmissue',
+      'description' => t("An issue for a jiscpm project or jiscpmprogramme."),
+      'title_label' => t("Title"),
+      'body_label' => t("Description"),
+    )
+  );
+}
+
+function jiscpmissue_content_extra_fields($type_name) {
+  if ($type_name == 'jiscpmissue') {
+    return array(
+      'group1' => array('label' => 'owner', 'weight' => -20),
+      'group2' => array('label' => 'Project title', 'weight' => -19),
+      'group3' => array('label' => 'Probability', 'weight' => -18),
+      'group4' => array('label' => 'Impact', 'weight' => -17),
+      'group5' => array('label' => 'Timescale', 'weight' => -16),
+      'group6' => array('label' => 'Residual issue', 'weight' => -15),
+      'group7' => array('label' => 'Early warning signs', 'weight' => -14),
+      'group8' => array('label' => 'Timescale', 'weight' => -13),
+    );
+  }
+}
+
+function jiscpmissue_form(&$node) {
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('JISCPM'), 'jiscpm');
+  $breadcrumb[] = l(t('issues'), 'jiscpm/issues');
+  drupal_set_breadcrumb($breadcrumb);
+
+  //if (arg(1)=='add') {
+    $s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
+    $s_pro = "SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid";
+  //}
+
+  $type = node_get_types('type', $node);
+
+  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';
+
+  $form['group1'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
+  );
+  
+  /* print out owner options */
+  $s_own = db_rewrite_sql($s_own);
+  $r = db_query($s_own);
+  $owners = array();
+  while ($owner = db_fetch_object($r)) {
+    $owners[$owner->uid] = $owner->name;
+    if (!$node->owner_uid) $node->owner_uid = $owner->uid;
+  }
+  $form['group1']['issue_owner_uid'] = array(
+    '#type' => 'select',
+    '#title' => t('Issue owner'),
+    '#options' => $owners,
+    '#required' => TRUE,
+    '#default_value' => $node->issues[0]['issue_owner_uid'],
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+  /* print out project options */
+  $s_pro = db_rewrite_sql($s_pro);
+  $r = db_query($s_pro);
+  $projects = array();
+  while ($project = db_fetch_object($r)) {
+    $projects[$project->nid] = $project->title;
+    if (!$node->project_nid) $node->project_nid = $project->nid;
+  }
+  $form['group2']['project_nid'] = array(
+    '#type' => 'select',
+    '#title' => t('Project'),
+    '#options' => $projects,
+    '#required' => TRUE,
+    '#default_value' => $node->issues[0]['project_nid'],
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+  
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => check_plain($type->title_label),
+    '#required' => TRUE,
+    '#default_value' => $node->title,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
+  );
+  
+  if ($type->has_body) {
+    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+  }
+  
+  $form['group3'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -19,
+  );
+  $form['group3']['issue_progress'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Progress on issue'),
+    '#required' => TRUE,
+    '#default_value' => $node->issues[0]['issue_progress'],
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+  $form['group4'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -18,
+  );
+  $form['group4']['issue_resolved'] = array(
+    '#type' => 'select',
+    '#title' => t('Is the issue resolved?'),
+    '#required' => TRUE,
+    '#options' => array(
+      'yes' => t('Yes'),
+      'no' => t('No'), 
+    ),
+    '#default_value' => $node->issues[0]['issue_resolved'],
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+  $form['group5'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -17,
+  );
+  $form['group5']['issue_resolution'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Issue resolution'),
+    '#required' => TRUE,
+    '#default_value' => $node->issues[0]['issue_resolution'],
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+
+  return $form;
+}
+
+function jiscpmissue_insert($node) {
+  
+  db_query("INSERT INTO {jiscpmissue}
+    (vid, nid, project_nid, issue_progress, issue_resolved, issue_resolution, issue_owner_uid)
+    VALUES
+    (%d, %d, %d, '%s', '%s', '%s', %s)",
+    $node->vid, $node->nid, $node->project_nid, $node->issue_progress, $node->issue_resolved, $node->issue_resolution, $node->issue_owner_uid);
+}
+
+function jiscpmissue_update($node) {
+
+  // if this is a new node or we're adding a new revision,
+  if ($node->revision) {
+    jiscpmissue_insert($node);
+  }
+  else {   
+    db_query("DELETE FROM {jiscpmissue} WHERE nid = %d AND vid = %d", $node->nid, $node->vid);
+    jiscpmissue_insert($node);
+  }
+}
+
+function jiscpmissue_nodeapi(&$node, $op, $teaser, $page) {
+  switch ($op) {
+    case 'prepare':
+    break;
+    case 'delete revision':
+      // Notice that we're matching a single revision based on the node's vid.
+      db_query('DELETE FROM {jiscpmissue} WHERE nid = %d', $node->nid);
+      break;
+  }
+}
+
+function jiscpmissue_delete($node) {
+  // Notice that we're matching all revision, by using the node's nid.
+  db_query('DELETE FROM {jiscpmissue} WHERE nid = %d', $node->nid);
+}
+
+function jiscpmissue_load($node) {
+  $result = db_query('SELECT project_nid, issue_progress, issue_resolved, issue_resolution, issue_owner_uid FROM {jiscpmissue} WHERE nid = %d', $node->nid);
+  $node->issues = array();
+  while ($row = db_fetch_object($result)) {
+    $issue = array(
+      'project_nid' => check_plain($row->project_nid),
+      'issue_progress' => check_plain($row->issue_progress),
+      'issue_resolved' => check_plain($row->issue_resolved),     
+      'issue_resolution' => check_plain($row->issue_resolution),  
+      'issue_owner_uid' => check_plain($row->issue_owner_uid),
+    );
+   
+    $node->issues[0] = $issue;
+  }
+  return $node;
+}
+
+function jiscpmissue_view($node, $teaser = FALSE, $page = FALSE) {
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('issues'), 'jiscpm/issues');
+  drupal_set_breadcrumb($breadcrumb);
+
+  return theme('jiscpmissue_view', $node, $teaser, $page);
+}
+
+function jiscpmissue_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'jiscpmissue'),
+  );
+}

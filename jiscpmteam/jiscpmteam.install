@@ -1,0 +1,67 @@
+<?php
+// $Id:$
+
+/**
+ * @file
+ * Install, uninstall and update functions for the jiscpm Team module
+ */
+
+/**
+ * @function
+ * Implementation of hook_install
+ */
+function jiscpmteam_install() {
+  drupal_install_schema('jiscpmteam');
+  drupal_install_schema('jiscpmteam_members');
+  //variable_set('node_options_jiscpmteam', array('status'));
+}
+
+/**
+ * @function
+ * Implementation of hook_disable
+ */
+function jiscpmteam_disable() {
+  drupal_set_message(t('Nodes of type "Team" have not been deleted on disabling jiscpm Team. Please note that they will now have reduced functionality, and will not be protected by jiscpm Team access controls.'), 'warning');
+}
+
+/**
+ * @function
+ * Implementation of hook_uninstall
+ */
+function jiscpmteam_uninstall() {
+  drupal_uninstall_schema('jiscpmteam');
+  drupal_uninstall_schema('jiscpmteam_members');
+}
+
+/**
+ * @function
+ * Implementation of hook_schema
+ */
+function jiscpmteam_schema() {
+  $schema['jiscpmteam'] = array(
+  'fields'                => array(
+      'nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('type' => 'int'),
+      'team_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array(
+      'nid',
+      'vid',
+    ),
+  );
+  $schema['jiscpmteam_members'] = array(
+  'fields'                => array(
+      'member_id'                 => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'team_nid'    => array('type' => 'int'),
+      'member_uid'    => array('type' => 'int'),
+      'member_description' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    ),
+    'primary key' => array(
+      'member_id',
+    ),
+  );
+  
+  return $schema;
+}
+

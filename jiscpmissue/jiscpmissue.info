@@ -1,0 +1,9 @@
+; $Id:  $
+name = JISC PM Issue
+description = "Allows recording of Issue based on jiscpm Projects and Programmes"
+dependencies[] = jiscpm 
+dependencies[] = jiscpmattribute
+dependencies[] = jiscpmproject
+package = JISC Project Management
+core = 6.x
+

@@ -1,0 +1,35 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ */
+
+function jiscpmissue_install() {
+  drupal_install_schema('jiscpmissue');
+}
+
+function jiscpmissue_disable() {
+  drupal_set_message(t('Nodes of type "Issue" have not been deleted on disabling jiscpm issue. Please note that they will now have reduced functionality, and will not be protected by jiscpm issue access controls.'), 'warning');
+}
+
+function jiscpmissue_uninstall() {
+  drupal_uninstall_schema('jiscpmissue');
+}
+
+function jiscpmissue_schema() {
+  $schema['jiscpmissue'] = array(
+    'fields'                => array(
+      'nid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('type' => 'int'),
+      'issue_progress' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'issue_resolved' => array('type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'issue_resolution' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'issue_owner_uid'  => array('type' => 'varchar', 'length' => 100),
+    ),
+    'primary key' => array('nid'),
+  );
+
+  return $schema;
+}

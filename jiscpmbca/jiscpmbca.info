@@ -1,0 +1,9 @@
+; $Id:  $
+name = JISC PM Business Case Assessment
+description = "Allows recording of Business Case Assessments based on jiscpm Projects and jiscpm Programmes"
+dependencies[] = jiscpm 
+dependencies[] = jiscpmattribute
+dependencies[] = jiscpmproject
+package = JISC Project Management
+core = 6.x
+
