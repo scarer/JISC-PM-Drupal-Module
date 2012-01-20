@@ -154,10 +154,10 @@ function jiscpmrisk_content_extra_fields($type_name) {
       'group3' => array('label' => 'Probability', 'weight' => -18),
       'group4' => array('label' => 'Impact', 'weight' => -17),
       'group5' => array('label' => 'Timescale', 'weight' => -16),
-      'group6' => array('label' => 'Residual risk', 'weight' => -15),
+      'group6' => array('label' => 'Residual risk', 'weight' => -10),
       'group7' => array('label' => 'Early warning signs', 'weight' => -14),
       'group8' => array('label' => 'Timescale', 'weight' => -13),
-      'group9' => array('label' => 'Risk Category', 'weight' => -12),
+      'group9' => array('label' => 'Risk Category', 'weight' => -15),
       'group10' => array('label' => 'Risk Management Approach', 'weight' => -11),
     );
   }
@@ -219,6 +219,11 @@ function jiscpmrisk_form(&$node) {
     $projects[$project->nid] = check_plain($project->title);
     if (!$node->project_nid) $node->project_nid = $project->nid;
   }
+  $form['group2'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
+  );
   $form['group2']['project_nid'] = array(
     '#type' => 'select',
     '#title' => t('Project'),
@@ -278,7 +283,7 @@ function jiscpmrisk_form(&$node) {
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -17,
   );
- $form['timescale'] = array(
+ $form['group5']['timescale'] = array(
  	'#type' => 'fieldset',
  	'#title' => t('Timescale'),
  	'#collapsible' => TRUE,
@@ -287,7 +292,7 @@ function jiscpmrisk_form(&$node) {
  if ($node->jiscpmrisks[0]['risk_start'] != '' || $node->jiscpmrisks[0]['risk_start'] != NULL || $node->jiscpmrisks[0]['risk_start'] != 0)
   {
 	if (module_exists('date_api') && module_exists('date_popup')) {
-		$form['timescale']['risk_start'] = array(
+		$form['group5']['timescale']['risk_start'] = array(
 			'#type' => 'date_popup',
 			'#title' => t('Risk Start'),
 			'#date_format' =>	 'Y-m-d',
@@ -297,7 +302,7 @@ function jiscpmrisk_form(&$node) {
   }else
   {
   if (module_exists('date_api') && module_exists('date_popup')) {
-		$form['timescale']['risk_start'] = array(
+		$form['group5']['timescale']['risk_start'] = array(
 			'#type' => 'date_popup',
 			'#title' => t('Risk Start'),
 			'#date_format' =>	 'Y-m-d',
@@ -308,7 +313,7 @@ function jiscpmrisk_form(&$node) {
   if ($node->jiscpmrisks[0]['risk_end'] != '' || $node->jiscpmrisks[0]['risk_end'] != NULL || $node->jiscpmrisks[0]['risk_end'] != 0)
   {
 	if (module_exists('date_api') && module_exists('date_popup')) {
-		$form['timescale']['risk_end'] = array(
+		$form['group5']['timescale']['risk_end'] = array(
 			'#type' => 'date_popup',
 			'#title' => t('Risk End'),
 			'#date_format' =>	 'Y-m-d',
@@ -318,7 +323,7 @@ function jiscpmrisk_form(&$node) {
   }else
   {
   if (module_exists('date_api') && module_exists('date_popup')) {
-		$form['timescale']['risk_end'] = array(
+		$form['group5']['timescale']['risk_end'] = array(
 			'#type' => 'date_popup',
 			'#title' => t('Risk End'),
 			'#date_format' =>	 'Y-m-d',
@@ -329,7 +334,7 @@ function jiscpmrisk_form(&$node) {
   $form['group6'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -16,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -10,
   );
   
   $form['group6']['risk_residual'] = array(
@@ -340,7 +345,7 @@ function jiscpmrisk_form(&$node) {
   $form['group7'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -15,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -10,
   );
   
   $form['group7']['risk_early_warning_signs'] = array(
@@ -351,7 +356,7 @@ function jiscpmrisk_form(&$node) {
   $form['group8'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -14,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -15,
   );
   
   $form['group8']['risk_category'] = array(

@@ -126,35 +126,35 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   $relationships = '<p><table><th>Related project</th><th>Relationship Description</th>' . $output_r . '</table></p>';
   //get project phases data
   for ($p = 0; $p < count($node->phases); $p ++) {
-  	$output_p .= '<tr><td valign="top"><h2>' . $node->phases[$p]['phase_title'] . '</h2></td><td valign="top">' . 
-  	$node->phases[$p]['phase_scope'] . '</td><td valign="top">' . date('d-m-Y', $node->phases[$p]['phase_datebegin']) . ' - ' 
+  	$output_p .= '<tr><td valign="top"><strong>' . $node->phases[$p]['phase_title'] . '</strong></td><td valign="top">' . 
+  	check_markup($node->phases[$p]['phase_scope'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td valign="top">' . date('d-m-Y', $node->phases[$p]['phase_datebegin']) . ' - ' 
   	. date('d-m-Y', $node->phases[$p]['phase_dateend']) .'</td></tr>';
   }
   $phases = '<p><table><th>Phase</th><th>Phase Description</th><th>Timescale</th>' . $output_p . '</table></p>';
   //get project stakeholders data
   for ($s = 0; $s < count($node->stakeholders); $s ++){
     $stake_user = user_load($node->stakeholders[$s]['stakeholder_uid']);
-  	$output_s .= '<tr><td><a href="?q=user/' . $stake_user->uid . '">' . $stake_user->name . '</a></td><td>' . $node->stakeholders[$s]['stakeholder_stake_in_project'] . '</td></tr>';
+  	$output_s .= '<tr><td><a href="?q=user/' . $stake_user->uid . '">' . $stake_user->name . '</a></td><td>' . check_markup($node->stakeholders[$s]['stakeholder_stake_in_project'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   } 
   $stakeholders = '<p><table><th>Stakeholder</th><th>Stake in project</th>' . $output_s . '</table></p>';
   //get project critical success factors data
   for ($f = 0; $f < count($node->factors); $f ++) {
-  	$output_f .= '<tr><td>' . $node->factors[$f]['factor_title'] . '</a></td><td>' . $node->factors[$f]['factor_description'] . '</td></tr>';
+  	$output_f .= '<tr><td>' . $node->factors[$f]['factor_title'] . '</a></td><td>' . check_markup($node->factors[$f]['factor_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $factors = '<p><table><th>Critical Success Factor</th><th>Description</th>' . $output_f . '</table></p>';
   //get project assumptions data
   for ($a = 0; $a < count($node->assumptions); $a ++) {
-  	$output_a .= '<tr><td>' . $node->assumptions[$a]['assumption_title'] . '</a></td><td>' . $node->assumptions[$a]['assumption_description'] . '</td></tr>';
+  	$output_a .= '<tr><td>' . $node->assumptions[$a]['assumption_title'] . '</a></td><td>' . check_markup($node->assumptions[$a]['assumption_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $assumptions = '<p><table><th>Assumption</th><th>Description</th>' . $output_a . '</table></p>';
   //get project constraints data
   for ($c = 0; $c < count($node->constraints); $c ++) {
-  	$output_c .= '<tr><td>' . $node->constraints[$c]['constraint_title'] . '</a></td><td>' . $node->constraints[$c]['constraint_description'] . '</td></tr>';
+  	$output_c .= '<tr><td>' . $node->constraints[$c]['constraint_title'] . '</a></td><td>' . check_markup($node->constraints[$c]['constraint_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $constraints = '<p><table><th>Constraint</th><th>Description</th>' . $output_c . '</table></p>';
   //get project goals and objectives data
   for ($g = 0; $g < count ($node->goals); $g ++) {
-  	$output_g .= '<tr><td>' . $node->goals[$g]['goal_title'] . '</a></td><td>' . $node->goals[$g]['goal_objectives'] . '</td></tr>';
+  	$output_g .= '<tr><td>' . $node->goals[$g]['goal_title'] . '</a></td><td>' . check_markup($node->goals[$g]['goal_objectives'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $goals = '<p><table><th>Goal</th><th>Objectives</th>' . $output_g . '</table></p>';
   //get project milestone data
@@ -164,7 +164,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   //get project team data
   for ($t = 0; $t < count($node->teams); $t ++) {
   	$output_t .= '<tr><td><a href="' . $base_url . '/node/' . $node->teams[$t]['team_nid'] . '">' . 
-  	$node->teams[$t]['team_title'] . '</a></td><td>' . $node->teams[$t]['team_description'] . '</td></tr>';
+  	$node->teams[$t]['team_title'] . '</a></td><td>' . check_markup($node->teams[$t]['team_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $teams = '<p><table><th>Team</th><th>Description</th>' . $output_t . '</table></p>';
   $milestones = '<p><table><th>Milestone</th><th>Delivery Date</th>' . $output_m . '</table></p>';
@@ -270,17 +270,17 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['scope']['projectscope']['organisational_scope'] = array(
     '#prefix' => '<div class="projectscope"><b>Organisational Scope</b><br>',
     '#suffix' => '</div>',
-    '#value' => t($org_scope),
+    '#value' => check_markup($org_scope, FILTER_FORMAT_DEFAULT, FALSE),
   );
   $node->content['scope']['projectscope']['logical_scope'] = array(
     '#prefix' => '<div class="projectscope"><b>Logical Scope</b><br>',
     '#suffix' => '</div>',
-    '#value' => t($log_scope),
+    '#value' => check_markup($log_scope, FILTER_FORMAT_DEFAULT, FALSE),
   );
   $node->content['scope']['projectscope']['out_of_scope'] = array(
     '#prefix' => '<div class="projectscope"><b>Out of Scope</b><br>',
     '#suffix' => '</div>',
-    '#value' => t($out_scope),
+    '#value' => check_markup($out_scope, FILTER_FORMAT_DEFAULT, FALSE),
   );
 
   $node->content['scope']['relatedprojects'] = array(

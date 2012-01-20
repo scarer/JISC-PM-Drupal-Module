@@ -583,7 +583,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#title' => t('Relationship description'),
 	'#weight' => 1,
 	);
-
+    $form['relationship_wrapper']['add_relationship']['new_relationship']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'relationship_wrapper', 'add_relationship', 'new_relationship', 'format'));
 	// We name our button 'jiscpmproject_relationship_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
 	$form['relationship_wrapper']['add_relationship']['jiscpmproject_relationship_more'] = array(
@@ -672,6 +672,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#title' => t('Phase Scope'),
     '#weight' => 1,
   );
+  $form['phase_wrapper']['add_phase']['new_phase']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'phase_wrapper', 'add_phase', 'new_phase', 'format'));
   //drupal_set_message('arg 0 = ' . arg(0));
   //drupal_set_message('arg 1 = ' . arg(1));
     /* project date start */
@@ -842,6 +843,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#title' => t('Perceived attitudes and/or risks'),
 	'#weight' => 1,
 	);
+	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 5, $parents=array('info', 'stakeholder_wrapper', 'add_stakeholder', 'new_stakeholder', 'format'));
 
 	// We name our button 'jiscpmproject_stakeholder_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
@@ -928,6 +930,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#title' => t('Critical success factor description'),
 	'#weight' => 1,
 	);
+	$form['factor_wrapper']['add_factor']['new_factor']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'factor_wrapper', 'add_factor', 'new_factor', 'format'));
 
 	// We name our button 'jiscpmproject_factor_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
@@ -1017,7 +1020,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#title' => t('Assumption description'),
 	'#weight' => 1,
 	);
-
+    $form['assumption_wrapper']['add_assumption']['new_assumption']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'assumption_wrapper', 'add_assumption', 'new_assumption', 'format'));
 	// We name our button 'jiscpmproject_assumption_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
 	$form['assumption_wrapper']['add_assumption']['jiscpmproject_assumption_more'] = array(
@@ -1100,10 +1103,10 @@ function jiscpmproject_form(&$node, $form_state) {
 	);
 	$form['constraint_wrapper']['add_constraint']['new_constraint']['new_constraint_description'] = array(
 	'#type' => 'textarea',
-	'#title' => t('constraint description'),
+	'#title' => t('Constraint description'),
 	'#weight' => 1,
 	);
-
+	$form['constraint_wrapper']['add_constraint']['new_constraint']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'constraint_wrapper', 'add_constraint', 'new_constraint', 'format'));
 	// We name our button 'jiscpmproject_constraint_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
 	$form['constraint_wrapper']['add_constraint']['jiscpmproject_constraint_more'] = array(
@@ -1190,6 +1193,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#title' => t('Objectives of goal'),
 	'#weight' => 1,
 	);
+	$form['goal_wrapper']['add_goal']['new_goal']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'goal_wrapper', 'add_goal', 'new_goal', 'format'));
 
 	// We name our button 'jiscpmproject_goal_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
@@ -1411,20 +1415,21 @@ function jiscpmproject_form(&$node, $form_state) {
    $form['scope']['organisational_scope'] = array(
     '#type' => 'textarea',
     '#title' => t('Organisational scope'),
-    '#default_value' => check_markup($node->jiscpmprojects[0]['organisational_scope'], $format= FILTER_FORMAT_DEFAULT, $check = TRUE),
+    '#default_value' => check_markup($node->jiscpmprojects[0]['organisational_scope'], FILTER_FORMAT_DEFAULT,  TRUE),
   );
   /* logical scope */
    $form['scope']['logical_scope'] = array(
     '#type' => 'textarea',
     '#title' => t('Logical scope'),
-    '#default_value' => check_markup($node->jiscpmprojects[0]['logical_scope'], $format = FILTER_FORMAT_DEFAULT, $check = TRUE),
+    '#default_value' => check_markup($node->jiscpmprojects[0]['logical_scope'], FILTER_FORMAT_DEFAULT, TRUE),
   );
   /* out of scope */
    $form['scope']['out_of_scope'] = array(
     '#type' => 'textarea',
     '#title' => t('Out of scope'),
-    '#default_value' => check_markup($node->jiscpmprojects[0]['out_of_scope'], $format = FILTER_FORMAT_DEFAULT, $check = TRUE),
+    '#default_value' => check_markup($node->jiscpmprojects[0]['out_of_scope'], FILTER_FORMAT_DEFAULT, TRUE),
   );
+  $form['scope']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'scope', 'format'));
   return $form;
 }
 

@@ -46,7 +46,7 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   //generate output for jiscpm bca actions
   for ($a = 0; $a < count ($node->actions); $a ++)
   {
-  	$actions .= '<tr><td>' . $node->actions[$a]['action_title'] . '</td><td>' . $node->actions[$a]['action_description'] . '</td><td>' . date('d M Y', $node->actions[$a]['action_deliverydate']) . '</td></tr>';
+  	$actions .= '<tr><td>' . $node->actions[$a]['action_title'] . '</td><td>' . check_markup($node->actions[$a]['action_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . date('d M Y', $node->actions[$a]['action_deliverydate']) . '</td></tr>';
   }
   $actions.= '</table></p>';
   $staffcosts .= '<p><table><th>Title</th><th>Quantity</th><th>Hours</th><th>Rate</th>';
@@ -61,49 +61,49 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   $trainingcosts .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
   for ($t = 0; $t < count ($node->training_costs); $t ++)
   {
-  	$trainingcosts .= '<tr><td>' . $node->training_costs[$t]['training_cost_title'] . '</td><td>' . $node->training_costs[$t]['training_cost_description'] . '</td><td>' . $node->training_costs[$t]['training_cost_total'] . '</td></tr>';
+  	$trainingcosts .= '<tr><td>' . $node->training_costs[$t]['training_cost_title'] . '</td><td>' . check_markup($node->training_costs[$t]['training_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->training_costs[$t]['training_cost_total'] . '</td></tr>';
   }
   $trainingcosts.= '</table></p>';
   //generate output for jiscpm bca equipment costs
   $equipmentcosts .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
   for ($e = 0; $e < count ($node->equipment_costs); $e ++)
   {
-  	$equipmentcosts .= '<tr><td>' . $node->equipment_costs[$e]['equipment_cost_title'] . '</td><td>' . $node->equipment_costs[$e]['equipment_cost_description'] . '</td><td>' . $node->equipment_costs[$e]['equipment_cost_total'] . '</td></tr>';
+  	$equipmentcosts .= '<tr><td>' . $node->equipment_costs[$e]['equipment_cost_title'] . '</td><td>' . check_markup($node->equipment_costs[$e]['equipment_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->equipment_costs[$e]['equipment_cost_total'] . '</td></tr>';
   }
   $equipmentcosts.= '</table></p>';
   //generate output for jiscpm bca other costs
   $othercosts .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
   for ($o = 0; $o < count ($node->other_costs); $o ++)
   {
-  	$othercosts .= '<tr><td>' . $node->other_costs[$o]['other_cost_title'] . '</td><td>' . $node->other_costs[$o]['other_cost_description'] . '</td><td>' . $node->other_costs[$o]['other_cost_total'] . '</td></tr>';
+  	$othercosts .= '<tr><td>' . $node->other_costs[$o]['other_cost_title'] . '</td><td>' . check_markup($node->other_costs[$o]['other_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->other_costs[$o]['other_cost_total'] . '</td></tr>';
   }
   $othercosts.= '</table></p>';
   //generate output for jiscpm bca running costs training
   $runningcoststraining .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
   for ($rct = 0; $rct < count ($node->running_cost_trainings); $rct ++)
   {
-  	$runningcoststraining .= '<tr><td>' . $node->running_cost_trainings[$rct]['running_cost_training_title'] . '</td><td>' . $node->running_cost_trainings[$rct]['running_cost_training_description'] . '</td><td>' . $node->running_cost_trainings[$rct]['running_cost_training_total'] . '</td></tr>';
+  	$runningcoststraining .= '<tr><td>' . $node->running_cost_trainings[$rct]['running_cost_training_title'] . '</td><td>' . check_markup($node->running_cost_trainings[$rct]['running_cost_training_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_trainings[$rct]['running_cost_training_total'] . '</td></tr>';
   }
   $runningcoststraining.= '</table></p>';
   //generate output for jiscpm bca running costs licensing
   $runningcostslicensing .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
   for ($rcl = 0; $rcl < count ($node->running_cost_licensings); $rcl ++)
   {
-  	$runningcostslicensing .= '<tr><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_title'] . '</td><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_description'] . '</td><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_total'] . '</td></tr>';
+  	$runningcostslicensing .= '<tr><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_title'] . '</td><td>' . check_markup($node->running_cost_licensings[$rcl]['running_cost_licensing_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_total'] . '</td></tr>';
   }
   $runningcostslicensing.= '</table></p>';
   //generate output for running costs maintenance
   $runningcostsmaintenance .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
   for ($rcm = 0; $rcm < count ($node->running_cost_maintenances); $rcm ++)
   {
-  	$runningcostsmaintenance .= '<tr><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_title'] . '</td><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_description'] . '</td><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_total'] . '</td></tr>';
+  	$runningcostsmaintenance .= '<tr><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_title'] . '</td><td>' . check_markup($node->running_cost_maintenances[$rcm]['running_cost_maintenance_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_total'] . '</td></tr>';
   }
   $runningcostsmaintenance.= '</table></p>';
   //generate output for jiscpm bca running costs other
   $runningcostsother .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
   for ($rco = 0; $rco < count ($node->running_cost_others); $rco ++)
   {
-  	$runningcostsother .= '<tr><td>' . $node->running_cost_others[$rco]['running_cost_other_title'] . '</td><td>' . $node->running_cost_others[$rco]['running_cost_other_description'] . '</td><td>' . $node->running_cost_others[$rco]['running_cost_other_total'] . '</td></tr>';
+  	$runningcostsother .= '<tr><td>' . $node->running_cost_others[$rco]['running_cost_other_title'] . '</td><td>' . check_markup($node->running_cost_others[$rco]['running_cost_other_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_others[$rco]['running_cost_other_total'] . '</td></tr>';
   }
   $runningcostsother.= '</table></p>';
   
@@ -116,7 +116,7 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group2'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -23,
   );
 
 //load project
@@ -125,35 +125,76 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
     '#prefix' => '<div class="bcaproject">',
     '#suffix' => '</div>',
     '#value' => theme('jiscpm_view_item', t('Project'), l($project->title, 'node/' . $project->nid)),
-    '#weight' => -22,
+    '#weight' => -23,
   );
-  $node->content['group2']['bcastrategies'] = array(
-    '#title' => t('Strategies'),
+  
+  $node->content['group9'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -22,
+  ); 
+  
+  $node->content['group9']['actionsfieldset'] = array(
+    '#title' => t('Project Actions'),
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
+    '#weight' => -22,
   );
-  $node->content['group2']['bcastrategies']['strategies'] = array(
+  
+  $node->content['group9']['actionsfieldset']['bcaactions'] = array(
+    '#prefix' => '<div class="bcaactions">',
+    '#suffix' => '</div>',
+    '#value' => t($actions),
+    '#weight' => -22,
+  );
+  
+  $node->content['group18'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group18') : -21,
+  ); 
+  
+  $node->content['group18']['strategiesfieldset'] = array(
+    '#title' => t('Project Strategies'),
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -21,
+  );
+  $node->content['group18']['strategiesfieldset'] ['strategies'] = array(
     '#prefix' => '<div class="bca-strategies">',
     '#suffix' => '</div>',
-    '#value' => t($node->jiscpmbcas[0]['bca_strategies']),
-    '#weight' => -18,
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_strategies'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#weight' => -21
   );
-
-  $node->content['group2']['bcabenefits'] = array(
-    '#prefix' => '<div class="bcabenefits"><strong>Benefits</strong><br>',
+  $node->content['group19'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#value' => $node->jiscpmbcas[0]['bca_benefits'],
-    '#weight' => -18,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group19') : -20,
+  ); 
+  
+  $node->content['group19']['benefitsfieldset'] = array(
+    '#title' => t('Project Benefits'),
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => -20,
+  );
+  $node->content['group19']['benefitsfieldset']['bcabenefits'] = array(
+    '#prefix' => '<div class="bcabenefits">',
+    '#suffix' => '</div>',
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_benefits'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#weight' => -20,
   );
 
   $node->content['group5'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -18,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -19,
   );
   $node->content['group5']['bcaimplications'] = array(
-    '#title' => t('Implications'),
+    '#title' => t('Implications of not undertaking project'),
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -161,8 +202,8 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group5']['bcaimplications']['implications'] = array(
     '#prefix' => '<div class="bcaimplications">',
     '#suffix' => '</div>',
-    '#value' => t($node->jiscpmbcas[0]['bca_implications']),
-    '#weight' => -18,
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_implications'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#weight' => -19,
   );
   
   $node->content['group6'] = array(
@@ -179,8 +220,8 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group6']['bcaalternatives']['Alternatives'] = array(
     '#prefix' => '<div class="bcaalternatives">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Alternatives'), jiscpmattribute_value('bca alternatives', $node->jiscpmbcas[0]['bca_alternatives'])),
-    '#weight' => -18,
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_alternatives'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#weight' => -15,
   );
   
   $node->content['group7'] = array(
@@ -195,32 +236,32 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
     '#collapsed' => TRUE,
   );
   $node->content['group7']['bcaorganisationalareas']['bca_staff_changes'] = array(
-    '#value' => t($node->jiscpmbcas[0]['bca_staff_changes']),
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_staff_changes'], FILTER_FORMAT_DEFAULT, FALSE),
     '#prefix' => '<div class="jiscpmbca-staff-changes"><h2>Staff Changes</h2>',
     '#suffix' => '</div>',
   );
   $node->content['group7']['bcaorganisationalareas']['bca_hr_related_issues'] = array(
-    '#value' => t($node->jiscpmbcas[0]['bca_hr_related_issues']),
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_hr_related_issues'], FILTER_FORMAT_DEFAULT, FALSE),
     '#prefix' => '<div class="jiscpmbca-hr-related-issues"><h2>HR Related Issues</h2>',
     '#suffix' => '</div>',
   );
   $node->content['group7']['bcaorganisationalareas']['bca_changes_technology'] = array(
-    '#value' => t($node->jiscpmbcas[0]['bca_changes_technology']),
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_changes_technology'], FILTER_FORMAT_DEFAULT, FALSE),
     '#prefix' => '<div class="jiscpmbca-changes-technology"><h2>Changes to technology</h2>',
     '#suffix' => '</div>',
   );
   $node->content['group7']['bcaorganisationalareas']['bca_process_changes'] = array(
-    '#value' => t($node->jiscpmbcas[0]['bca_process_changes']),
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_process_changes'], FILTER_FORMAT_DEFAULT, FALSE),
     '#prefix' => '<div class="jiscpmbca-process-changes"><h2>Process Changes</h2>',
     '#suffix' => '</div>',
   );
   $node->content['group7']['bcaorganisationalareas']['bca_internal_support'] = array(
-    '#value' => t($node->jiscpmbcas[0]['bca_internal_support']),
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_internal_support'], FILTER_FORMAT_DEFAULT, FALSE),
     '#prefix' => '<div class="jiscpmbca-internal-support"><h2>Internal Support</h2>',
     '#suffix' => '</div>',
   );
   $node->content['group7']['bcaorganisationalareas']['external_suppport'] = array(
-    '#value' => t($node->jiscpmbcas[0]['external_suppport']),
+    '#value' => check_markup($node->jiscpmbcas[0]['external_suppport'], FILTER_FORMAT_DEFAULT, FALSE),
     '#prefix' => '<div class="jiscpmbca-external-support"><h2>External Support</h2>',
     '#suffix' => '</div>',
   );
@@ -239,29 +280,11 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group8']['bcapayback']['payback'] = array(
     '#prefix' => '<div class="bcapayback">',
     '#suffix' => '</div>',
-    '#value' => t($node->jiscpmbcas[0]['bca_payback']),
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_payback'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => -22,
   );
     
-  $node->content['group9'] = array(
-    '#prefix' => '<div class="jiscpmfields">',
-    '#suffix' => '</div>',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -22,
-  ); 
-  $node->content['group9']['actionsfieldset'] = array(
-    '#title' => t('Project Actions'),
-    '#type' => 'fieldset',
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    '#weight' => -22,
-  );
-  
-  $node->content['group9']['actionsfieldset']['bcaactions'] = array(
-    '#prefix' => '<div class="bcaactions">',
-    '#suffix' => '</div>',
-    '#value' => t($actions),
-    '#weight' => -22,
-  );
+
   
   $node->content['group10'] = array(
     '#prefix' => '<div class="jiscpmfields">',
@@ -395,13 +418,13 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
     '#suffix' => '</div>',
     '#value' => t($runningcostsother),
   );
-  $node->content['body_field'] = array(
+  /*$node->content['body_field'] = array(
     '#prefix' => '<div class="jiscpmbody">',
     '#suffix' => '</div>',
     '#value' => theme('jiscpm_view_item', t('Description'), $node->content['body']['#value']),
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'body_field') : -20,
   );
-  unset($node->content['body']);
+  unset($node->content['body']);*/
   
   return $node;
 }

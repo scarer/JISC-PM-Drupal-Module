@@ -495,11 +495,20 @@ function jiscpmbca_form(&$node, $form_state) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
   );
   // Title.
+  $title_default = "";
+  if ($node->title != "" || $node->title != NULL)
+  {
+	  $title_default = $node->title;
+  }
+  else
+  {
+	  $title_default = "<INSERT PROJECT NAME> BCA";
+  }
   $form['group1']['title'] = array(
     '#type' => 'textfield',
-    '#title' => t('BCA Name'),
+    '#title' => t('BCA Title'),
     '#required' => TRUE,
-    '#default_value' => $node->title,
+    '#default_value' => $title_default,
   );
   /*$form['group2'] = array(
     '#type' => 'markup',
@@ -523,7 +532,7 @@ function jiscpmbca_form(&$node, $form_state) {
 		'#type' => 'select',
 		'#title' => t('Project'),
 		'#options' => $projects,
-		'#default_value' => $project_nid,
+		'#default_value' => $node->project_nid,
 		'#weight' => -19,
 		'#process' => array('jiscpm_dependent_select_process'),
 		'#required' => TRUE,
@@ -535,7 +544,7 @@ function jiscpmbca_form(&$node, $form_state) {
   $form['action_wrapper'] = array(
     '#tree' => FALSE,
     '#weight' => -18,
-    '#prefix' => '<h2>Actions</h2><div class="clear-block" id="jiscpmbca-action-wrapper">',
+    '#prefix' => '<h2>Actions</h2><div class="clear-block" id="jiscpmbca-action-wrapper">Actions are key steps that will be undertaken during a project. For example, the action could be "Re-design website" and the description gives an overview of how the re-design of the website will occur. Each action must also be assigned a delivery date.',
     '#suffix' => '</div>',
   );
 
@@ -601,8 +610,10 @@ function jiscpmbca_form(&$node, $form_state) {
   $form['action_wrapper']['add_action']['new_action']['new_action_description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
-    '#weight' => 0,
+    '#weight' => 1,
+	//'#validate' => array('filter_form_validate' => array()),
   );
+  $form['action_wrapper']['add_action']['new_action']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'action_wrapper', 'add_action', 'new_action', 'format'));
     /* project date start */
 
   if (module_exists('date_api') && module_exists('date_popup')) {
@@ -611,6 +622,7 @@ function jiscpmbca_form(&$node, $form_state) {
       '#title' => t('Delivery date'),
       '#date_format' =>  'Y-m-d',
       '#default_value' => date('Y-m-d'),
+	  '#weight' => 3,
     );
   }
   
@@ -807,11 +819,12 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 1,
   );
+  $form['training_cost_wrapper']['add_training_cost']['new_training_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'training_cost_wrapper', 'add_training_cost', 'new_training_cost', 'format'));
     /* total cost */
   $form['training_cost_wrapper']['add_training_cost']['new_training_cost']['new_training_cost_total'] = array(
     '#type' => 'textfield',
     '#title' => t('Total cost'),
-    '#weight' => 0,
+    '#weight' => 3,
   );
 
 
@@ -904,10 +917,11 @@ function jiscpmbca_form(&$node, $form_state) {
 	'#title' => t('Description'),
 	'#weight' => 2,
 	);
+	$form['equipment_cost_wrapper']['add_equipment_cost']['new_equipment_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 3, $parents=array('info',  'equipment_cost_wrapper', 'add_equipment_cost', 'new_equipment_cost', 'format'));
 	$form['equipment_cost_wrapper']['add_equipment_cost']['new_equipment_cost']['new_equipment_cost_total'] = array(
 	'#type' => 'textfield',
 	'#title' => t('Total Cost'),
-	'#weight' => 3,
+	'#weight' => 4,
 	);
 
 	// We name our button 'jiscpmbca_equipment_cost_more' to avoid conflicts with other modules using
@@ -996,10 +1010,11 @@ function jiscpmbca_form(&$node, $form_state) {
 	'#title' => t('Description'),
 	'#weight' => 1,
 	);
+	$form['other_cost_wrapper']['add_other_cost']['new_other_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info',  'other_cost_wrapper', 'add_other_cost', 'new_other_cost', 'format'));
 	$form['other_cost_wrapper']['add_other_cost']['new_other_cost']['new_other_cost_total'] = array(
 	'#type' => 'textfield',
 	'#title' => t('Total'),
-	'#weight' => 0,
+	'#weight' => 3,
 	);
 	// We name our button 'jiscpmbca_other_cost_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
@@ -1090,10 +1105,11 @@ function jiscpmbca_form(&$node, $form_state) {
 	'#title' => t('Description'),
 	'#weight' => 1,
 	);
+	$form['running_cost_training_wrapper']['add_running_cost_training']['new_running_cost_training']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info',  'running_cost_training_wrapper', 'add_running_cost_training', 'new_running_cost_training', 'format'));
 	$form['running_cost_training_wrapper']['add_running_cost_training']['new_running_cost_training']['new_running_cost_training_total'] = array(
 	'#type' => 'textfield',
 	'#title' => t('Total Cost'),
-	'#weight' => 0,
+	'#weight' => 3,
 	);
 	// We name our button 'jiscpmbca_running_cost_training_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
@@ -1181,10 +1197,11 @@ function jiscpmbca_form(&$node, $form_state) {
 	'#title' => t('Description'),
 	'#weight' => 1,
 	);
+	$form['running_cost_licensing_wrapper']['add_running_cost_licensing']['new_running_cost_licensing']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info',  'running_cost_licensing_wrapper', 'add_running_cost_licensing', 'new_running_cost_licensing', 'format'));
 	$form['running_cost_licensing_wrapper']['add_running_cost_licensing']['new_running_cost_licensing']['new_running_cost_licensing_total'] = array(
 	'#type' => 'textfield',
 	'#title' => t('Total Cost'),
-	'#weight' => 0,
+	'#weight' => 3,
 	);
 	// We name our button 'jiscpmbca_running_cost_licensing_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
@@ -1273,10 +1290,11 @@ function jiscpmbca_form(&$node, $form_state) {
 	'#title' => t('Description'),
 	'#weight' => 1,
 	);
+	$form['running_cost_maintenance_wrapper']['add_running_cost_maintenance']['new_running_cost_maintenance']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info',  'running_cost_maintenance_wrapper', 'add_running_cost_maintenance', 'new_running_cost_maintenance', 'format'));
 	$form['running_cost_maintenance_wrapper']['add_running_cost_maintenance']['new_running_cost_maintenance']['new_running_cost_maintenance_total'] = array(
 	'#type' => 'textfield',
 	'#title' => t('Total Cost'),
-	'#weight' => 0,
+	'#weight' => 3,
 	);
 	// We name our button 'jiscpmbca_running_cost_maintenance_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
@@ -1363,12 +1381,13 @@ function jiscpmbca_form(&$node, $form_state) {
   $form['running_cost_other_wrapper']['add_running_cost_other']['new_running_cost_other']['new_running_cost_other_description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
-    '#weight' => 0,
+    '#weight' => 1,
   );
+  $form['running_cost_other_wrapper']['add_running_cost_other']['new_running_cost_other']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info',  'running_cost_other_wrapper', 'add_running_cost_other', 'new_running_cost_other', 'format'));
   $form['running_cost_other_wrapper']['add_running_cost_other']['new_running_cost_other']['new_running_cost_other_total'] = array(
     '#type' => 'textfield',
     '#title' => t('Total Cost'),
-    '#weight' => 0,
+    '#weight' => 3,
   );
   
   // We name our button 'jiscpmbca_running_cost_other_more' to avoid conflicts with other modules using
@@ -1404,6 +1423,7 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Project Strategies'),
     '#default_value' => $node->jiscpmbcas[0]['bca_strategies'],
   );
+  $form['group10']['strategies_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents=array('info', 'group10', 'strategies_fieldset', 'format'));
   $form['group11'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1422,6 +1442,7 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Project Benefits'),
     '#default_value' => $node->jiscpmbcas[0]['bca_benefits'],
   );
+  $form['group11']['benefits_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents=array('info', 'group11', 'benefits_fieldset', 'format'));
   $form['group12'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1440,6 +1461,7 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Implications of Not Undertaking Project'),
     '#default_value' => $node->jiscpmbcas[0]['bca_implications'],
   );
+  $form['group12']['implications_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents=array('info', 'group12', 'implications_fieldset', 'format'));
   $form['group13'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1458,6 +1480,7 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Project Alternatives'),
     '#default_value' => $node->jiscpmbcas[0]['bca_alternatives'],
   );
+  $form['group13']['alternatives_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents=array('info', 'group13', 'alternatives_fieldset', 'format'));
   $form['group14'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1501,6 +1524,7 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('External Support Implications'),
     '#default_value' => $node->jiscpmbcas[0]['bca_external_support'],
   );
+  $form['group14']['organisational_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents=array('info', 'group14', 'organisational_fieldset', 'format'));
   $form['group15'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1519,6 +1543,8 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Project Payback'),
     '#default_value' => $node->jiscpmbcas[0]['bca_payback'],
   );
+  $form['group15']['payback_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents=array('info', 'group15', 'payback_fieldset', 'format'));
+  //$form['format'] = filter_form($node->format);
   return $form;
 }
 
