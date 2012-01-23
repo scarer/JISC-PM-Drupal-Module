@@ -67,14 +67,14 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group2']['pprsummaryobjectives'] = array(
     '#prefix' => '<div class="pprstatus">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Summary of objectives'), jiscpmattribute_value('ppr status', $node->pprs[0]['ppr_summary_objectives'])),
+    '#value' => theme('jiscpm_view_item', t('Summary of objectives'), jiscpmattribute_value('ppr status', check_markup($node->pprs[0]['ppr_summary_objectives'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
 
   $node->content['group2']['pprbenefitsachieved'] = array(
     '#prefix' => '<div class="pprbenefitsachieved">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Benefits achieved'), jiscpmattribute_value('ppr benefits achieved', $node->pprs[0]['ppr_benefits_achieved'])),
+    '#value' => theme('jiscpm_view_item', t('Benefits achieved'), jiscpmattribute_value('ppr benefits achieved', check_markup($node->pprs[0]['ppr_benefits_achieved'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 3,
   );
 
@@ -87,7 +87,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group5']['pprbenefitsnotachieved'] = array(
     '#prefix' => '<div class="pprbenefitsnotachieved">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Benefits not achieved'), jiscpmattribute_value('ppr benefits not achieved', $node->pprs[0]['ppr_benefits_not_achieved'])),
+    '#value' => theme('jiscpm_view_item', t('Benefits not achieved'), jiscpmattribute_value('ppr benefits not achieved', check_markup($node->pprs[0]['ppr_benefits_not_achieved'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 1,
   );
   
@@ -100,7 +100,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group6']['pprnegativebenefitsfactors'] = array(
     '#prefix' => '<div class="pprnegativebenefitsfactors">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Negative Factors that led to benefits not being achieved'), jiscpmattribute_value('ppr negative benefits factors not achieved', $node->pprs[0]['ppr_negative_benefits_factors'])),
+    '#value' => theme('jiscpm_view_item', t('Negative Factors that led to benefits not being achieved'), jiscpmattribute_value('ppr negative benefits factors not achieved', check_markup($node->pprs[0]['ppr_negative_benefits_factors'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   
@@ -113,7 +113,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group7']['pprunderestimatedtasks'] = array(
     '#prefix' => '<div class="pprunderestimatedtasks">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Underestimated tasks'), jiscpmattribute_value('ppr underestimated tasks', $node->pprs[0]['ppr_underestimated_tasks'])),
+    '#value' => theme('jiscpm_view_item', t('Underestimated tasks'), jiscpmattribute_value('ppr underestimated tasks', check_markup($node->pprs[0]['ppr_underestimated_tasks'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   
@@ -126,7 +126,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group8']['pprnegativetimefactors'] = array(
     '#prefix' => '<div class="pprnegativetimefactors">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Negative time factors'), jiscpmattribute_value('ppr negative time factors', $node->pprs[0]['ppr_negative_time_factors'])),
+    '#value' => theme('jiscpm_view_item', t('Negative time factors'), jiscpmattribute_value('ppr negative time factors', check_markup($node->pprs[0]['ppr_negative_time_factors'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
     
@@ -139,7 +139,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group9']['pprunderestimatedcosts'] = array(
     '#prefix' => '<div class="pprunderestimatedcosts">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Underestimated costs'), jiscpmattribute_value('ppr underestimated costs', $node->pprs[0]['ppr_underestimated_costs'])),
+    '#value' => theme('jiscpm_view_item', t('Underestimated costs'), jiscpmattribute_value('ppr underestimated costs', check_markup($node->pprs[0]['ppr_underestimated_costs'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   
@@ -152,7 +152,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group10']['pproverestimatedcosts'] = array(
     '#prefix' => '<div class="pproverestimatedcosts">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Overestimated costs'), jiscpmattribute_value('ppr overestimated costs', $node->pprs[0]['ppr_overestimated_costs'])),
+    '#value' => theme('jiscpm_view_item', t('Overestimated costs'), jiscpmattribute_value('ppr overestimated costs', check_markup($node->pprs[0]['ppr_overestimated_costs'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   
@@ -165,7 +165,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group11']['pprnegativequalityfactors'] = array(
     '#prefix' => '<div class="pprnegativequalityfactors">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Factors that led to a loss in quality of project outcomes'), jiscpmattribute_value('ppr negative quality factors', $node->pprs[0]['ppr_negative_quality_factors'])),
+    '#value' => theme('jiscpm_view_item', t('Factors that led to a loss in quality of project outcomes'), jiscpmattribute_value('ppr negative quality factors', check_markup($node->pprs[0]['ppr_negative_quality_factors'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   
@@ -178,7 +178,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group12']['pprdeliveredoutputs'] = array(
     '#prefix' => '<div class="pprdeliveredoutputs">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Delivered outputs'), jiscpmattribute_value('ppr delivered outputs', $node->pprs[0]['ppr_delivered_outputs'])),
+    '#value' => theme('jiscpm_view_item', t('Delivered outputs'), jiscpmattribute_value('ppr delivered outputs', check_markup($node->pprs[0]['ppr_delivered_outputs'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   $node->content['group13'] = array(
@@ -190,7 +190,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group13']['pprunexpectedoutcomes'] = array(
     '#prefix' => '<div class="pprunexpectedoutcomes">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Unexpected outcomes'), jiscpmattribute_value('ppr unexpected outcomes', $node->pprs[0]['ppr_unexpected_outcomes'])),
+    '#value' => theme('jiscpm_view_item', t('Unexpected outcomes'), jiscpmattribute_value('ppr unexpected outcomes', check_markup($node->pprs[0]['ppr_unexpected_outcomes'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   $node->content['group14'] = array(
@@ -202,7 +202,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group14']['pprlessonslearned'] = array(
     '#prefix' => '<div class="pprlessonslearned">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Lessons learned'), jiscpmattribute_value('ppr lessons learned', $node->pprs[0]['ppr_lessons_learned'])),
+    '#value' => theme('jiscpm_view_item', t('Lessons learned'), jiscpmattribute_value('ppr lessons learned', check_markup($node->pprs[0]['ppr_lessons_learned'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   $node->content['group15'] = array(
@@ -214,7 +214,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group15']['pprrecommendationsforproject'] = array(
     '#prefix' => '<div class="pprrecommendationsforproject">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Recommendations for project'), jiscpmattribute_value('ppr recommendations for project', $node->pprs[0]['ppr_recommendations_for_project'])),
+    '#value' => theme('jiscpm_view_item', t('Recommendations for project'), jiscpmattribute_value('ppr recommendations for project', check_markup($node->pprs[0]['ppr_recommendations_for_project'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   $node->content['group16'] = array(
@@ -226,7 +226,7 @@ function theme_jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group16']['pprrecommendationsforfutureprojects'] = array(
     '#prefix' => '<div class="pprrecommendationsforfutureprojects">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Recommendations for future projects'), jiscpmattribute_value('ppr recommendations for future projects', $node->pprs[0]['ppr_recommendations_for_future_projects'])),
+    '#value' => theme('jiscpm_view_item', t('Recommendations for future projects'), jiscpmattribute_value('ppr recommendations for future projects', check_markup($node->pprs[0]['ppr_recommendations_for_future_projects'], FILTER_FORMAT_DEFAULT, FALSE))),
     '#weight' => 2,
   );
   $node->content['body_field'] = array(

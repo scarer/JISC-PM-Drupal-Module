@@ -263,48 +263,92 @@ function jiscpmsr_form(&$node, $form_state) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -17,
   );
   
-  $form['group5']['sr_overview'] = array(
+  $form['group5']['sr_overview_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Status Report Overview'),
+	'#tree' => FALSE,
+	'#weight' => -17,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+
+  
+  $form['group5']['sr_overview_wrapper']['sr_overview'] = array(
     '#type' => 'textarea',
     '#title' =>t('Status report overview'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_overview'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_overview'], FILTER_FORMAT_DEFAULT, FALSE),
     '#description' => t('A short overview of the project/programme that the status report is addressing.'),
+	'#weight' => 0,
   );
+  $form['group5']['sr_overview_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group5', 'sr_overview_wrapper', 'format'));
+  
    $form['group6'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -16,
   );
-  
-  $form['group6']['sr_milestone_report'] = array(
+  $form['group6']['sr_milestone_report_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Milestone Report'),
+	'#tree' => FALSE,
+	'#weight' => -16,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+
+  $form['group6']['sr_milestone_report_wrapper']['sr_milestone_report'] = array(
     '#type' => 'textarea',
     '#title' =>t('Milestone Report'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_milestone_report'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_milestone_report'], FILTER_FORMAT_DEFAULT, FALSE),
     '#description' => t('An overview of the project/programme milestones and how they might have changed or remained constant.'),
+	'#weight' => 0,
   );
-   $form['group7'] = array(
+  $form['group6']['sr_milestone_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group6', 'sr_milestone_report_wrapper', 'format'));
+  
+  $form['group7'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -15,
   );
-  
-  $form['group7']['sr_risk_management_report'] = array(
+  $form['group7']['sr_risk_management_report_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Risk Management Report'),
+	'#tree' => FALSE,
+	'#weight' => -15,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+  $form['group7']['sr_risk_management_report_wrapper']['sr_risk_management_report'] = array(
     '#type' => 'textarea',
     '#title' =>t('Risk Management Report'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_risk_management_report'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_risk_management_report'], FILTER_FORMAT_DEFAULT, FALSE),
     '#description' => t('An overview of the project/programme risks and how they might have changed or remained constant.'),
+	'#weight' => 0,
   );
+  $form['group7']['sr_risk_management_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group7', 'sr_risk_management_report_wrapper', 'format'));
+  
    $form['group8'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -14,
   );
-  
-  $form['group8']['sr_issues_report'] = array(
+  $form['group8']['sr_issues_report_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Issues Report'),
+	'#tree' => FALSE,
+	'#weight' => -14,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+  $form['group8']['sr_issues_report_wrapper']['sr_issues_report'] = array(
     '#type' => 'textarea',
     '#title' =>t('Issues Report'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_issues_report'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_issues_report'], FILTER_FORMAT_DEFAULT, FALSE),
     '#description' => t('An overview of the project/programme issues and how they might have changed or remained constant.'),
+	'#weight' => 0,
   );
+  $form['group8']['sr_issues_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group8', 'sr_issues_report_wrapper', 'format'));
+  
   $form['group9'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -316,8 +360,8 @@ function jiscpmsr_form(&$node, $form_state) {
  	'#collapsible' => TRUE,
  	'#collapsed' => FALSE,
  );
- if ($node->sr_start != '' || $node->sr_start != NULL || $node->sr_start != 0)
-  {
+ //if ($node->sr_start != '' || $node->sr_start != NULL || $node->sr_start != 0)
+  //{
 	if (module_exists('date_api') && module_exists('date_popup')) {
 		$form['group9']['timescale']['sr_start'] = array(
 			'#type' => 'date_popup',
@@ -326,20 +370,20 @@ function jiscpmsr_form(&$node, $form_state) {
 			'#default_value' => date('Y-m-d', $node->jiscpmsrs[0]['sr_start']),
 		);
 	}
-  }
-  else
-  {
-  if (module_exists('date_api') && module_exists('date_popup')) {
+  //}
+  //else
+  //{
+  /*if (module_exists('date_api') && module_exists('date_popup')) {
 		$form['group9']['timescale']['sr_start'] = array(
 			'#type' => 'date_popup',
 			'#title' => t('Reporting Period Start'),
 			'#date_format' =>	 'Y-m-d',
 			'#default_value' => date('Y-m-d'),
 		);
-	}
-  }
-  if ($node->sr_end != '' || $node->sr_end != NULL || $node->sr_end != 0)
-  {
+	}*/
+ // }
+  //if ($node->sr_end != '' || $node->sr_end != NULL || $node->sr_end != 0)
+  //{
 	if (module_exists('date_api') && module_exists('date_popup')) {
 		$form['group9']['timescale']['sr_end'] = array(
 			'#type' => 'date_popup',
@@ -348,42 +392,61 @@ function jiscpmsr_form(&$node, $form_state) {
 			'#default_value' => date('Y-m-d', $node->jiscpmsrs[0]['sr_end']),
 		);
 	}
-  }
-  else
-  {
-  if (module_exists('date_api') && module_exists('date_popup')) {
+  //}
+  //else
+  //{
+  /*if (module_exists('date_api') && module_exists('date_popup')) {
 		$form['group9']['timescale']['sr_end'] = array(
 			'#type' => 'date_popup',
 			'#title' => t('Reporting Period End'),
 			'#date_format' =>	 'Y-m-d',
 			'#default_value' => date('Y-m-d'),
 		);
-	}
-  }
+	}*/
+  //}
   $form['group10'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group10') : -12,
   );
-  
-  $form['group10']['sr_overall_status'] = array(
+  $form['group10']['sr_overall_status_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Overall Status of the Project'),
+	'#tree' => FALSE,
+	'#weight' => -12,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+  $form['group10']['sr_overall_status_wrapper']['sr_overall_status'] = array(
     '#type' => 'textarea',
     '#title' =>t('Overall status of the project'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_overall_status'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_overall_status'], FILTER_FORMAT_DEFAULT, FALSE),
     '#description' => t('The overall status of the project/programme.'),
+	'#weight' => 0,
   );
+  $form['group10']['sr_overall_status_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group10', 'sr_overall_status_wrapper', 'format'));
+  
   $form['group11'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group11') : -11,
   );
-  
-  $form['group11']['sr_project_summary'] = array(
+  $form['group11']['sr_project_summery_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Project Summaryw'),
+	'#tree' => FALSE,
+	'#weight' => -11,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+  $form['group11']['sr_project_summery_wrapper']['sr_project_summary'] = array(
     '#type' => 'textarea',
     '#title' => t('Project Summary'),
     '#description' =>t('A summary of the current stage of the project/programme.'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_project_summary'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_project_summary'], FILTER_FORMAT_DEFAULT, FALSE),
+	'#weight' => 0,
   );
+  $form['group11']['sr_project_summery_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group11', 'sr_project_summery_wrapper', 'format'));
   
   //insert milestone mds for the last period
   $milestones = array();
@@ -405,7 +468,7 @@ function jiscpmsr_form(&$node, $form_state) {
   /* hook form */
   $form['md_wrapper'] = array(
 	'#tree' => FALSE,
-	'#weight' => 5,
+	'#weight' => -4,
 	'#prefix' => '<h2>Milestone mds</h2><div class="clear-block" id="jiscpmsr-md-wrapper">',
 	'#suffix' => '</div>',
 
@@ -510,6 +573,7 @@ function jiscpmsr_form(&$node, $form_state) {
 	'#title' => t('Deliverable Status'),
 	'#weight' => 3,
 	);
+	$form['md_wrapper']['add_md']['new_md']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 4, $parents=array('info', 'md_wrapper', 'add_md', 'new_md', 'format'));
 	$form['md_wrapper']['add_md']['new_md']['new_md_current_sr'] = array(
 '#type' => 'select',
 	'#title' => t('Current or next status report'),
@@ -542,41 +606,68 @@ function jiscpmsr_form(&$node, $form_state) {
   $form['group16'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group16') : -6,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group16') : -5,
   );
-  
-  $form['group16']['sr_project_recommendations'] = array(
+   $form['group16']['sr_project_recommendations_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Project Recommendations'),
+	'#tree' => FALSE,
+	'#weight' => -5,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+  $form['group16']['sr_project_recommendations_wrapper']['sr_project_recommendations'] = array(
     '#type' => 'textarea',
     '#title' =>t('Project Recommendations'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_project_recommendations'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_project_recommendations'], FILTER_FORMAT_DEFAULT, FALSE),
     '#description' => t('A summary of the current recommendations for the project.'),
+	'#weight' => 0,
   );
+  $form['group16']['sr_project_recommendations_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group16', 'sr_project_recommendations_wrapper','format'));
   
   $form['group17'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group17') : -5,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group17') : -4,
   );
-  
-  $form['group17']['sr_objectives_for_next_sr'] = array(
+  $form['group17']['sr_objectives_for_next_sr_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Objectives for the next Status Report'),
+	'#tree' => FALSE,
+	'#weight' => -4,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+  $form['group17']['sr_objectives_for_next_sr_wrapper']['sr_objectives_for_next_sr'] = array(
     '#type' => 'textarea',
     '#title' =>t('Objectives for the next Status Report'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_objectives_for_next_sr'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_objectives_for_next_sr'], FILTER_FORMAT_DEFAULT, FALSE),
     '#description' => t('A summary of the objectives expected to be discussed and obtained in the next Status Report.'),
+	'#weight' => 0,
   );
-    $form['group18'] = array(
+  $form['group17']['sr_objectives_for_next_sr_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group17', 'sr_objectives_for_next_sr_wrapper', 'format'));
+  
+  $form['group18'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group18') : -4,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group18') : -3,
   );
-  
-  $form['group18']['sr_related_project_information'] = array(
+  $form['group18']['sr_related_project_info_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Related Project Information'),
+	'#tree' => FALSE,
+	'#weight' => -3,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+  $form['group18']['sr_related_project_info_wrapper']['sr_related_project_information'] = array(
     '#type' => 'textarea',
     '#title' =>t('Related Project Information'),
-    '#default_value' => $node->jiscpmsrs[0]['sr_related_project_information'],
+    '#default_value' => check_markup($node->jiscpmsrs[0]['sr_related_project_information'], FILTER_FORMAT_DEFAULT, FALSE),
     '#description' => t('A summary of related project information. For example, other projects that may be demanding the time of team members etc.'),
+	'#weight' => 0,
   );
-
+  $form['group18']['sr_related_project_info_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group18', 'sr_related_project_info_wrapper', 'format'));
   return $form;
 }
 
@@ -941,8 +1032,8 @@ function jiscpmsr_md_display_form($delta, $milestone_id, $md_title, $md_due_date
 
 function jiscpmsr_view($node, $teaser = FALSE, $page = FALSE) {
   $breadcrumb = array();
-  $breadcrumb[] = l(t('jiscpm'), 'jiscpm');
-  $breadcrumb[] = l(t('srs'), 'jiscpm/srs');
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('Status Reports'), 'jiscpm/dashboard/srs');
   drupal_set_breadcrumb($breadcrumb);
 
   return theme('jiscpmsr_view', $node, $teaser, $page);

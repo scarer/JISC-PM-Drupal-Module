@@ -92,14 +92,14 @@ function theme_jiscpmrisk_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group5']['risk_residual'] = array(
     '#prefix' => '<strong>Residual Risk</strong><div class="riskresidual">',
     '#suffix' => '</div>',
-    '#value' => $node->jiscpmrisks[0]['risk_residual'],
+    '#value' => check_markup($node->jiscpmrisks[0]['risk_residual'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => 4,
   );
   
   $node->content['group6']['risk_early_warning_signs'] = array(
     '#prefix' => '<strong>Early Warning Signs</strong><div class="riskearlywarningsigns">',
     '#suffix' => '</div>',
-    '#value' => $node->jiscpmrisks[0]['risk_early_warning_signs'],
+    '#value' => check_markup($node->jiscpmrisks[0]['risk_early_warning_signs'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => 5,
   );
   $loaduser = user_load($node->jiscpmrisks[0]['risk_owner_uid']);
@@ -124,7 +124,7 @@ function theme_jiscpmrisk_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group10']['risk_management_approach'] = array(
     '#prefix' => '<strong>Risk Management Approach</strong><div class="riskmanagementapproach">',
     '#suffix' => '</div>',
-    '#value' => t($node->jiscpmrisks[0]['risk_management_approach']),
+    '#value' => check_markup($node->jiscpmrisks[0]['risk_management_approach'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => 9,
   );
   

@@ -520,6 +520,12 @@ function jiscpmbca_form(&$node, $form_state) {
   
   /* insert project drop-down */
   /* adds functionality for adding project staff_costs */
+  $currentproject = array();
+  if ($node->project_nid != NULL)
+  {
+	  $project = node_load($node->project_nid);
+	  $currentproject[$project->nid] = $project->title;
+  }
   $projects = array();
   $results_pro = db_query("SELECT n.title, n.nid FROM {node} n WHERE n.type = 'jiscpmproject'");
   while ($row_pro = db_fetch_object($results_pro))
@@ -532,7 +538,7 @@ function jiscpmbca_form(&$node, $form_state) {
 		'#type' => 'select',
 		'#title' => t('Project'),
 		'#options' => $projects,
-		'#default_value' => $node->project_nid,
+		'#default_value' => $currentproject,
 		'#weight' => -19,
 		'#process' => array('jiscpm_dependent_select_process'),
 		'#required' => TRUE,

@@ -337,22 +337,45 @@ function jiscpmrisk_form(&$node) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -10,
   );
   
-  $form['group6']['risk_residual'] = array(
+  $form['group6']['risk_residual_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Residual Risk'),
+	'#tree' => FALSE,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+  );
+  
+  $form['group6']['risk_residual_wrapper']['risk_residual'] = array(
     '#type' => 'textarea',
     '#title' =>t('Risk Residual'),
+	'#prefix' => '<div id="risktext">',
+	'#suffix' => '</div>',
     '#default_value' => $node->jiscpmrisks[0]['risk_residual'],
+	'#description' => t('The residual risk that remains after all management steps have been taken.'),
+	'#weight' => 0,
   );
+  $form['group6']['risk_residual_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group6', 'risk_residual_wrapper', 'format'));
+  
   $form['group7'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -10,
   );
-  
-  $form['group7']['risk_early_warning_signs'] = array(
+  $form['group7']['risk_early_warning_signs_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Early Warning Signs'),
+	'#tree' => FALSE,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+  );
+  $form['group7']['risk_early_warning_signs_wrapper']['risk_early_warning_signs'] = array(
     '#type' => 'textarea',
     '#title' =>t('Risk Early Warning Signs'),
     '#default_value' => $node->jiscpmrisks[0]['risk_early_warning_signs'],
+	'#weight' => 0,
   );
+  $form['group7']['risk_early_warning_signs_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group7', 'risk_early_warning_signs_wrapper', 'format'));
+  
   $form['group8'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -376,13 +399,19 @@ function jiscpmrisk_form(&$node) {
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -13,
   );
-  
-  $form['group9']['risk_management_approach'] = array(
+    $form['group9']['risk_management_approach_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Risk Management Approach'),
+	'#tree' => FALSE,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+  );
+  $form['group9']['risk_management_approach_wrapper']['risk_management_approach'] = array(
     '#type' => 'textarea',
     '#title' =>t('Risk Management Approach'),
     '#default_value' => $node->jiscpmrisks[0]['risk_management_approach'],
   );
-
+  $form['group9']['risk_management_approach_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group9', 'risk_management_approach_wrapper', 'format'));
   return $form;
 }
 

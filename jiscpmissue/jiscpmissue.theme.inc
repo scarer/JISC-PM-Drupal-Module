@@ -64,7 +64,7 @@ function theme_jiscpmissue_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group2']['issue_progress'] = array(
     '#prefix' => '<strong>Progress on issue</strong><div class="issueprogress">',
     '#suffix' => '</div>',
-    '#value' => $node->issues[0]['issue_progress'],
+    '#value' => check_markup($node->issues[0]['issue_progress'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => 1,
   );
   $node->content['group3'] = array(
@@ -75,7 +75,7 @@ function theme_jiscpmissue_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group3']['issue_resolved'] = array(
     '#prefix' => '<strong>Is the issue resolved?</strong><div class="issueresolved">',
     '#suffix' => '</div>',
-    '#value' => $node->issues[0]['issue_resolved'],
+    '#value' => check_markup($node->issues[0]['issue_resolved'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => 1,
   );
   $node->content['group4'] = array(
@@ -86,7 +86,7 @@ function theme_jiscpmissue_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group4']['issue_resolution'] = array(
     '#prefix' => '<strong>Issue resolution</strong><div class="issueresolution">',
     '#suffix' => '</div>',
-    '#value' => $node->issues[0]['issue_resolution'],
+    '#value' => check_markup($node->issues[0]['issue_resolution'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => 1,
   );
   $node->content['group5'] = array(

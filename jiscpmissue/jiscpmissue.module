@@ -217,6 +217,11 @@ function jiscpmissue_form(&$node) {
     $projects[$project->nid] = $project->title;
     if (!$node->project_nid) $node->project_nid = $project->nid;
   }
+  $form['group2'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
+  );
   $form['group2']['project_nid'] = array(
     '#type' => 'select',
     '#title' => t('Project'),
@@ -233,9 +238,13 @@ function jiscpmissue_form(&$node) {
     '#default_value' => $node->title,
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
   );
-  
+  $form['body'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'body') : -19,
+  );
   if ($type->has_body) {
-    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+    $form['body']['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
   }
   
   $form['group3'] = array(
@@ -243,13 +252,23 @@ function jiscpmissue_form(&$node) {
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -19,
   );
-  $form['group3']['issue_progress'] = array(
+  $form['group3']['issue_progress_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Issue Progress'),
+	'#tree' => FALSE,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+  );
+  $form['group3']['issue_progress_wrapper']['issue_progress'] = array(
     '#type' => 'textarea',
-    '#title' => t('Progress on issue'),
+    '#title' => t('Issue Progress'),
     '#required' => TRUE,
     '#default_value' => $node->issues[0]['issue_progress'],
     '#process' => array('jiscpm_dependent_select_process'),
+	'#weight' => 0,
   );
+  $form['group3']['issue_progress_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group3', 'issue_progress_wrapper','format'));
+  
   $form['group4'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -271,14 +290,22 @@ function jiscpmissue_form(&$node) {
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -17,
   );
-  $form['group5']['issue_resolution'] = array(
+  $form['group5']['issue_resolution_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Issue Resolution'),
+	'#tree' => FALSE,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+  );
+  $form['group5']['issue_resolution_wrapper']['issue_resolution'] = array(
     '#type' => 'textarea',
-    '#title' => t('Issue resolution'),
+    '#title' => t('Issue Resolution'),
     '#required' => TRUE,
     '#default_value' => $node->issues[0]['issue_resolution'],
     '#process' => array('jiscpm_dependent_select_process'),
+	'#weight' => 0,
   );
-
+  $form['group5']['issue_resolution_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group5', 'issue_resolution_wrapper','format'));
   return $form;
 }
 

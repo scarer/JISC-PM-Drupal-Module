@@ -321,7 +321,7 @@ function jiscpmteam_form(&$node, $form_state) {
 	'#title' => t('Team Member description'),
 	'#weight' => 1,
 	);
-
+    $form['member_wrapper']['add_member']['new_member']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'member_wrapper', 'add_member', 'new_member', 'format'));
 	// We name our button 'jiscpmteam_member_more' to avoid conflicts with other modules using
 	// AHAH-enabled buttons with the id 'more'.
 	$form['member_wrapper']['add_member']['jiscpmteam_member_more'] = array(
@@ -352,12 +352,13 @@ function jiscpmteam_form(&$node, $form_state) {
     '#required' => TRUE,
   );
   /* description of team */
-   $form['team_description'] = array(
+   $form['team']['team_description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description of Team'),
-    '#default_value' => check_plain($node->jiscpmteams[0]['team_description']),
+    '#default_value' => check_markup($node->jiscpmteams[0]['team_description'], FILTER_FORMAT_DEFAULT, false),
+	'#weight' => 5,
   );
-  
+  $form['team']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 6, $parents=array('info', 'team', 'format'));
   return $form;
 }
 

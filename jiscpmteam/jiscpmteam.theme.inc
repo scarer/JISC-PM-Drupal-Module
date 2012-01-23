@@ -49,7 +49,7 @@ function theme_jiscpmteam_view($node, $teaser = FALSE, $page = FALSE) {
   for ($m = 0; $m < count ($node->members); $m ++)
   {
     $user = user_load($node->members[$m]['member_uid']);  
-  	$members_o .= '<tr><td><a href="?q=user/' . $user->uid . '">' . $user->name . '</a></td><td>' . $node->members[$m]['member_description'] . '</td></tr>';
+  	$members_o .= '<tr><td><a href="?q=user/' . $user->uid . '">' . $user->name . '</a></td><td>' . check_markup($node->members[$m]['member_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $members_o.= '</table></p>';
   
@@ -89,7 +89,7 @@ function theme_jiscpmteam_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['description'] = array(
     '#prefix' => '<strong>Team Description</strong><div class="jiscpmteamdescription">',
     '#suffix' => '</div>',
-    '#value' => $node->jiscpmteams[0]['team_description'],
+    '#value' => check_markup($node->jiscpmteams[0]['team_description'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'body_field') : -20,
   );
   unset($node->content['body']);

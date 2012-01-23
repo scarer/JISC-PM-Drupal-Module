@@ -53,102 +53,127 @@ function theme_jiscpmsr_view($node, $teaser = FALSE, $page = FALSE) {
     '#prefix' => '<div class="project">',
     '#suffix' => '</div>',
     '#value' => theme('jiscpm_view_item', t('Project'), l($loadproject->title, 'node/'. $loadproject->nid)),
-    '#weight' => 1,
+    '#weight' => -20,
   );
-
-  $node->content['group2'] = array(
+  //load project manager info and display
+  $project_manager = array();
+  $results = db_query('SELECT project_manager_uid FROM {jiscpmproject} WHERE nid = %d', $loadproject->nid);
+  while ($rows = db_fetch_object($results)) {
+    $project_manager = user_load($rows->project_manager_uid);
+  }
+  if ($project_manager->uid != -1)
+  {
+  	$node->content['projectmanager'] = array(
+    	'#prefix' => '<div class="jiscpmfields">',
+    	'#suffix' => '</div>',
+    	'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'projectmanager') : -19,
+		'#value' => theme('jiscpm_view_item', t('Project Manager'), l($project_manager->name, 'user/'. $project_manager->uid)),
+  	);
+  }
+  else
+  {
+	  
+  }
+  $node->content['group3'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
-  );
-
-  $node->content['group2']['sr_focus_area'] = array(
-    '#prefix' => '<strong>Focus Area</strong><div class="srfocusarea">',
-    '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_focus_area'],
-    '#weight' => 1,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -18,
   );
 
   $node->content['group3']['sr_product_process'] = array(
-    '#prefix' => '<strong>Product/Process</strong><div class="srproductprocess">',
+	'#value' => theme('jiscpm_view_item', t('Product/Process'),$node->jiscpmsrs[0]['sr_product_process']),
+  );
+  $node->content['group2'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_product_process'],
-    '#weight' => 2,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -17,
   );
 
-  $node->content['group4']['sr_overview'] = array(
-    '#prefix' => '<strong>Overview</strong><div class="sroverview">',
+  $node->content['group2']['sr_focus_area'] = array(
+    '#value' => theme('jiscpm_view_item', t('Focus Area'), $node->jiscpmsrs[0]['sr_focus_area']),
+    '#weight' => 1,
+  );
+  
+  $node->content['group9'] = array( 
+    '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_overview'],
-    '#weight' => 3,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -16,
+  );
+  $node->content['group9']['sr_start'] = array(
+    '#value' => theme('jiscpm_view_item', t('Start of reporting period'), date('d-m-Y', $node->jiscpmsrs[0]['sr_start'])),
+    '#weight' => 0,
+  );
+  $node->content['group9']['sr_end'] = array(
+    '#value' => theme('jiscpm_view_item', t('End of reporting period'), date('d-m-Y', $node->jiscpmsrs[0]['sr_end'])),
+    '#weight' => 1,
+  );
+ $node->content['group4'] = array( 
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -15,
+  );
+  $node->content['group4']['sr_overview'] = array(
+    '#value' => theme('jiscpm_view_item', t('Status Report Overview'), check_markup($node->jiscpmsrs[0]['sr_overview'], FILTER_FORMAT_DEFAULT, FALSE)),
+  );
+  $node->content['group11'] = array( 
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group11') : -14,
+  );
+  $node->content['group11']['sr_overall_status'] = array(
+    '#value' => theme('jiscpm_view_item', t('Overall Status'), check_markup($node->jiscpmsrs[0]['sr_overall_status'], FILTER_FORMAT_DEFAULT, FALSE)),
+  );
+  $node->content['group12'] = array( 
+    '#prefix' => '<div class="jiscpmfields">',
+    '#suffix' => '</div>',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group12') : -13,
+  );
+  $node->content['group12']['sr_project_summary'] = array(
+    '#value' => theme('jiscpm_view_item', t('Project Summary'), check_markup($node->jiscpmsrs[0]['sr_project_summary'], FILTER_FORMAT_DEFAULT, FALSE)),
   );
 
   $node->content['group5'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -16,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -12,
   );
   
   $node->content['group5']['sr_milestone_report'] = array(
-    '#prefix' => '<strong>Milestone Report</strong><div class="srmilestonereport">',
-    '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_milestone_report'],
-    '#weight' => 4,
+    '#value' => theme('jiscpm_view_item', t('Milestone Report'), check_markup($node->jiscpmsrs[0]['sr_milestone_report'], FILTER_FORMAT_DEFAULT, FALSE)),
+    '#weight' => 1,
   );
   
-  $node->content['group6']['sr_risk_management_report'] = array(
-    '#prefix' => '<strong>Risk Management Report</strong><div class="srriskmanagementreport">',
-    '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_risk_management_report'],
-    '#weight' => 5,
+  $node->content['group5']['sr_risk_management_report'] = array(
+    '#value' => theme('jiscpm_view_item', t('Risk Management Report'), check_markup($node->jiscpmsrs[0]['sr_risk_management_report'], FILTER_FORMAT_DEFAULT, FALSE)),
+    '#weight' => 2,
   );
-  $node->content['group7']['sr_issues_report'] = array(
-    '#prefix' => '<strong>Issues Report</strong><div class="srissuesreport">',
+  $node->content['group5']['sr_issues_report'] = array(
+    '#value' => theme('jiscpm_view_item', t('Issues Report'), check_markup($node->jiscpmsrs[0]['sr_issues_report'], FILTER_FORMAT_DEFAULT, FALSE)),
+    '#weight' => 3,
+  );
+  $node->content['group8'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_issues_report'],
-    '#weight' => 6,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -11,
   );
   $node->content['group8']['sr_project_recommendations'] = array(
-    '#prefix' => '<strong>Project Recommendations</strong><div class="srprojectrecommendations">',
-    '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_project_recommendations'],
-    '#weight' => 7,
+    '#value' => theme('jiscpm_view_item', t('Project Recommendations'), check_markup($node->jiscpmsrs[0]['sr_project_recommendations'])),
   );
-  $node->content['group9']['sr_start'] = array(
-    '#prefix' => '<strong>Start of reporting period</strong><div class="srstart">',
+  $node->content['group13'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#value' => date('d-m-Y', $node->jiscpmsrs[0]['sr_start']),
-    '#weight' => 8,
-  );
-  $node->content['group10']['sr_end'] = array(
-    '#prefix' => '<strong>End of reporting period</strong><div class="srend">',
-    '#suffix' => '</div>',
-    '#value' => date('d-m-Y', $node->jiscpmsrs[0]['sr_end']),
-    '#weight' => 9,
-  );
-  $node->content['group11']['sr_overall_status'] = array(
-    '#prefix' => '<strong>Overall Status of Project</strong><div class="sroverallstatus">',
-    '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_overall_status'],
-    '#weight' => 10,
-  );
-  $node->content['group12']['sr_project_summary'] = array(
-    '#prefix' => '<strong>Project Summary</strong><div class="srprojectsummary">',
-    '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_project_summary'],
-    '#weight' => 11,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group13') : -10,
   );
   $node->content['group13']['sr_objectives_for_next_sr'] = array(
-    '#prefix' => '<strong>Objectives for Next Status Report</strong><div class="srobjectivesfornextsr">',
-    '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_objectives_for_next_sr'],
-    '#weight' => 12,
+    '#value' => theme('jiscpm_view_item', t('Objectives for Next Status Report'), check_markup($node->jiscpmsrs[0]['sr_objectives_for_next_sr'], FILTER_FORMAT_DEFAULT, FALSE)),
   );
-    $node->content['group14']['sr_related_project_information'] = array(
-    '#prefix' => '<strong>Related Project Information</strong><div class="srrelatedprojectinformation">',
+  $node->content['group14'] = array(
+    '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
-    '#value' => $node->jiscpmsrs[0]['sr_related_project_information'],
-    '#weight' => 13,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group14') : -9,
+  );
+  $node->content['group14']['sr_related_project_information'] = array(
+    '#value' => theme('jiscpm_view_item', t('Related Project Information'), check_markup($node->jiscpmsrs[0]['sr_related_project_information'], FILTER_FORMAT_DEFAULT, FALSE)),
   );
   /*$node->content['body_field'] = array(
     '#prefix' => '<div class="jiscpmbody">',
