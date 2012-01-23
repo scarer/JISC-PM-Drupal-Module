@@ -120,20 +120,20 @@ function jiscpmrfc_access_sql($sql, $where = array()) {
 function jiscpmrfc_menu() {
   $items = array();
 
-  $items['jiscpm/dashboard/risks'] = array(
-    'title' => 'Risks',
-    'description' => 'jiscpm risks',
+  $items['jiscpm/dashboard/rfcs'] = array(
+    'title' => 'RFCs',
+    'description' => 'jiscpm RFCs',
     'page callback' => 'jiscpmrfc_list',
     'access arguments' => array('jiscpm risk: access'),
     'file' => 'jiscpmrfc.admin.inc',
     'type' => MENU_NORMAL_ITEM
   );
 
-  $items['jiscpm/project_risks_js/%'] = array(
-    'title' => 'Risks',
-    'page callback' => '_jiscpmrfc_project_risks_js',
+  $items['jiscpm/project_rfcs_js/%'] = array(
+    'title' => 'RFCs',
+    'page callback' => '_jiscpmrfc_project_rfcs_js',
     'page arguments' => array(2),
-    'access arguments' => array('jiscpm risk: access'),
+    'access arguments' => array('jiscpm rfc: access'),
     'file' => 'jiscpmrfc.admin.inc',
     'type' => MENU_CALLBACK,
   );
@@ -252,13 +252,22 @@ function jiscpmrfc_form(&$node) {
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -19,
   );
-  $form['group3']['rfc_rationale'] = array(
+  $form['group3']['rfc_rationale_wrapper'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Request for Change Rationale'),
+	'#tree' => FALSE,
+	'#collapsed' => FALSE,
+	'#collapsible' => TRUE,
+	);
+  $form['group3']['rfc_rationale_wrapper']['rfc_rationale'] = array(
     '#type' => 'textarea',
     '#title' => t('RFC Rationale'),
     '#required' => TRUE,
     '#default_value' => $node->rfcs[0]['rfc_rationale'],
     '#process' => array('jiscpm_dependent_select_process'),
+	'#weight' => 0,
   );
+  $form['group3']['rfc_rationale_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group3', 'rfc_rationale_wrapper', 'format'));
 
   return $form;
 }
@@ -317,8 +326,8 @@ function jiscpmrfc_load($node) {
 
 function jiscpmrfc_view($node, $teaser = FALSE, $page = FALSE) {
   $breadcrumb = array();
-  $breadcrumb[] = l(t('jiscpm'), 'jiscpm');
-  $breadcrumb[] = l(t('risks'), 'jiscpm/risks');
+  $breadcrumb[] = l(t('jiscpm'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('risks'), 'jiscpm/dashboard/rfcs');
   drupal_set_breadcrumb($breadcrumb);
 
   return theme('jiscpmrfc_view', $node, $teaser, $page);

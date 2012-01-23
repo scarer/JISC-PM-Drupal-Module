@@ -366,7 +366,7 @@ function jiscpmissue_load($node) {
 function jiscpmissue_view($node, $teaser = FALSE, $page = FALSE) {
   $breadcrumb = array();
   $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
-  $breadcrumb[] = l(t('issues'), 'jiscpm/issues');
+  $breadcrumb[] = l(t('Issues'), 'jiscpm/dashboard/issues');
   drupal_set_breadcrumb($breadcrumb);
 
   return theme('jiscpmissue_view', $node, $teaser, $page);
