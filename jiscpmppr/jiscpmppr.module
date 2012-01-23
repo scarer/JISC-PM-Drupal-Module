@@ -700,8 +700,8 @@ function jiscpmppr_load($node) {
 
 function jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
   $breadcrumb = array();
-  $breadcrumb[] = l(t('jiscpm'), 'jiscpm');
-  $breadcrumb[] = l(t('Post Project Reviews'), 'jiscpm/pprs');
+  $breadcrumb[] = l(t('jiscpm/dashboard'), 'jiscpm');
+  $breadcrumb[] = l(t('Post Project Reviews'), 'jiscpm/dashboard/pprs');
   drupal_set_breadcrumb($breadcrumb);
 
   return theme('jiscpmppr_view', $node, $teaser, $page);

@@ -166,7 +166,7 @@ function jiscpmrisk_content_extra_fields($type_name) {
 
 function jiscpmrisk_form(&$node) {
   $breadcrumb = array();
-  $breadcrumb[] = l(t('JISCPM'), 'jiscpm');
+  $breadcrumb[] = l(t('JISCPM'), 'jiscpm/dashboard');
   $breadcrumb[] = l(t('Risks'), 'jiscpm/risks');
   drupal_set_breadcrumb($breadcrumb);
 
@@ -480,8 +480,8 @@ function jiscpmrisk_load($node) {
 
 function jiscpmrisk_view($node, $teaser = FALSE, $page = FALSE) {
   $breadcrumb = array();
-  $breadcrumb[] = l(t('jiscpm'), 'jiscpm');
-  $breadcrumb[] = l(t('risks'), 'jiscpm/risks');
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('Risks'), 'jiscpm/dashboard/risks');
   drupal_set_breadcrumb($breadcrumb);
 
   return theme('jiscpmrisk_view', $node, $teaser, $page);

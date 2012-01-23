@@ -455,6 +455,10 @@ function jiscpmbca_nodeapi(&$node, $op, $teaser, $page) {
 function jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   $node = node_prepare($node, $teaser);
   $content = $node->content['body']['#value'];
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('BCAS'), 'jiscpm/dashboard/bcas');
+  drupal_set_breadcrumb($breadcrumb);
   // @TODO: render and theme staff_cost listing.
   return theme('jiscpmbca_view', $node, $teaser, $page);
 }

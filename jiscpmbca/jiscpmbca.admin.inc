@@ -9,7 +9,7 @@ function jiscpmbca_list() {
   global $base_url;
   $breadcrumb = array();
   $breadcrumb[] = l(t('Home'), '/');
-  $breadcrumb[] = l(t('JISC PM'), 'jiscpm');
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
   drupal_set_breadcrumb($breadcrumb);
   $header = array(
       array('data' => t('BCA'), 'field' => 'title'),
