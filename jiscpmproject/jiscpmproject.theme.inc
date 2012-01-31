@@ -73,7 +73,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
     $risktitle = $risks_rows->title;
     $risknid = $risks_rows->vid;
     $riskowner = user_load($risks_rows->risk_owner_uid);
-    $output_risks .= '<tr><td><a href="?q=node/' . $risknid . '">' . $risktitle . '</a></td><td><a href="user/' . $riskowner->uid . '">' . $riskowner->name . '</a></td>';
+    $output_risks .= '<tr><td><a href="' . $base_url . '/node/' . $risknid . '">' . $risktitle . '</a></td><td><a href="user/' . $riskowner->uid . '">' . $riskowner->name . '</a></td>';
   }
   $risks = '<p><table><th>Risk</th><th>Owner</th>' . $output_risks . '</table></p>';
   //get issues from database
@@ -82,7 +82,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
     $issuetitle = $issues_rows->title;
     $issuenid = $issues_rows->vid;
     $issueowner = user_load($issues_rows->issue_owner_uid);
-    $output_issues .= '<tr><td><a href="?q=node/' . $issuenid . '">' . $issuetitle . '</a></td><td><a href="user/' . $issueowner->uid . '">' . $issueowner->name . '</a></td>';
+    $output_issues .= '<tr><td><a href="' . $base_url . '/node/' . $issuenid . '">' . $issuetitle . '</a></td><td><a href="user/' . $issueowner->uid . '">' . $issueowner->name . '</a></td>';
   }
   $issues = '<p><table><th>Issue</th><th>Owner</th>' . $output_issues . '</table></p>';
   //get business case assessments from database
@@ -90,7 +90,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   while ($bca_rows = db_fetch_object($bca_results)) {
     $bcatitle = $bca_rows->title;
     $bcanid = $bca_rows->vid;
-    $output_bcas .= '<tr><td><a href="?q=node/' . $bcanid . '">' . $bcatitle . '</a></td>';
+    $output_bcas .= '<tr><td><a href="' . $base_url . '/node/' . $bcanid . '">' . $bcatitle . '</a></td>';
   }
   $bca = '<p><table><th>BCA</th>' . $output_bcas . '</table></p>';
   //get post project reviews from database
@@ -98,7 +98,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   while ($ppr_rows = db_fetch_object($ppr_results)) {
     $pprtitle = $ppr_rows->title;
     $pprnid = $ppr_rows->vid;
-    $output_pprs .= '<tr><td><a href="?q=node/' . $pprnid . '">' . $pprtitle . '</a></td>';
+    $output_pprs .= '<tr><td><a href="' . $base_url . '/node/' . $pprnid . '">' . $pprtitle . '</a></td>';
   }
   $ppr = '<p><table><th>PPR</th>' . $output_pprs . '</table></p>';
   //get status reports from database
@@ -106,7 +106,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   while ($sr_rows = db_fetch_object($sr_results)) {
     $srtitle = $sr_rows->title;
     $srnid = $sr_rows->vid;
-    $output_srs .= '<tr><td><a href="?q=node/' . $srnid . '">' . $srtitle . '</a></td><td>' . date('d-m-Y', $sr_rows->sr_start) . ' to ' . date('d-m-Y', $sr_rows->sr_end) . '</td></tr>';
+    $output_srs .= '<tr><td><a href="' . $base_url . '/node/' . $srnid . '">' . $srtitle . '</a></td><td>' . date('d-m-Y', $sr_rows->sr_start) . ' to ' . date('d-m-Y', $sr_rows->sr_end) . '</td></tr>';
   }
   $sr = '<p><table><th>Status Report</th><th>Timescale</th>' . $output_srs . '</table></p>';
   //get requests for change from database
@@ -114,14 +114,14 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   while ($rfc_rows = db_fetch_object($rfc_results)) {
     $rfctitle = $rfc_rows->title;
     $rfcnid = $rfc_rows->vid;
-    $output_rfcs .= '<tr><td><a href="?q=node/' . $rfcnid . '">' . $rfctitle . '</a></td>';
+    $output_rfcs .= '<tr><td><a href="' . $base_url . '/node/' . $rfcnid . '">' . $rfctitle . '</a></td>';
   }
   $rfcs = '<p><table><th>RFC</th>' . $output_rfcs . '</table></p>';
   
   //get project relationships data
   for($r = 0; $r < count($node->relationships); $r ++) {
     $rel_project = node_load($node->relationships[$r]['relationship_nid']);
-  	$output_r .= '<tr><td><a href="?q=node/' . $rel_project->nid . '">' . $rel_project->title . '</a></td><td>' . $node->relationships[$r]['relationship_description'] . '</td></tr>';
+  	$output_r .= '<tr><td><a href="' . $base_url . '/node/' . $rel_project->nid . '">' . $rel_project->title . '</a></td><td>' . $node->relationships[$r]['relationship_description'] . '</td></tr>';
   }
   $relationships = '<p><table><th>Related project</th><th>Relationship Description</th>' . $output_r . '</table></p>';
   //get project phases data

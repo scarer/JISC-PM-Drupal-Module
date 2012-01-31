@@ -217,7 +217,7 @@ function jiscpmtask_tasks()
 	  $header = array(
       array('data' => t('Task'), 'field' => 'nid')
 	  );
-	  $s = "SELECT n.title, n.nid FROM {node} n JOIN {jiscpmtask} j ON n.nid=j.task_nid
+	  $s = "SELECT n.title, n.nid FROM {node} n JOIN {jiscpmtask} j ON n.nid=j.nid
         WHERE type='jiscpmtask'";
       //$sql .= tablesort_sql($header);
       $result = pager_query($s, 50);
@@ -521,13 +521,13 @@ function jiscpmtask_insert($node) {
   $node->datebegin = strtotime($node->datebegin);
   $node->dateend = strtotime($node->dateend);
   db_query("INSERT INTO {jiscpmtask}
-    (task_nid, project_nid, stepno, taskcategory, taskstatus, taskpriority, weight,
+    (nid, vid, project_nid, stepno, taskcategory, taskstatus, taskpriority, weight,
     datebegin, dateend, durationunit, duration, pricemode, price, currency,
     assigned_uid)
     VALUES
-    (%d, %d, %d, '%s', '%s', '%s', '%s',
+    (%d, %d, %d, %d, '%s', '%s', '%s', '%s',
     %d, %d, '%s', %d, '%s', %f, '%s', %d)",
-    $node->nid, $node->project_nid, $node->stepno, $node->taskcategory, $node->taskstatus, $node->taskpriority,
+    $node->nid, $node->vid, $node->project_nid, $node->stepno, $node->taskcategory, $node->taskstatus, $node->taskpriority,
     $node->weight, $node->datebegin, $node->dateend, $node->durationunit, $node->duration,
     $node->pricemode, $node->price, $node->currency,
     $node->assigned_uid
@@ -540,7 +540,7 @@ function jiscpmtask_update($node) {
   jiscpmtask_insert($node);
   }
   else {
-    db_query('DELETE FROM {jiscpmtask} WHERE task_nid = %d', $node->nid);
+    db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
     jiscpmtask_insert($node);
     
   }
@@ -572,18 +572,18 @@ function jiscpmtask_nodeapi(&$node, $op, $teaser, $page) {
       break;
     case 'delete revision':
       // Notice that we're matching a single revision based on the node's vid.
-      db_query('DELETE FROM {jiscpmtask} WHERE task_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
       break;
   }
 }
 
 function jiscpmtask_delete($node) {
   // Notice that we're matching all revision, by using the node's nid.
-  db_query('DELETE FROM {jiscpmtask} WHERE task_nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
 }
 
 function jiscpmtask_load($node) {
-  $additions = db_fetch_object(db_query('SELECT * FROM {jiscpmtask} WHERE task_nid = %d', $node->nid));
+  $additions = db_fetch_object(db_query('SELECT * FROM {jiscpmtask} WHERE nid = %d', $node->nid));
   $additions->stepno_old = $node->stepno;
   $additions->title_old = $node->title;
   return $additions;

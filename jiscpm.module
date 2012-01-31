@@ -555,7 +555,7 @@ function jiscpm_issues()
     $project = node_load($records->project_nid);
     $owner = user_load($records->issue_owner_uid);
   	$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
-  	'<a href="' . $base_url . '/user/' . $requestor->uid . '">' . $requestor->name . '</a>', 
+  	'<a href="' . $base_url . '/user/' . $owner->uid . '">' . $owner->name . '</a>', 
   	'<a href="' . $base_url . '/node/' . $project->nid . '">' . $project->title . '</a>');
   }
   $pager = theme('pager', NULL, 50, 0);
@@ -672,7 +672,7 @@ function jiscpm_export_form_validate($form, &$form_state)
 function jiscpm_export_form_submit($form, &$form_state)
 { 
     //include php zipfile class
-    include(drupal_get_path('module', 'jiscpm') . '/' . 'zipfile.php');
+    include(drupal_get_path('module', 'jiscpm') . '/' . 'jiscpm_zipfile.php');
     $zipfile = new zipfile();
     $zipfile->add_dir("project_docs/");
     //if stakeholders are omitted
