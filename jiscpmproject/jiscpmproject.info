@@ -6,7 +6,6 @@ dependencies[] = jiscpmattribute
 ;dependencies[] = jiscpmphase
 dependencies[] = date_popup
 dependencies[] = date_api
-dependencies[] = civicrm
 dependencies[] = ahah_helper
 package = JISC Project Management
 core = 6.x
