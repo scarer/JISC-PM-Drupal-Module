@@ -501,7 +501,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -19,
   );
   // Body field.
-  $form['group2']['body_field'] = node_body_field($node, 'Introduction', $type->min_word_count);
+  $form['group2']['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
 
   /* adds functionality for adding project relationships */
   $projects = array();
@@ -565,6 +565,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#weight' => -16,
 	'#collapsed' => TRUE,
 	'#collapsible' => TRUE,
+	'#description' => t('A project may have none, one or many relationships to different projects. Relationships can be defined by resources (e.g. staff, costs, time etc.) or planned value, risks and run on effects.'),
 	);
 
 	// Define the form fields for the new relationship title and relationship_description's name.
@@ -576,10 +577,12 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#type' => 'select',
 	'#title' => t('Project that is related'),
 	'#options' => $projects,
+	'#description' => t('Please select a project that is related'),
 	'#weight' => 0,
 	);
 	$form['relationship_wrapper']['add_relationship']['new_relationship']['new_relationship_description'] = array(
 	'#type' => 'textarea',
+	'#description' => t('Add a description of how this project could possibly effect outcomes'), 
 	'#title' => t('Relationship description'),
 	'#weight' => 1,
 	);
@@ -655,6 +658,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#weight' => -16,
     '#collapsed' => TRUE,
 	'#collapsible' => TRUE,
+	'#description' => t('A project phase is a chunk of time in a project that is determinable by a group of deliverables. Examples of phases include "Start-up", "Planning" etc.'),
   );
 
   // Define the form fields for the new phase title and phase_scope's name.
@@ -670,6 +674,7 @@ function jiscpmproject_form(&$node, $form_state) {
   $form['phase_wrapper']['add_phase']['new_phase']['new_phase_scope'] = array(
     '#type' => 'textarea',
     '#title' => t('Phase Scope'),
+	'#description' => t('Enter the scope for a phase'),
     '#weight' => 1,
   );
   $form['phase_wrapper']['add_phase']['new_phase']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'phase_wrapper', 'add_phase', 'new_phase', 'format'));
@@ -796,6 +801,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#weight' => -16,
     '#collapsed' => TRUE,
 	'#collapsible' => TRUE,
+	'#description' => t('A stakeholder may be an employee, a manager, a client or anyone who may have an impact on the project'),
 	);
 
 	// Define the form fields for the new stakeholder title and stakeholder_stake_in_project's name.
@@ -808,15 +814,18 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#title' => t('Stakeholder'),
 	'#options' => $people,
 	'#weight' => 0,
+	'#description' => t('Select a user from the list who is a project stakeholder'),
 	);
 	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_stake_in_project'] = array(
 	'#type' => 'textarea',
 	'#title' => t('Stake in project'),
 	'#weight' => 1,
+	'#description' => t('Describe the stakeholders position/role in the project'),
 	);
     $form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_management_strategy'] = array(
 	'#type' => 'textarea',
 	'#title' => t('Management strategy'),
+	'#description' => t('For example "There will be a monthly strategy meeting and this stakeholder will be invited etc."'),
 	'#weight' => 2,
 	);
 	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_potential_impact'] = array(
@@ -836,6 +845,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	$form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_expectations'] = array(
 	'#type' => 'textarea',
 	'#title' => t('Expectations'),
+	'#description' => t('List what the stakeholders expectations are'),
 	'#weight' => 4,
 	);
     $form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['new_stakeholder_attitudes_risks'] = array(
@@ -913,6 +923,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#weight' => -16,
 	'#collapsed' => TRUE,
 	'#collapsible' => TRUE,
+	'#description' => t('A critical success factor is a defining deliverable and/or direct result of the project that will significantly contribute to whether or not a project has been a success'),
 	);
 
 	// Define the form fields for the new factor title and factor_description's name.
@@ -1003,6 +1014,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#weight' => -16,
 	'#collapsed' => TRUE,
 	'#collapsible' => TRUE,
+	'#description' => t('A project assumption is something that can be assumed about the project'),
 	);
 
 	// Define the form fields for the new assumption title and assumption_description's name.
@@ -1089,6 +1101,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#weight' => -16,
 	'#collapsed' => TRUE,
 	'#collapsible' => TRUE,
+	'#description' => t('A project constraint is something that limits the project e.g. all staff will be working remotely on the project'),
 	);
 
 	// Define the form fields for the new constraint title and constraint_description's name.
@@ -1176,6 +1189,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#weight' => -16,
 	'#collapsed' => TRUE,
 	'#collapsible' => TRUE,
+	'#description' => t('A goal is an achievable outcome e.g. staff overheads will be lowered'),
 	);
 
 	// Define the form fields for the new goal title and goal_objectives's name.
@@ -1192,6 +1206,7 @@ function jiscpmproject_form(&$node, $form_state) {
 	'#type' => 'textarea',
 	'#title' => t('Objectives of goal'),
 	'#weight' => 1,
+	'#description' => t('Objectives of a goal are what the goal is expected to achieve'),
 	);
 	$form['goal_wrapper']['add_goal']['new_goal']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'goal_wrapper', 'add_goal', 'new_goal', 'format'));
 
@@ -1264,6 +1279,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#weight' => -16,
     '#collapsed' => TRUE,
 	'#collapsible' => TRUE,
+	'#description' => t('A milestone is a significant deliverable and/or collection of deliverables'),
   );
 
   // Define the form fields for the new milestone title and milestone_scope's name.
@@ -1311,7 +1327,7 @@ function jiscpmproject_form(&$node, $form_state) {
   $form['group10']['projectcategory'] = array(
     '#type' => 'select',
     '#title' => t('Category'),
-    '#default_value' => check_plain($node->jiscpmprojects[0]['projectcategory']),
+    '#default_value' => $node->jiscpmprojects[0]['projectcategory'],
     '#options' => $category_list['values'],
   );
   $form['group11'] = array(
@@ -1324,7 +1340,7 @@ function jiscpmproject_form(&$node, $form_state) {
   $form['projectstatus'] = array(
     '#type' => 'select',
     '#title' => t('Status'),
-    '#default_value' => check_plain($node->jiscpmprojects[0]['projectstatus']),
+    '#default_value' => $node->jiscpmprojects[0]['projectstatus'],
     '#options' => $status_list['values'],
   );
   $form['group12'] = array(
@@ -1337,7 +1353,7 @@ function jiscpmproject_form(&$node, $form_state) {
   $form['projectpriority'] = array(
     '#type' => 'select',
     '#title' => t('Priority'),
-    '#default_value' => check_plain($node->jiscpmprojects[0]['projectpriority']),
+    '#default_value' => $node->jiscpmprojects[0]['projectpriority'],
     '#options' => $priority_list['values'],
   );
   /* project date start */
@@ -1390,7 +1406,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#type' => 'select',
     '#title' => t('Project Manager'),
     '#options' => $people,
-    '#default_value' => check_plain($node->jiscpmprojects[0]['project_manager_uid']),
+    '#default_value' => $node->jiscpmprojects[0]['project_manager_uid'],
     '#process' => array('jiscpm_dependent_select_process'),
   );
   
@@ -1399,7 +1415,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#type' => 'select',
     '#title' => t('Client'),
     '#options' => $people,
-    '#default_value' => check_plain($node->jiscpmprojects[0]['client_uid']),
+    '#default_value' => $node->jiscpmprojects[0]['client_uid'],
     '#process' => array('jiscpm_dependent_select_process'),
   );
   
@@ -1415,19 +1431,22 @@ function jiscpmproject_form(&$node, $form_state) {
    $form['scope']['organisational_scope'] = array(
     '#type' => 'textarea',
     '#title' => t('Organisational scope'),
-    '#default_value' => check_markup($node->jiscpmprojects[0]['organisational_scope'], FILTER_FORMAT_DEFAULT,  TRUE),
+    '#default_value' => $node->jiscpmprojects[0]['organisational_scope'],
+	'#description' => t('The scope of organisational responsibilities e.g. my department will be responsible for a & b whereas the IT department will be responsible for... etc.'),
   );
   /* logical scope */
    $form['scope']['logical_scope'] = array(
     '#type' => 'textarea',
     '#title' => t('Logical scope'),
-    '#default_value' => check_markup($node->jiscpmprojects[0]['logical_scope'], FILTER_FORMAT_DEFAULT, TRUE),
+    '#default_value' => $node->jiscpmprojects[0]['logical_scope'],
+	'#description' => t('The scope of logical outcomes e.g. this server will host the new company website...etc.'),
   );
   /* out of scope */
    $form['scope']['out_of_scope'] = array(
     '#type' => 'textarea',
     '#title' => t('Out of scope'),
-    '#default_value' => check_markup($node->jiscpmprojects[0]['out_of_scope'], FILTER_FORMAT_DEFAULT, TRUE),
+    '#default_value' => $node->jiscpmprojects[0]['out_of_scope'],
+	'#description' => t('Any tasks/deliverables/outcomes that will not fall into the scope of the project but may be related to the project (worth mentioning)'),
   );
   $form['scope']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'scope', 'format'));
   return $form;
