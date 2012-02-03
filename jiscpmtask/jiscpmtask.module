@@ -302,16 +302,16 @@ function jiscpmtask_jiscpmproject_change_hierarchy($project_nid, $organization_n
 
 function jiscpmtask_form(&$node) {
   $breadcrumb = array();
-  $breadcrumb[] = l(t('jiscpm'), 'jiscpm');
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
 
   if (array_key_exists('project_nid', $_GET)) {
-    $breadcrumb[] = l(t('Projects'), 'jiscpm/projects');
+    $breadcrumb[] = l(t('Projects'), 'jiscpm/dashboard/projects');
     $project = node_load($_GET['project_nid']);
     $breadcrumb[] = l(t('Project : !project', array('!project' => $project->title)), 'node/'. $project->nid);
     $breadcrumb[] = l(t('Tasks'), 'node/'. $project->nid .'/tasks');
   }
   else {
-    $breadcrumb[] = l(t('Tasks'), 'jiscpm/tasks');
+    $breadcrumb[] = l(t('Tasks'), 'jiscpm/dashboard/tasks');
   }
   
   drupal_set_breadcrumb($breadcrumb);
