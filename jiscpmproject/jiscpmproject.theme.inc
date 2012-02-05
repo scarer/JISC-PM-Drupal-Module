@@ -1,6 +1,4 @@
 <?php
-// $Id: jiscpmproject.theme.inc,v 1.2.4.17 2010/01/17 14:38:15 magnity Exp $
-
 /**
  * @file
  */

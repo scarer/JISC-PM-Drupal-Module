@@ -1,5 +1,3 @@
-/* $Id: */
-
 /* Ensures Gantt chart fits into page. Styling probably needs work still though. */
 div.gantt {
   width: 100%;

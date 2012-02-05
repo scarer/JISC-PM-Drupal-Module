@@ -1,6 +1,4 @@
 <?php
-// $Id: jiscpmattribute.admin.inc,v 1.5.4.16 2009/12/12 22:02:18 magnity Exp $
-
 /**
  * @file
  */

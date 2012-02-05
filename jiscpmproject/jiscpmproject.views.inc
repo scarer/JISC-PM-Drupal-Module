@@ -1,6 +1,4 @@
 <?php
-// $Id: $
-
 function jiscpmproject_views_data() {
   $data['jiscpmproject']['table']['group']  = 'jiscpm';
   $data['jiscpmproject']['table']['join'] = array(

@@ -1,5 +1,4 @@
 <?php
-// $Id: $
 
 function theme_jiscpmattribute_list($form) {
   drupal_add_tabledrag('attributes', 'order', 'sibling', 'attribute-weight'); 

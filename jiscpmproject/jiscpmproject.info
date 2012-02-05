@@ -1,4 +1,3 @@
-; $Id:  $
 name = JISC PM Project
 description = "Allows recording of projects based on jiscpm Organizations"
 dependencies[] = jiscpm 

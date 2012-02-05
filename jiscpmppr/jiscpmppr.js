@@ -1,5 +1,3 @@
-// $Id: $
-
 function jiscpmrisk_organization_risks(_organization_select, _risk_select_id, _with_all_option, _all_text) {
   var risk_select = $("#" + _risk_select_id).get(0);
   jiscpm_empty_select(risk_select);

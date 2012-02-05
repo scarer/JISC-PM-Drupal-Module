@@ -1,5 +1,3 @@
-// $Id: jiscpmproject.js,v 1.1.4.1 2009/04/13 11:34:31 magnity Exp $
-
 function jiscpmproject_organization_projects(_organization_select, _project_select_id, _with_all_option, _all_text) {
   var project_select = $("#" + _project_select_id).get(0);
   jiscpm_empty_select(project_select);

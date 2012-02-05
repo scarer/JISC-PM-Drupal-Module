@@ -1,4 +1,3 @@
-// $Id: jiscpm.js,v 1.3.4.2 2010/01/02 15:19:17 magnity Exp $
 
 function jiscpm_empty_select(_select) {
   if(_select == undefined) return;

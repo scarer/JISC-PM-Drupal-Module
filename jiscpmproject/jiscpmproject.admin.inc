@@ -1,6 +1,4 @@
 <?php
-// $Id: $
-
 /**
  * This is the view of all the JISC PM Projects that have been posted to the site.
  * TODO: Add filters to view based on status and priority values

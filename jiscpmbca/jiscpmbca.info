@@ -1,4 +1,3 @@
-; $Id:  $
 name = JISC PM Business Case Assessment
 description = "Allows recording of Business Case Assessments based on jiscpm Projects and jiscpm Programmes"
 dependencies[] = jiscpm 

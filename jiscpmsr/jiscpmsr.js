@@ -1,5 +1,3 @@
-// $Id: $
-
 function jiscpmsr_organization_srs(_organization_select, _sr_select_id, _with_all_option, _all_text) {
   var sr_select = $("#" + _sr_select_id).get(0);
   jiscpm_empty_select(sr_select);
