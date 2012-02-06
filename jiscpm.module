@@ -42,7 +42,7 @@ $items['admin/settings/jiscpm'] = array(
 'page callback' => 'drupal_get_form',
 'page arguments' => array('jiscpm_admin_settings'),
 'access arguments' => array('jiscpm: access administration pages'),
-'type' => MENU_NORMAL_ITEM);	
+'type' => MENU_NORMAL_ITEM);
 $items['admin/settings/jiscpm/jiscpm'] = array(
 'title' => 'jiscpm',
 'description' => 'jiscpm Administration Page',
@@ -409,8 +409,8 @@ array('data' => t('End Date'), 'field' => 'dateend'),
 array('data' => t('Project Manager'), 'field' => 'project_manager_uid'),
 );
 
-$sql  = db_query(db_rewrite_sql("SELECT n.nid, n.title, jp.projectstatus, jp.dateend, jp.project_manager_uid FROM {node} 
-n JOIN {jiscpmproject} jp ON n.nid = jp.nid WHERE n.type = 'jiscpmproject'"));
+$sql  = db_rewrite_sql("SELECT n.nid, n.title, jp.projectstatus, jp.dateend, jp.project_manager_uid FROM {node} 
+n JOIN {jiscpmproject} jp ON n.nid = jp.nid WHERE n.type = 'jiscpmproject'");
 //$sql .= tablesort_sql($header);
 $result = pager_query($sql, 50);
 while ( $records = db_fetch_object($result) ) {
@@ -519,8 +519,8 @@ array('data' => t('Owner'), 'field' => 'issue_owner_uid'),
 array('data' => t('Project'), 'field' => 'project_nid'),
 );
 
-$sql  = db_query(db_rewrite_sql("SELECT n.nid, n.title, i.project_nid, i.issue_owner_uid FROM {node} n JOIN {jiscpmissue} 
-i ON n.nid = i.nid WHERE n.type = 'jiscpmissue' AND i.issue_resolved = 'no'"));
+$sql  = db_rewrite_sql("SELECT n.nid, n.title, i.project_nid, i.issue_owner_uid FROM {node} n JOIN {jiscpmissue} 
+i ON n.nid = i.nid WHERE n.type = 'jiscpmissue' AND i.issue_resolved = 'no'");
 //$sql .= tablesort_sql($header);
 $result = pager_query($sql, 50);
 while ( $records = db_fetch_object($result) ) {

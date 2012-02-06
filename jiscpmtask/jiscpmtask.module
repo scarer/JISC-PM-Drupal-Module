@@ -1,617 +1,607 @@
 <?php
 /**
- * @file
- */
+* @file
+*/
 
 function jiscpmtask_help($path, $arg) {
-  $o = '';
+$o = '';
 
-  switch ($path) {
-    case "admin/help#jiscpmtask":
-      $o = '<p>'. t("Provides task support for jiscpm") .'</p>';
-      break;
-  }
+switch ($path) {
+case "admin/help#jiscpmtask":
+$o = '<p>'. t("Provides task support for jiscpm") .'</p>';
+break;
+}
 
-  return $o;
+return $o;
 }
 
 function jiscpmtask_perm() {
-  return array(
-    'jiscpm task: access',
-    'jiscpm task: add',
-    'jiscpm task: delete all',
-    'jiscpm task: delete own',
-    'jiscpm task: edit all',
-    'jiscpm task: edit own',
-    'jiscpm task: view all',
-    'jiscpm task: view own',
-  );
+return array(
+'jiscpm task: access',
+'jiscpm task: add',
+'jiscpm task: delete all',
+'jiscpm task: delete own',
+'jiscpm task: edit all',
+'jiscpm task: edit own',
+'jiscpm task: view all',
+'jiscpm task: view own',
+);
 }
 
 function jiscpmtask_init() {
-  $settings = array(
-    'jiscpm' => array(
-      'project_tasks_url' => url('jiscpm/project_tasks_js/'),
-      'project_assignments_url' => url('jiscpm/project_assignments_js/'),
-    ),
-  );
-  drupal_add_js($settings, 'setting');
-  drupal_add_js(drupal_get_path('module', 'jiscpmtask') .'/jiscpmtask.js', 'module', 'header', FALSE);
+$settings = array(
+'jiscpm' => array(
+'project_tasks_url' => url('jiscpm/project_tasks_js/'),
+'project_assignments_url' => url('jiscpm/project_assignments_js/'),
+),
+);
+drupal_add_js($settings, 'setting');
+drupal_add_js(drupal_get_path('module', 'jiscpmtask') .'/jiscpmtask.js', 'module', 'header', FALSE);
 }
 
 function jiscpmtask_access($op, $node, $account=NULL) {
-  if (empty($account)) {
-    global $user;
-    $account = $user;
-  }
+if (empty($account)) {
+global $user;
+$account = $user;
+}
 
-  if (is_numeric($node)) $node = node_load($node);
+if (is_numeric($node)) $node = node_load($node);
 
-  if ($op == 'create') {
-    return user_access('jiscpm task: add');
-  }
+if ($op == 'create') {
+return user_access('jiscpm task: add');
+}
 
-  if ($op == 'delete') {
-    if (user_access('jiscpm task: delete all')) {
-      return TRUE;
-    } 
-    else if (user_access('jiscpm task: delete own') && ($account->uid == $node->uid)) {
-      return TRUE;
-    }
-  }
+if ($op == 'delete') {
+if (user_access('jiscpm task: delete all')) {
+return TRUE;
+} 
+else if (user_access('jiscpm task: delete own') && ($account->uid == $node->uid)) {
+return TRUE;
+}
+}
 
-  if ($op == 'update') {
-    if (user_access('jiscpm task: edit all')) {
-      return TRUE;
-    }
-    else if (user_access('jiscpm task: edit own') && ($account->uid == $node->uid)) {
-      return TRUE;
-    }
-  }
+if ($op == 'update') {
+if (user_access('jiscpm task: edit all')) {
+return TRUE;
+}
+else if (user_access('jiscpm task: edit own') && ($account->uid == $node->uid)) {
+return TRUE;
+}
+}
 
-  if ($op == 'view') {
-    if (user_access('jiscpm task: view all')) {
-      return TRUE;
-    }
-    else if (user_access('jiscpm task: view own') && ($account->uid == $node->uid)) {
-      return TRUE;
-    }
-  }
-  return FALSE;
+if ($op == 'view') {
+if (user_access('jiscpm task: view all')) {
+return TRUE;
+}
+else if (user_access('jiscpm task: view own') && ($account->uid == $node->uid)) {
+return TRUE;
+}
+}
+return FALSE;
 }
 
 function jiscpmtask_menu() {
-  $items['node/%node/tasks'] = array(
-    'title' => 'Tasks',
-    'page callback' => 'jiscpmtask_tasks',
-    'page arguments' => array(1),
-    'access callback' => '_jiscpmtask_tasks_access',
-    'access arguments' => array(1),
-    'file' => 'jiscpmtask.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 4
-  );
-  $items['jiscpm/project_tasks_js/%'] = array(
-    'title' => 'Tasks',
-    'page callback' => '_jiscpmtask_project_tasks_js',
-    'page arguments' => array(2),
-    'access arguments' => array('jiscpm task: access'),
-    'file' => 'jiscpmtask.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
-  $items['jiscpm/project_assignments_js/%'] = array(
-    'title' => 'Assignments',
-    'page callback' => '_jiscpmtask_project_assignments_js',
-    'page arguments' => array(2, 3),
-    'access arguments' => array('jiscpm task: access'),
-    'file' => 'jiscpmtask.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
-  $items['jiscpm/dashboard/tasks'] = array(
-    'title' => 'Tasks',
-    'description' => 'jiscpm Tasks',
-    'page callback' => 'jiscpmtask_list',
-    'access arguments' => array('jiscpm task: access'),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'jiscpmtask.admin.inc',
-  );
-  
-  $items['admin/settings/jiscpm/task'] = array(
-    'title' => 'jiscpm Task',
-    'description' => 'jiscpm Task Administration Page',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('jiscpmtask_admin_settings'),
-    'access arguments' => array('jiscpm: access administration pages'),
-    'type' => MENU_LOCAL_TASK,
-  );
+$items['node/%node/tasks'] = array(
+'title' => 'Tasks',
+'page callback' => 'jiscpmtask_tasks',
+'page arguments' => array(1),
+'access callback' => '_jiscpmtask_tasks_access',
+'access arguments' => array(1),
+'file' => 'jiscpmtask.admin.inc',
+'type' => MENU_LOCAL_TASK,
+'weight' => 4
+);
+$items['jiscpm/project_tasks_js/%'] = array(
+'title' => 'Tasks',
+'page callback' => '_jiscpmtask_project_tasks_js',
+'page arguments' => array(2),
+'access arguments' => array('jiscpm task: access'),
+'file' => 'jiscpmtask.admin.inc',
+'type' => MENU_CALLBACK,
+);
+$items['jiscpm/project_assignments_js/%'] = array(
+'title' => 'Assignments',
+'page callback' => '_jiscpmtask_project_assignments_js',
+'page arguments' => array(2, 3),
+'access arguments' => array('jiscpm task: access'),
+'file' => 'jiscpmtask.admin.inc',
+'type' => MENU_CALLBACK,
+);
+$items['jiscpm/dashboard/tasks'] = array(
+'title' => 'Tasks',
+'description' => 'jiscpm Tasks',
+'page callback' => 'jiscpmtask_list',
+'access arguments' => array('jiscpm task: access'),
+'type' => MENU_NORMAL_ITEM,
+'file' => 'jiscpmtask.admin.inc',
+);
 
-  return $items;
+$items['admin/settings/jiscpm/task'] = array(
+'title' => 'jiscpm Task',
+'description' => 'jiscpm Task Administration Page',
+'page callback' => 'drupal_get_form',
+'page arguments' => array('jiscpmtask_admin_settings'),
+'access arguments' => array('jiscpm: access administration pages'),
+'type' => MENU_LOCAL_TASK,
+);
+
+return $items;
 }
 
 function jiscpmtask_admin_settings() {
-  $form = array();
-  
-  $form['jiscpmtask_enable_ganttchart'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Gantt Charts (experimental feature)'),
-    '#default_value' => variable_get('jiscpmtask_enable_ganttchart', False),
-    '#description' => t('First get jsgantt.zip from http://jsgantt.com and put jsgantt.js andf jsgantt.css in directory   <i>sites/all/libraries/jsgantt</i> then enable this checkbox.'),
-  );
+$form = array();
 
-  $form['jiscpmtask_jsgantt_location'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Location of jsgantt library'),
-    '#default_value' => variable_get('jiscpmtask_jsgantt_location', t('sites/all/libraries/jsgantt')),
-    '#description' => t('The directory that contains the jsgantt library ( sites/all/libraries/jsgantt is recommended )'),
-    '#size' => 50,
-    '#after_build' => array('jsgantt_check_directory'),
-  );
+$form['jiscpmtask_enable_ganttchart'] = array(
+'#type' => 'checkbox',
+'#title' => t('Enable Gantt Charts (experimental feature)'),
+'#default_value' => variable_get('jiscpmtask_enable_ganttchart', False),
+'#description' => t('First get jsgantt.zip from http://jsgantt.com and put jsgantt.js andf jsgantt.css in directory   <i>sites/all/libraries/jsgantt</i> then enable this checkbox.'),
+);
 
-
-  $form['jiscpmtask_jsgantt_options'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Chart display options'),
-    '#default_value' => variable_get('jiscpmtask_jsgantt_options', array('ShowStartDate','ShowEndDate','ShowDur')),
-    '#options' => array(
-      'ShowStartDate' => t('Show Start Date'),
-      'ShowEndDate' => t('Show End Date'),
-      'ShowDur' => t('Show Duration'),
-    ),
-    '#description' => t('Choose display options for gantt chart.'),
-  );
+$form['jiscpmtask_jsgantt_location'] = array(
+'#type' => 'textfield',
+'#title' => t('Location of jsgantt library'),
+'#default_value' => variable_get('jiscpmtask_jsgantt_location', t('sites/all/libraries/jsgantt')),
+'#description' => t('The directory that contains the jsgantt library ( sites/all/libraries/jsgantt is recommended )'),
+'#size' => 50,
+'#after_build' => array('jsgantt_check_directory'),
+);
 
 
-  $form['jiscpmtask_jsgantt_color'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Gantt chart default color'),
-    '#default_value' => variable_get('jiscpmtask_jsgantt_color', '666666'),
-    '#description' => t('Enter default color for gantt chart bars.'),
-    '#size' => 6,
-  );
-  $form['jiscpmtask_jsgantt_color_completed'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Gantt chart "completed" color'),
-    '#default_value' => variable_get('jiscpmtask_jsgantt_color_completed', '0DFF24'),
-    '#description' => t('Enter "completed" color for gantt chart bars.'),
-    '#size' => 6,
-  );
-  $form['jiscpmtask_jsgantt_color_in_progress'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Gantt chart "in progress" color'),
-    '#default_value' => variable_get('jiscpmtask_jsgantt_color_in_progress', '00CCFF'),
-    '#description' => t('Enter "in progress" color for gantt chart bars.'),
-    '#size' => 6,
-  );
-  $form['jiscpmtask_jsgantt_color_on_hold'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Gantt chart "on hold" color'),
-    '#default_value' => variable_get('jiscpmtask_jsgantt_color_on_hold', 'FFF60D'),
-    '#description' => t('Enter "on hold" color for gantt chart bars.'),
-    '#size' => 6,
-  );
-  $form['jiscpmtask_jsgantt_color_overdue'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Gantt chart "overdue" color'),
-    '#default_value' => variable_get('jiscpmtask_jsgantt_color_overdue', 'FF0D0D'),
-    '#description' => t('Enter "overdue" color for gantt chart bars.'),    '#size' => 6,
-  );
+$form['jiscpmtask_jsgantt_options'] = array(
+'#type' => 'checkboxes',
+'#title' => t('Chart display options'),
+'#default_value' => variable_get('jiscpmtask_jsgantt_options', array('ShowStartDate', 'ShowEndDate', 'ShowDur')),
+'#options' => array(
+'ShowStartDate' => t('Show Start Date'),
+'ShowEndDate' => t('Show End Date'),
+'ShowDur' => t('Show Duration'),
+),
+'#description' => t('Choose display options for gantt chart.'),
+);
 
-  return system_settings_form($form);
+
+$form['jiscpmtask_jsgantt_color'] = array(
+'#type' => 'textfield',
+'#title' => t('Gantt chart default color'),
+'#default_value' => variable_get('jiscpmtask_jsgantt_color', '666666'),
+'#description' => t('Enter default color for gantt chart bars.'),
+'#size' => 6,
+);
+$form['jiscpmtask_jsgantt_color_completed'] = array(
+'#type' => 'textfield',
+'#title' => t('Gantt chart "completed" color'),
+'#default_value' => variable_get('jiscpmtask_jsgantt_color_completed', '0DFF24'),
+'#description' => t('Enter "completed" color for gantt chart bars.'),
+'#size' => 6,
+);
+$form['jiscpmtask_jsgantt_color_in_progress'] = array(
+'#type' => 'textfield',
+'#title' => t('Gantt chart "in progress" color'),
+'#default_value' => variable_get('jiscpmtask_jsgantt_color_in_progress', '00CCFF'),
+'#description' => t('Enter "in progress" color for gantt chart bars.'),
+'#size' => 6,
+);
+$form['jiscpmtask_jsgantt_color_on_hold'] = array(
+'#type' => 'textfield',
+'#title' => t('Gantt chart "on hold" color'),
+'#default_value' => variable_get('jiscpmtask_jsgantt_color_on_hold', 'FFF60D'),
+'#description' => t('Enter "on hold" color for gantt chart bars.'),
+'#size' => 6,
+);
+$form['jiscpmtask_jsgantt_color_overdue'] = array(
+'#type' => 'textfield',
+'#title' => t('Gantt chart "overdue" color'),
+'#default_value' => variable_get('jiscpmtask_jsgantt_color_overdue', 'FF0D0D'),
+'#description' => t('Enter "overdue" color for gantt chart bars.'),    '#size' => 6,
+);
+
+return system_settings_form($form);
 }
 
 function jsgantt_check_directory($form_element) {
-  $file = $form_element['#value']."/jsgantt.js";
-  if (!file_exists($file)){
-     form_set_error($form_element['#name'], t('The file %file does not exist.', array('%file' => $file)));
-  }
-  return $form_element;
+$file = $form_element['#value'] . "/jsgantt.js";
+if (!file_exists($file)) {
+form_set_error($form_element['#name'], t('The file %file does not exist.', array('%file' => $file)));
+}
+return $form_element;
 }
 /* returns a list of tasks for the project */
 
-function jiscpmtask_tasks()
-{
-	$output = "There are no tasks";
-	  global $base_url;
-	  $header = array(
-      array('data' => t('Task'), 'field' => 'nid')
-	  );
-	  $s = "SELECT n.title, n.nid FROM {node} n JOIN {jiscpmtask} j ON n.nid=j.nid
-        WHERE type='jiscpmtask'";
-      //$sql .= tablesort_sql($header);
-      $result = pager_query($s, 50);
-      while ( $records = db_fetch_object($result) )
-      {
-		  $task = node_load($records->nid);
-  	      $rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>');
-	  }
-	  //return "Project task listing";
-	  $pager = theme('pager', NULL, 50, 0);
-      if ( count($rows) && !empty($pager))
-      {
-           $rows[] = array(array('data' => $pager, 'colspan' => '1'));
-      }
-  
-      if ( count($rows) )
-      {
-           $output = theme('table', $header, $rows);
-      }
-      else
-      {
-        //drupal_set_message("There are no tasks", 'status');
-      }
-  return $output;
+function jiscpmtask_tasks() {
+$output = "There are no tasks";
+global $base_url;
+$header = array(
+array('data' => t('Task'), 'field' => 'nid')
+);
+$s = db_rewrite_sql("SELECT n.title, n.nid FROM {node} n JOIN {jiscpmtask} j ON n.nid=j.nid WHERE type='jiscpmtask'");
+//$sql .= tablesort_sql($header);
+$result = pager_query($s, 50);
+while ( $records = db_fetch_object($result) ) {
+$task = node_load($records->nid);
+$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>');
+}
+//return "Project task listing";
+$pager = theme('pager', NULL, 50, 0);
+if ( count($rows) && !empty($pager)) {
+$rows[] = array(array('data' => $pager, 'colspan' => '1'));
+}
+
+if ( count($rows) ) {
+$output = theme('table', $header, $rows);
+}
+else {
+//drupal_set_message("There are no tasks", 'status');
+}
+return $output;
 }
 
 function jiscpmtask_theme() {
-  return array(
-    'jiscpmtask_list' => array(
-      'file'      => 'jiscpmtask.theme.inc',
-      'arguments' => array('header', 'tasks'),
-    ),
-    'jiscpmtask_tasks' => array(
-      'file'      => 'jiscpmtask.theme.inc',
-      'arguments' => array('form'),
-    ),
-    'jiscpmtask_view' => array(
-      'file'      => 'jiscpmtask.theme.inc',
-      'arguments' => array('node', 'teaser', 'page'),
-    ),
-  );
+return array(
+'jiscpmtask_list' => array(
+'file'      => 'jiscpmtask.theme.inc',
+'arguments' => array('header', 'tasks'),
+),
+'jiscpmtask_tasks' => array(
+'file'      => 'jiscpmtask.theme.inc',
+'arguments' => array('form'),
+),
+'jiscpmtask_view' => array(
+'file'      => 'jiscpmtask.theme.inc',
+'arguments' => array('node', 'teaser', 'page'),
+),
+);
 }
 
 function jiscpmtask_node_info() {
-  return array(
-    'jiscpmtask' => array(
-      'name' => t('JISCPM Task'),
-      'module' => 'jiscpmtask',
-      'description' => t("A task for jiscpm."),
-      'title_label' => t("Title"),
-      'body_label' => t("Description"),
-    )
-  );
+return array(
+'jiscpmtask' => array(
+'name' => t('JISCPM Task'),
+'module' => 'jiscpmtask',
+'description' => t("A task for jiscpm."),
+'title_label' => t("Title"),
+'body_label' => t("Description"),
+)
+);
 }
 
 function jiscpmtask_content_extra_fields($type_name) {
-  if ($type_name == 'jiscpmtask') {
-    return array(
-      'group1' => array('label' => 'Organization/Project/Task/Weight/Step Group', 'weight' => -20),
-      'group2' => array('label' => 'Category/Status/Priority Group', 'weight' => -19),
-      'group3' => array('label' => 'Date/Duration Group', 'weight' => -18),
-      'group4' => array('label' => 'Price Group', 'weight' => -17),
-      'group5' => array('label' => 'Assigned to', 'weight' => -16),
-    );
-  }
+if ($type_name == 'jiscpmtask') {
+return array(
+'group1' => array('label' => 'Organization/Project/Task/Weight/Step Group', 'weight' => -20),
+'group2' => array('label' => 'Category/Status/Priority Group', 'weight' => -19),
+'group3' => array('label' => 'Date/Duration Group', 'weight' => -18),
+'group4' => array('label' => 'Price Group', 'weight' => -17),
+'group5' => array('label' => 'Assigned to', 'weight' => -16),
+);
+}
 }
 
 function jiscpmtask_jiscpmorganization_change($organization_nid, $organization_title) {
-  $s = "UPDATE {jiscpmtask} SET organization_title='%s' WHERE organization_nid=%d AND organization_title <> '%s'";
-  db_query($s, $organization_title, $organization_nid, $organization_title);
+$s = "UPDATE {jiscpmtask} SET organization_title='%s' WHERE organization_nid=%d AND organization_title <> '%s'";
+db_query($s, $organization_title, $organization_nid, $organization_title);
 }
 
 function jiscpmtask_jiscpmproject_change($project_nid, $project_title) {
-  $s = "UPDATE {jiscpmtask} SET project_title='%s' WHERE project_nid=%d AND project_title <> '%s'";
-  db_query($s, $project_title, $project_nid, $project_title);
+$s = "UPDATE {jiscpmtask} SET project_title='%s' WHERE project_nid=%d AND project_title <> '%s'";
+db_query($s, $project_title, $project_nid, $project_title);
 }
 
 function jiscpmtask_jiscpmproject_change_hierarchy($project_nid, $organization_nid, $organization_title) {
-  $s = "UPDATE {jiscpmtask} SET organization_nid=%d, organization_title='%s' WHERE project_nid=%d";
-  db_query($s, $organization_nid, $organization_title, $project_nid);
+$s = "UPDATE {jiscpmtask} SET organization_nid=%d, organization_title='%s' WHERE project_nid=%d";
+db_query($s, $organization_nid, $organization_title, $project_nid);
 }
 
 function jiscpmtask_form(&$node) {
-  $breadcrumb = array();
-  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+$breadcrumb = array();
+$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
 
-  if (array_key_exists('project_nid', $_GET)) {
-    $breadcrumb[] = l(t('Projects'), 'jiscpm/dashboard/projects');
-    $project = node_load($_GET['project_nid']);
-    $breadcrumb[] = l(t('Project : !project', array('!project' => $project->title)), 'node/'. $project->nid);
-    $breadcrumb[] = l(t('Tasks'), 'node/'. $project->nid .'/tasks');
-  }
-  else {
-    $breadcrumb[] = l(t('Tasks'), 'jiscpm/dashboard/tasks');
-  }
-  
-  drupal_set_breadcrumb($breadcrumb);
+if (array_key_exists('project_nid', $_GET)) {
+$breadcrumb[] = l(t('Projects'), 'jiscpm/dashboard/projects');
+$project = node_load($_GET['project_nid']);
+$breadcrumb[] = l(t('Project : !project', array('!project' => $project->title)), 'node/'. $project->nid);
+$breadcrumb[] = l(t('Tasks'), 'node/'. $project->nid .'/tasks');
+}
+else {
+$breadcrumb[] = l(t('Tasks'), 'jiscpm/dashboard/tasks');
+}
 
-  $type = node_get_types('type', $node);
+drupal_set_breadcrumb($breadcrumb);
 
-  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';
+$type = node_get_types('type', $node);
 
-  $form['group1'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
-  );
-  $projects = array();
-  $results_pro = db_query("SELECT n.title, n.nid FROM {node} n WHERE n.type = 'jiscpmproject'");
-  while ($row_pro = db_fetch_object($results_pro))
-  {
-  	$projects[$row_pro->nid] = $row_pro->title;
-  }
-  if ($projects != NULL || $projects != '' || $projects != 0)
-  {
-  	$form['group1']['project_nid'] = array(
-    	'#type' => 'select',
-    	'#title' => t('Project'),
-    	'#default_value' => $node->project_nid,
-    	'#options' => $projects,
-    	'#process' => array('jiscpm_dependent_select_process'),
-    	'#required' => true,
-  	);
-  }
+$form['#attributes']['class'] = 'jiscpmcomponent_node_form';
 
-  $form['group1']['weight'] = array(
-    '#type' => 'weight',
-    '#title' => t('Weight'),
-    '#default_value' => $node->weight,
-  );
+$form['group1'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
+);
+$projects = array();
+$results_pro = db_query(db_rewrite_sql("SELECT n.title, n.nid FROM {node} n WHERE n.type = 'jiscpmproject'"));
+while ($row_pro = db_fetch_object($results_pro)) {
+$projects[$row_pro->nid] = $row_pro->title;
+}
+if ($projects != NULL || $projects != '' || $projects != 0) {
+$form['group1']['project_nid'] = array(
+'#type' => 'select',
+'#title' => t('Project'),
+'#default_value' => $node->project_nid,
+'#options' => $projects,
+'#process' => array('jiscpm_dependent_select_process'),
+'#required' => TRUE,
+);
+}
 
-  $form['group1']['stepno'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Step no.'),
-    '#size' => 15,
-    '#required' => FALSE,
-    '#default_value' => $node->stepno,
-  );
+$form['group1']['weight'] = array(
+'#type' => 'weight',
+'#title' => t('Weight'),
+'#default_value' => $node->weight,
+);
 
-  $form['title'] = array(
-    '#type' => 'textfield',
-    '#title' => check_plain($type->title_label),
-    '#required' => TRUE,
-    '#default_value' => $node->title,
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -18,
-  );
+$form['group1']['stepno'] = array(
+'#type' => 'textfield',
+'#title' => t('Step no.'),
+'#size' => 15,
+'#required' => FALSE,
+'#default_value' => $node->stepno,
+);
 
-  $form['group2'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -17,
-  );
+$form['title'] = array(
+'#type' => 'textfield',
+'#title' => check_plain($type->title_label),
+'#required' => TRUE,
+'#default_value' => $node->title,
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -18,
+);
 
-  $taskcategory_list = jiscpmattribute_attributes_bydomain('Task category');
-  $form['group2']['taskcategory'] = array(
-    '#type' => 'select',
-    '#title' => t('Category'),
-    '#default_value' => $node->taskcategory,
-    '#options' => $taskcategory_list['values'],
-  );
+$form['group2'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -17,
+);
 
-  $taskstatus_list = jiscpmattribute_attributes_bydomain('Task status');
-  $form['group2']['taskstatus'] = array(
-    '#type' => 'select',
-    '#title' => t('Status'),
-    '#default_value' => $node->taskstatus,
-    '#options' => $taskstatus_list['values'],
-  );
+$taskcategory_list = jiscpmattribute_attributes_bydomain('Task category');
+$form['group2']['taskcategory'] = array(
+'#type' => 'select',
+'#title' => t('Category'),
+'#default_value' => $node->taskcategory,
+'#options' => $taskcategory_list['values'],
+);
 
-  $taskpriority_list = jiscpmattribute_attributes_bydomain('Task priority');
-  $form['group2']['taskpriority'] = array(
-    '#type' => 'select',
-    '#title' => t('Priority'),
-    '#default_value' => $node->taskpriority,
-    '#options' => $taskpriority_list['values'],
-  );
+$taskstatus_list = jiscpmattribute_attributes_bydomain('Task status');
+$form['group2']['taskstatus'] = array(
+'#type' => 'select',
+'#title' => t('Status'),
+'#default_value' => $node->taskstatus,
+'#options' => $taskstatus_list['values'],
+);
 
-  $form['group3'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -16,
-  );
+$taskpriority_list = jiscpmattribute_attributes_bydomain('Task priority');
+$form['group2']['taskpriority'] = array(
+'#type' => 'select',
+'#title' => t('Priority'),
+'#default_value' => $node->taskpriority,
+'#options' => $taskpriority_list['values'],
+);
 
-  if (module_exists('date_api') && module_exists('date_popup')) {
-    $form['group3']['datebegin'] = array(
-      '#type' => 'date_popup',
-      '#title' => t('Date begin'),
-      '#date_format' =>  'Y-m-d',
-      '#default_value' => date('Y-m-d', $node->datebegin),
-    );
-  }
-  else
-  {
-  	$form['group3']['datebegin'] = array(
-    	'#type' => 'date',
-    	'#title' => t('Date begin'),
-    	'#default_value' => date('Y-m-d', $node->datebegin),
-  	);
-  }
-  
-  if (module_exists('date_api') && module_exists('date_popup')) {
-    $form['group3']['dateend'] = array(
-      '#type' => 'date_popup',
-      '#title' => t('Date end'),
-      '#date_format' =>  'Y-m-d',
-      '#default_value' => date('Y-m-d', $node->dateend),
-    );
-  }
-  else
-  {
-  	$form['group3']['dateend'] = array(
-    	'#type' => 'date',
-    	'#title' => t('Date end'),
-    	'#default_value' => date('Y-m-d', $node->dateend),
-  	);
-  }
-  
-  $durationunit_list = jiscpmattribute_attributes_bydomain('Duration unit');
-  $form['group3']['durationunit'] = array(
-    '#type' => 'select',
-    '#title' => t('Duration unit'),
-    '#default_value' => $node->durationunit,
-    '#options' => $durationunit_list['values'],
-  );
+$form['group3'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -16,
+);
 
-  $form['group3']['duration'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Duration'),
-    '#size' => 20,
-    '#default_value' => $node->duration,
-  );
+if (module_exists('date_api') && module_exists('date_popup')) {
+$form['group3']['datebegin'] = array(
+'#type' => 'date_popup',
+'#title' => t('Date begin'),
+'#date_format' =>  'Y-m-d',
+'#default_value' => date('Y-m-d', $node->datebegin),
+);
+}
+else {
+$form['group3']['datebegin'] = array(
+'#type' => 'date',
+'#title' => t('Date begin'),
+'#default_value' => date('Y-m-d', $node->datebegin),
+);
+}
 
-  $form['group4'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -16,
-  );
+if (module_exists('date_api') && module_exists('date_popup')) {
+$form['group3']['dateend'] = array(
+'#type' => 'date_popup',
+'#title' => t('Date end'),
+'#date_format' =>  'Y-m-d',
+'#default_value' => date('Y-m-d', $node->dateend),
+);
+}
+else {
+$form['group3']['dateend'] = array(
+'#type' => 'date',
+'#title' => t('Date end'),
+'#default_value' => date('Y-m-d', $node->dateend),
+);
+}
 
-  $pricemode_list = jiscpmattribute_attributes_bydomain('Price mode');
-  $form['group4']['pricemode'] = array(
-    '#type' => 'select',
-    '#title' => t('Price mode'),
-    '#default_value' => $node->pricemode,
-    '#options' => $pricemode_list['values'],
-  );
+$durationunit_list = jiscpmattribute_attributes_bydomain('Duration unit');
+$form['group3']['durationunit'] = array(
+'#type' => 'select',
+'#title' => t('Duration unit'),
+'#default_value' => $node->durationunit,
+'#options' => $durationunit_list['values'],
+);
 
-  $form['group4']['price'] = array(
-    '#title' => t('Price'),
-    '#type' => 'textfield',
-    '#size' => 15,
-    '#default_value' => $node->price,
-  );
+$form['group3']['duration'] = array(
+'#type' => 'textfield',
+'#title' => t('Duration'),
+'#size' => 20,
+'#default_value' => $node->duration,
+);
 
-  $currency_list = jiscpmattribute_attributes_bydomain('Currency');
-  $form['group4']['currency'] = array(
-    '#type' => 'select',
-    '#title' => t('Price currency'),
-    '#default_value' => $node->currency,
-    '#options' => $currency_list['values'],
-  );
-  
-  $form['group5'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -16,
-  );
-  $s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
-  $r = db_query($s_own);
-  $owners = array();
-  while ($owner = db_fetch_object($r)) {
-    $owners[$owner->uid] = check_plain($owner->name);
-    if (!$node->owner_uid) $node->owner_uid = $owner->uid;
-  }
-  $form['group5']['assigned_uid'] = array(
-    '#type' => 'select',
-    '#title' => t('Assigned to'),
-    '#options' => $owners,
-    '#default_value' => $node->assigned_uid,
-  );
-  
-  if ($type->has_body) {
-    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
-  }
+$form['group4'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -16,
+);
 
-  $form['stepno_old'] = array(
-    '#type' => 'hidden',
-    '#default_value' => $node->stepno_old,
-  );
+$pricemode_list = jiscpmattribute_attributes_bydomain('Price mode');
+$form['group4']['pricemode'] = array(
+'#type' => 'select',
+'#title' => t('Price mode'),
+'#default_value' => $node->pricemode,
+'#options' => $pricemode_list['values'],
+);
 
-  $form['title_old'] = array(
-    '#type' => 'hidden',
-    '#default_value' => $node->title_old,
-  );
+$form['group4']['price'] = array(
+'#title' => t('Price'),
+'#type' => 'textfield',
+'#size' => 15,
+'#default_value' => $node->price,
+);
 
-  return $form;
+$currency_list = jiscpmattribute_attributes_bydomain('Currency');
+$form['group4']['currency'] = array(
+'#type' => 'select',
+'#title' => t('Price currency'),
+'#default_value' => $node->currency,
+'#options' => $currency_list['values'],
+);
+
+$form['group5'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -16,
+);
+$s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
+$r = db_query($s_own);
+$owners = array();
+while ($owner = db_fetch_object($r)) {
+$owners[$owner->uid] = check_plain($owner->name);
+if (!$node->owner_uid) $node->owner_uid = $owner->uid;
+}
+$form['group5']['assigned_uid'] = array(
+'#type' => 'select',
+'#title' => t('Assigned to'),
+'#options' => $owners,
+'#default_value' => $node->assigned_uid,
+);
+
+if ($type->has_body) {
+$form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+}
+
+$form['stepno_old'] = array(
+'#type' => 'hidden',
+'#default_value' => $node->stepno_old,
+);
+
+$form['title_old'] = array(
+'#type' => 'hidden',
+'#default_value' => $node->title_old,
+);
+
+return $form;
 }
 
 // INSERT / UPDATE FUNCTIONS
 function jiscpmtask_insert($node) {
-  //_jiscpmtask_beforesave($node);
-  $node->datebegin = strtotime($node->datebegin);
-  $node->dateend = strtotime($node->dateend);
-  db_query("INSERT INTO {jiscpmtask}
-    (nid, vid, project_nid, stepno, taskcategory, taskstatus, taskpriority, weight,
-    datebegin, dateend, durationunit, duration, pricemode, price, currency,
-    assigned_uid)
-    VALUES
-    (%d, %d, %d, %d, '%s', '%s', '%s', '%s',
-    %d, %d, '%s', %d, '%s', %f, '%s', %d)",
-    $node->nid, $node->vid, $node->project_nid, $node->stepno, $node->taskcategory, $node->taskstatus, $node->taskpriority,
-    $node->weight, $node->datebegin, $node->dateend, $node->durationunit, $node->duration,
-    $node->pricemode, $node->price, $node->currency,
-    $node->assigned_uid
-  );
+//_jiscpmtask_beforesave($node);
+$node->datebegin = strtotime($node->datebegin);
+$node->dateend = strtotime($node->dateend);
+db_query("INSERT INTO {jiscpmtask}
+(nid, vid, project_nid, stepno, taskcategory, taskstatus, taskpriority, weight,
+datebegin, dateend, durationunit, duration, pricemode, price, currency,
+assigned_uid)
+VALUES
+(%d, %d, %d, %d, '%s', '%s', '%s', '%s',
+%d, %d, '%s', %d, '%s', %f, '%s', %d)",
+$node->nid, $node->vid, $node->project_nid, $node->stepno, $node->taskcategory, $node->taskstatus, $node->taskpriority,
+$node->weight, $node->datebegin, $node->dateend, $node->durationunit, $node->duration,
+$node->pricemode, $node->price, $node->currency,
+$node->assigned_uid
+);
 }
 
 function jiscpmtask_update($node) {
-    // if this is a new node or we're adding a new revision,
-  if ($node->revision) {
-  jiscpmtask_insert($node);
-  }
-  else {
-    db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
-    jiscpmtask_insert($node);
-    
-  }
+// if this is a new node or we're adding a new revision,
+if ($node->revision) {
+jiscpmtask_insert($node);
+}
+else {
+db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
+jiscpmtask_insert($node);
+
+}
 }
 
 function jiscpmtask_nodeapi(&$node, $op, $teaser, $page) {
-  switch ($op) {
-    case 'prepare':
-      if(!$node->nid) {
+switch ($op) {
+case 'prepare':
+if(!$node->nid) {
 
-        $taskcategory_list = jiscpmattribute_attributes_bydomain('Task category');
-        $node->taskcategory = $taskcategory_list['default'];
+$taskcategory_list = jiscpmattribute_attributes_bydomain('Task category');
+$node->taskcategory = $taskcategory_list['default'];
 
-        $taskstatus_list = jiscpmattribute_attributes_bydomain('Task status');
-        $node->taskstatus = $taskstatus_list['default'];
+$taskstatus_list = jiscpmattribute_attributes_bydomain('Task status');
+$node->taskstatus = $taskstatus_list['default'];
 
-        $taskpriority_list = jiscpmattribute_attributes_bydomain('Task priority');
-        $node->taskpriority = $taskpriority_list['default'];
+$taskpriority_list = jiscpmattribute_attributes_bydomain('Task priority');
+$node->taskpriority = $taskpriority_list['default'];
 
-        $durationunit_list = jiscpmattribute_attributes_bydomain('Duration unit');
-        $node->durationunit = $durationunit_list['default'];
+$durationunit_list = jiscpmattribute_attributes_bydomain('Duration unit');
+$node->durationunit = $durationunit_list['default'];
 
-        $pricemode_list = jiscpmattribute_attributes_bydomain('Price mode');
-        $node->pricemode = $pricemode_list['default'];
+$pricemode_list = jiscpmattribute_attributes_bydomain('Price mode');
+$node->pricemode = $pricemode_list['default'];
 
-        $currency_list = jiscpmattribute_attributes_bydomain('Currency');
-        $node->currency = $currency_list['default'];
-      }
-      break;
-    case 'delete revision':
-      // Notice that we're matching a single revision based on the node's vid.
-      db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
-      break;
-  }
+$currency_list = jiscpmattribute_attributes_bydomain('Currency');
+$node->currency = $currency_list['default'];
+}
+break;
+case 'delete revision':
+// Notice that we're matching a single revision based on the node's vid.
+db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
+break;
+}
 }
 
 function jiscpmtask_delete($node) {
-  // Notice that we're matching all revision, by using the node's nid.
-  db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
+// Notice that we're matching all revision, by using the node's nid.
+db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
 }
 
 function jiscpmtask_load($node) {
-  $additions = db_fetch_object(db_query('SELECT * FROM {jiscpmtask} WHERE nid = %d', $node->nid));
-  $additions->stepno_old = $node->stepno;
-  $additions->title_old = $node->title;
-  return $additions;
+$additions = db_fetch_object(db_query('SELECT * FROM {jiscpmtask} WHERE nid = %d', $node->nid));
+$additions->stepno_old = $node->stepno;
+$additions->title_old = $node->title;
+return $additions;
 }
 
 function jiscpmtask_validate(&$node) {
-  /*if (($node->nid == $node->parent_nid) && $node->parent_nid) {
-    form_set_error('parent_nid', t('Impossible to assign itself as parent.'));
-  }*/
+/*if (($node->nid == $node->parent_nid) && $node->parent_nid) {
+form_set_error('parent_nid', t('Impossible to assign itself as parent.'));
+}*/
 }
 
 function jiscpmtask_view($node, $teaser = FALSE, $page = FALSE) {
-  $breadcrumb = array();
-  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
-  $breadcrumb[] = l(t('Tasks'), 'jiscpm/dashboard/tasks');
-  drupal_set_breadcrumb($breadcrumb);
+$breadcrumb = array();
+$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+$breadcrumb[] = l(t('Tasks'), 'jiscpm/dashboard/tasks');
+drupal_set_breadcrumb($breadcrumb);
 
-  return theme('jiscpmtask_view', $node, $teaser, $page);
+return theme('jiscpmtask_view', $node, $teaser, $page);
 }
 
 function _jiscpmtask_tasks_access($node=NULL) {
-  // Determines whether the task tab of a project is visible
-  if ($node == NULL) return FALSE;
-  if ($node->type == 'jiscpmproject' && user_access('jiscpm task: access')) return TRUE;
-  return FALSE;
+// Determines whether the task tab of a project is visible
+if ($node == NULL) return FALSE;
+if ($node->type == 'jiscpmproject' && user_access('jiscpm task: access')) return TRUE;
+return FALSE;
 }
 
 function jiscpmtask_views_api() {
-  return array(
-    'api' => 2,
-    'path' => drupal_get_path('module', 'jiscpmtask'),
-  );
+return array(
+'api' => 2,
+'path' => drupal_get_path('module', 'jiscpmtask'),
+);
 }

@@ -143,7 +143,7 @@ function jiscpmattribute_list_form($form_id, $header, $attributes) {
     );
 
     $form['attributes']['attributes'][$attribute->aid]['attribute_operations_'. $attribute->aid] = array(
-      '#value' => filter_xss(jiscpm_icon_edit('jiscpm/attributes/edit/'. $attribute->aid, $i, $_GET) .'&nbsp;'.  jiscpm_icon_delete('jiscpm/attributes/delete/'. $attribute->aid, $i, $_GET)),
+      '#value' => jiscpm_icon_edit('jiscpm/attributes/edit/'. $attribute->aid, $i, $_GET) .'&nbsp;'.  jiscpm_icon_delete('jiscpm/attributes/delete/'. $attribute->aid, $i, $_GET),
     );
   }
 
@@ -152,7 +152,6 @@ function jiscpmattribute_list_form($form_id, $header, $attributes) {
     '#submit' => array('jiscpmattribute_list_submit'),
     '#value' => t('Save'),
   );
-
   return $form;
 }
 

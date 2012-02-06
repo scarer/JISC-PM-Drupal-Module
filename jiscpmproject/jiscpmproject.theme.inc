@@ -10,7 +10,6 @@ function theme_jiscpmproject_list($header, $projects) {
   foreach ($projects as $key => $project) {
     $rows[] = array(
       jiscpm_icon('projectcategory_'. $project->projectcategory, $project->projectcategory),
-      l($project->organization_title, 'node/'. $project->organization_nid),
       l($project->title, 'node/'. $project->nid) . theme('mark', node_mark($project->nid, $project->changed)),
       jiscpm_icon('status_'. $project->projectstatus, $project->projectstatus),
       jiscpm_icon('priority_'. $project->projectpriority, $project->projectpriority),
@@ -35,13 +34,6 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
     '#suffix' => '</dl></div>',
     '#weight' => -25,
   );
-  /*
-  $node->content['links']['expenses'] = theme('jiscpm_link', 'jiscpmproject', 'jiscpmexpense', $node->nid, 1);
-  $node->content['links']['notes'] = theme('jiscpm_link', 'jiscpmproject', 'jiscpmnote', $node->nid, 2);
-  $node->content['links']['tasks'] = theme('jiscpm_link', 'jiscpmproject', 'jiscpmtask', $node->nid, 3);
-  $node->content['links']['tickets'] = theme('jiscpm_link', 'jiscpmproject', 'jiscpmticket', $node->nid, 4);  
-  $node->content['links']['timetrackings'] = theme('jiscpm_link', 'jiscpmproject', 'jiscpmtimetracking', $node->nid, 5);
-  */
 
   $node->content['group10'] = array(
     '#prefix' => '<div class="jiscpmfields">',

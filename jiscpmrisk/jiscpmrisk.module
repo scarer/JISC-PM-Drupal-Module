@@ -1,493 +1,490 @@
 <?php
 /**
- * @file
- */
+* @file
+*/
 
 /** 
- * @function
- * Implementation of hook_help
- */
+* @function
+* Implementation of hook_help
+*/
 function jiscpmrisk_help($path, $arg) {
-  $o = '';
+$o = '';
 
-  switch ($path) {
-    case "admin/help#jiscpmrisk":
-      $o = '<p>'.  t("Provides risk support for jiscpm") .'</p>';
-      break;
-  }
+switch ($path) {
+case "admin/help#jiscpmrisk":
+$o = '<p>'.  t("Provides risk support for jiscpm") .'</p>';
+break;
+}
 
-  return $o;
+return $o;
 }
 
 /**
- * @function
- * Implementation of hook_perm
- */
+* @function
+* Implementation of hook_perm
+*/
 function jiscpmrisk_perm() {
-  return array(
-    'jiscpm risk: access',
-    'jiscpm risk: add',
-    'jiscpm risk: edit all',
-    'jiscpm risk: edit own',
-    'jiscpm risk: delete all',
-    'jiscpm risk: delete own',
-  );
+return array(
+'jiscpm risk: access',
+'jiscpm risk: add',
+'jiscpm risk: edit all',
+'jiscpm risk: edit own',
+'jiscpm risk: delete all',
+'jiscpm risk: delete own',
+);
 }
 
 /**
- * @function
- * Implementation of hook_init
- */
+* @function
+* Implementation of hook_init
+*/
 function jiscpmrisk_init() {
-  /*$settings = array(
-    'jiscpm' => array(
-      'organization_risks_url' => url('jiscpm/organization_risks_js/')
-    ),
-  );
-  drupal_add_js($settings, 'setting');*/
+/*$settings = array(
+'jiscpm' => array(
+'organization_risks_url' => url('jiscpm/organization_risks_js/')
+),
+);
+drupal_add_js($settings, 'setting');*/
 
-  /*drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
-  drupal_add_js(drupal_get_path('module', 'jiscpmrisk') .'/jiscpmrisk.js', 'module', 'header', FALSE);*/
+/*drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
+drupal_add_js(drupal_get_path('module', 'jiscpmrisk') .'/jiscpmrisk.js', 'module', 'header', FALSE);*/
 }
 
 function jiscpmrisk_access($op, $node, $account=NULL) {
-  if (empty($account)) {
-    global $user;
-    $account = $user;
-  }
-    
-  if (is_numeric($node)) {
-    $node = node_load($node);
-  }
-  
-  if ($op == 'create') {
-    return user_access('jiscpm risk: add');
-  }
-  
-  if ($op == 'delete') {
-    if (user_access('jiscpm risk: delete all')) 
-    {
-      return TRUE;
-    } else if (user_access('jiscpm risk: delete own') && ($account->uid == $node->uid)) 
-    {
-      return TRUE;
-    } 
-  }
-  
-  if ($op == 'update') {
-    if (user_access('jiscpm risk: edit all')) {
-      return TRUE;
-    } 
-    else if (user_access('jiscpm risk: edit own') && ($account->uid == $node->uid)) {
-      return TRUE;
-    } 
-  }
-  
-  if ($op == 'view') {
-    if (user_access('jiscpm risk: view all')) {
-      return TRUE;
-    } 
-    else if (user_access('jiscpm risk: view own') && ($account->uid == $node->uid)) {
-      return TRUE;
-    } 
-  }
-  return FALSE;
+if (empty($account)) {
+global $user;
+$account = $user;
+}
+
+if (is_numeric($node)) {
+$node = node_load($node);
+}
+
+if ($op == 'create') {
+return user_access('jiscpm risk: add');
+}
+
+if ($op == 'delete') {
+if (user_access('jiscpm risk: delete all')) {
+return TRUE;
+} 
+elseif (user_access('jiscpm risk: delete own') && ($account->uid == $node->uid)) {
+return TRUE;
+} 
+}
+
+if ($op == 'update') {
+if (user_access('jiscpm risk: edit all')) {
+return TRUE;
+} 
+elseif (user_access('jiscpm risk: edit own') && ($account->uid == $node->uid)) {
+return TRUE;
+} 
+}
+
+if ($op == 'view') {
+if (user_access('jiscpm risk: view all')) {
+return TRUE;
+} 
+elseif (user_access('jiscpm risk: view own') && ($account->uid == $node->uid)) {
+return TRUE;
+} 
+}
+return FALSE;
 }
 
 function jiscpmrisk_menu() {
-  $items = array();
+$items = array();
 
-  $items['jiscpm/dashboard/risks'] = array(
-    'title' => 'Risks',
-    'description' => 'jiscpm risks',
-    'page callback' => 'jiscpmrisk_list',
-    'access arguments' => array('jiscpm risk: access'),
-    'file' => 'jiscpmrisk.admin.inc',
-    'type' => MENU_NORMAL_ITEM
-  );
+$items['jiscpm/dashboard/risks'] = array(
+'title' => 'Risks',
+'description' => 'jiscpm risks',
+'page callback' => 'jiscpmrisk_list',
+'access arguments' => array('jiscpm risk: access'),
+'file' => 'jiscpmrisk.admin.inc',
+'type' => MENU_NORMAL_ITEM
+);
 
-  $items['jiscpm/project_risks_js/%'] = array(
-    'title' => 'Risks',
-    'page callback' => '_jiscpmrisk_project_risks_js',
-    'page arguments' => array(2),
-    'access arguments' => array('jiscpm risk: access'),
-    'file' => 'jiscpmrisk.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
+$items['jiscpm/project_risks_js/%'] = array(
+'title' => 'Risks',
+'page callback' => '_jiscpmrisk_project_risks_js',
+'page arguments' => array(2),
+'access arguments' => array('jiscpm risk: access'),
+'file' => 'jiscpmrisk.admin.inc',
+'type' => MENU_CALLBACK,
+);
 
-  return $items;
+return $items;
 }
 
 function jiscpmrisk_theme() {
-  return array(
-    'jiscpmrisk_list' => array(
-      'file'      => 'jiscpmrisk.theme.inc',
-      'arguments' => array('header', 'risks'),
-    ),
-    'jiscpmrisk_view' => array(
-      'file'      => 'jiscpmrisk.theme.inc',
-      'arguments' => array('node', 'teaser', 'page'),
-    ),
-  );
+return array(
+'jiscpmrisk_list' => array(
+'file'      => 'jiscpmrisk.theme.inc',
+'arguments' => array('header', 'risks'),
+),
+'jiscpmrisk_view' => array(
+'file'      => 'jiscpmrisk.theme.inc',
+'arguments' => array('node', 'teaser', 'page'),
+),
+);
 }
 
 function jiscpmrisk_node_info() {
-  return array(
-    'jiscpmrisk' => array(
-      'name' => t('JISCPM Risk'),
-      'module' => 'jiscpmrisk',
-      'description' => t("A risk for jiscpm."),
-      'title_label' => t("Title"),
-      'body_label' => t("Description"),
-    )
-  );
+return array(
+'jiscpmrisk' => array(
+'name' => t('JISCPM Risk'),
+'module' => 'jiscpmrisk',
+'description' => t("A risk for jiscpm."),
+'title_label' => t("Title"),
+'body_label' => t("Description"),
+)
+);
 }
 
 function jiscpmrisk_content_extra_fields($type_name) {
-  if ($type_name == 'jiscpmrisk') {
-    return array(
-      'group0' => array('label' => 'Risk', 'weight' => -21),
-      'group1' => array('label' => 'Owner', 'weight' => -20),
-      'group2' => array('label' => 'Project title', 'weight' => -19),
-      'group3' => array('label' => 'Probability', 'weight' => -18),
-      'group4' => array('label' => 'Impact', 'weight' => -17),
-      'group5' => array('label' => 'Timescale', 'weight' => -16),
-      'group6' => array('label' => 'Residual risk', 'weight' => -10),
-      'group7' => array('label' => 'Early warning signs', 'weight' => -14),
-      'group8' => array('label' => 'Timescale', 'weight' => -13),
-      'group9' => array('label' => 'Risk Category', 'weight' => -15),
-      'group10' => array('label' => 'Risk Management Approach', 'weight' => -11),
-    );
-  }
+if ($type_name == 'jiscpmrisk') {
+return array(
+'group0' => array('label' => 'Risk', 'weight' => -21),
+'group1' => array('label' => 'Owner', 'weight' => -20),
+'group2' => array('label' => 'Project title', 'weight' => -19),
+'group3' => array('label' => 'Probability', 'weight' => -18),
+'group4' => array('label' => 'Impact', 'weight' => -17),
+'group5' => array('label' => 'Timescale', 'weight' => -16),
+'group6' => array('label' => 'Residual risk', 'weight' => -10),
+'group7' => array('label' => 'Early warning signs', 'weight' => -14),
+'group8' => array('label' => 'Timescale', 'weight' => -13),
+'group9' => array('label' => 'Risk Category', 'weight' => -15),
+'group10' => array('label' => 'Risk Management Approach', 'weight' => -11),
+);
+}
 }
 
 
 function jiscpmrisk_form(&$node) {
-  $breadcrumb = array();
-  $breadcrumb[] = l(t('JISCPM'), 'jiscpm/dashboard');
-  $breadcrumb[] = l(t('Risks'), 'jiscpm/risks');
-  drupal_set_breadcrumb($breadcrumb);
+$breadcrumb = array();
+$breadcrumb[] = l(t('JISCPM'), 'jiscpm/dashboard');
+$breadcrumb[] = l(t('Risks'), 'jiscpm/risks');
+drupal_set_breadcrumb($breadcrumb);
 
-  $s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
-  $s_pro = "SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid";
- 
+$s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
+$s_pro = db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid");
 
-  /*$type = node_get_types('type', $node);
 
-  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';*/
-  $form['group0'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -21,
-  );
-  
-  $form['group0']['title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Risk'),
-    '#required' => TRUE,
-    '#default_value' => $node->title,
-  );
-  
-  $form['group1'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
-  );
-  
-  /* print out owner options */
-  /*$s_own = db_rewrite_sql($s_own);*/
-  $r = db_query($s_own);
-  $owners = array();
-  while ($owner = db_fetch_object($r)) {
-    $owners[$owner->uid] = check_plain($owner->name);
-    if (!$node->owner_uid) $node->owner_uid = $owner->uid;
-  }
-  $form['group1']['risk_owner_uid'] = array(
-    '#type' => 'select',
-    '#title' => t('Risk owner'),
-    '#options' => $owners,
-    '#default_value' => $node->jiscpmrisks[0]['risk_owner_uid'],
-    '#process' => array('jiscpm_dependent_select_process'),
-  );
-  /* print out project options */
-  /*$s_pro = db_rewrite_sql($s_pro);*/
-  $r = db_query($s_pro);
-  $projects = array();
-  while ($project = db_fetch_object($r)) {
-    $projects[$project->nid] = check_plain($project->title);
-    if (!$node->project_nid) $node->project_nid = $project->nid;
-  }
-  $form['group2'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
-  );
-  $form['group2']['project_nid'] = array(
-    '#type' => 'select',
-    '#title' => t('Project'),
-    '#options' => $projects,
-    '#default_value' => $node->jiscpmrisks[0]['project_nid'],
-    '#process' => array('jiscpm_dependent_select_process'),
-    '#required' => TRUE,
-  );
+/*$type = node_get_types('type', $node);
 
-  
-  if ($type->has_body) {
-    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
-  }
-  
-  $form['group3'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -19,
-  );
-  
-  $form['group3']['risk_probability'] = array(
-    '#type' => 'select',
-    '#options' => array(
-      'Very Low' => t('Very Low'),
-      'Low' => t('Low'),
-      'Low - Medium' => t('Low - Medium'),
-      'Medium' => t('Medium'),
-      'Medium - High' => t('Medium - High'),
-      'High' => t('High'),
-      'Very High' => t('Very High'),  
-    ),
-    '#title' =>t('Risk Probability'),
-    '#default_value' => $node->jiscpmrisks[0]['risk_probability'],
-  );
- $form['group4'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -18,
-  );
-  
-  $form['group4']['risk_impact'] = array(
-    '#type' => 'select',
-    '#options' => array(
-      'Very Low' => t('Very Low'),
-      'Low' => t('Low'),
-      'Low - Medium' => t('Low - Medium'),
-      'Medium' => t('Medium'),
-      'Medium - High' => t('Medium - High'),
-      'High' => t('High'),
-      'Very High' => t('Very High'),  
-    ),
-    '#title' =>t('Risk Impact'),
-    '#default_value' => $node->jiscpmrisks[0]['risk_impact'],
-  );
-  $form['group5'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -17,
-  );
- $form['group5']['timescale'] = array(
- 	'#type' => 'fieldset',
- 	'#title' => t('Timescale'),
- 	'#collapsible' => TRUE,
- 	'#collapsed' => FALSE,
- );
- if ($node->jiscpmrisks[0]['risk_start'] != '' || $node->jiscpmrisks[0]['risk_start'] != NULL || $node->jiscpmrisks[0]['risk_start'] != 0)
-  {
-	if (module_exists('date_api') && module_exists('date_popup')) {
-		$form['group5']['timescale']['risk_start'] = array(
-			'#type' => 'date_popup',
-			'#title' => t('Risk Start'),
-			'#date_format' =>	 'Y-m-d',
-			'#default_value' => date('Y-m-d', $node->jiscpmrisks[0]['risk_start']),
-		);
-	}
-  }else
-  {
-  if (module_exists('date_api') && module_exists('date_popup')) {
-		$form['group5']['timescale']['risk_start'] = array(
-			'#type' => 'date_popup',
-			'#title' => t('Risk Start'),
-			'#date_format' =>	 'Y-m-d',
-			'#default_value' => date('Y-m-d'),
-		);
-	}
-  }
-  if ($node->jiscpmrisks[0]['risk_end'] != '' || $node->jiscpmrisks[0]['risk_end'] != NULL || $node->jiscpmrisks[0]['risk_end'] != 0)
-  {
-	if (module_exists('date_api') && module_exists('date_popup')) {
-		$form['group5']['timescale']['risk_end'] = array(
-			'#type' => 'date_popup',
-			'#title' => t('Risk End'),
-			'#date_format' =>	 'Y-m-d',
-			'#default_value' => date('Y-m-d', $node->jiscpmrisks[0]['risk_end']),
-		);
-	}
-  }else
-  {
-  if (module_exists('date_api') && module_exists('date_popup')) {
-		$form['group5']['timescale']['risk_end'] = array(
-			'#type' => 'date_popup',
-			'#title' => t('Risk End'),
-			'#date_format' =>	 'Y-m-d',
-			'#default_value' => date('Y-m-d'),
-		);
-	}
-  }
-  $form['group6'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -10,
-  );
-  
-  $form['group6']['risk_residual_wrapper'] = array(
-	'#type' => 'fieldset',
-	'#title' => t('Residual Risk'),
-	'#tree' => FALSE,
-	'#collapsed' => FALSE,
-	'#collapsible' => TRUE,
-  );
-  
-  $form['group6']['risk_residual_wrapper']['risk_residual'] = array(
-    '#type' => 'textarea',
-    '#title' =>t('Risk Residual'),
-	'#prefix' => '<div id="risktext">',
-	'#suffix' => '</div>',
-    '#default_value' => $node->jiscpmrisks[0]['risk_residual'],
-	'#description' => t('The residual risk that remains after all management steps have been taken.'),
-	'#weight' => 0,
-  );
-  $form['group6']['risk_residual_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group6', 'risk_residual_wrapper', 'format'));
-  
-  $form['group7'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -10,
-  );
-  $form['group7']['risk_early_warning_signs_wrapper'] = array(
-	'#type' => 'fieldset',
-	'#title' => t('Early Warning Signs'),
-	'#tree' => FALSE,
-	'#collapsed' => FALSE,
-	'#collapsible' => TRUE,
-  );
-  $form['group7']['risk_early_warning_signs_wrapper']['risk_early_warning_signs'] = array(
-    '#type' => 'textarea',
-    '#title' =>t('Risk Early Warning Signs'),
-    '#default_value' => $node->jiscpmrisks[0]['risk_early_warning_signs'],
-	'#weight' => 0,
-  );
-  $form['group7']['risk_early_warning_signs_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group7', 'risk_early_warning_signs_wrapper', 'format'));
-  
-  $form['group8'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -15,
-  );
-  
-  $form['group8']['risk_category'] = array(
-    '#type' => 'select',
-    '#title' =>t('Risk Category'),
-    '#options' => array(
-      'Skills' => t('Skills'),
-      'Management' => t('Management'),
-      'Hardware' => t('Hardware'),
-      'Software' => t('Software'),
-      'User Acceptance' => t('User Acceptance'),
-    ),
-    '#default_value' => $node->jiscpmrisks[0]['risk_category'],
-  );
-  $form['group9'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -13,
-  );
-    $form['group9']['risk_management_approach_wrapper'] = array(
-	'#type' => 'fieldset',
-	'#title' => t('Risk Management Approach'),
-	'#tree' => FALSE,
-	'#collapsed' => FALSE,
-	'#collapsible' => TRUE,
-  );
-  $form['group9']['risk_management_approach_wrapper']['risk_management_approach'] = array(
-    '#type' => 'textarea',
-    '#title' =>t('Risk Management Approach'),
-    '#default_value' => $node->jiscpmrisks[0]['risk_management_approach'],
-  );
-  $form['group9']['risk_management_approach_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group9', 'risk_management_approach_wrapper', 'format'));
-  return $form;
+$form['#attributes']['class'] = 'jiscpmcomponent_node_form';*/
+$form['group0'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -21,
+);
+
+$form['group0']['title'] = array(
+'#type' => 'textfield',
+'#title' => t('Risk'),
+'#required' => TRUE,
+'#default_value' => $node->title,
+);
+
+$form['group1'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
+);
+
+/* print out owner options */
+/*$s_own = db_rewrite_sql($s_own);*/
+$r = db_query($s_own);
+$owners = array();
+while ($owner = db_fetch_object($r)) {
+$owners[$owner->uid] = check_plain($owner->name);
+if (!$node->owner_uid) $node->owner_uid = $owner->uid;
+}
+$form['group1']['risk_owner_uid'] = array(
+'#type' => 'select',
+'#title' => t('Risk owner'),
+'#options' => $owners,
+'#default_value' => $node->jiscpmrisks[0]['risk_owner_uid'],
+'#process' => array('jiscpm_dependent_select_process'),
+);
+/* print out project options */
+/*$s_pro = db_rewrite_sql($s_pro);*/
+$r = db_query($s_pro);
+$projects = array();
+while ($project = db_fetch_object($r)) {
+$projects[$project->nid] = check_plain($project->title);
+if (!$node->project_nid) $node->project_nid = $project->nid;
+}
+$form['group2'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
+);
+$form['group2']['project_nid'] = array(
+'#type' => 'select',
+'#title' => t('Project'),
+'#options' => $projects,
+'#default_value' => $node->jiscpmrisks[0]['project_nid'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#required' => TRUE,
+);
+
+
+if ($type->has_body) {
+$form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+}
+
+$form['group3'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -19,
+);
+
+$form['group3']['risk_probability'] = array(
+'#type' => 'select',
+'#options' => array(
+'Very Low' => t('Very Low'),
+'Low' => t('Low'),
+'Low - Medium' => t('Low - Medium'),
+'Medium' => t('Medium'),
+'Medium - High' => t('Medium - High'),
+'High' => t('High'),
+'Very High' => t('Very High'),  
+),
+'#title' => t('Risk Probability'),
+'#default_value' => $node->jiscpmrisks[0]['risk_probability'],
+);
+$form['group4'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -18,
+);
+
+$form['group4']['risk_impact'] = array(
+'#type' => 'select',
+'#options' => array(
+'Very Low' => t('Very Low'),
+'Low' => t('Low'),
+'Low - Medium' => t('Low - Medium'),
+'Medium' => t('Medium'),
+'Medium - High' => t('Medium - High'),
+'High' => t('High'),
+'Very High' => t('Very High'),  
+),
+'#title' => t('Risk Impact'),
+'#default_value' => $node->jiscpmrisks[0]['risk_impact'],
+);
+$form['group5'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -17,
+);
+$form['group5']['timescale'] = array(
+'#type' => 'fieldset',
+'#title' => t('Timescale'),
+'#collapsible' => TRUE,
+'#collapsed' => FALSE,
+);
+if ($node->jiscpmrisks[0]['risk_start'] != '' || $node->jiscpmrisks[0]['risk_start'] != NULL || $node->jiscpmrisks[0]['risk_start'] != 0) {
+if (module_exists('date_api') && module_exists('date_popup')) {
+$form['group5']['timescale']['risk_start'] = array(
+'#type' => 'date_popup',
+'#title' => t('Risk Start'),
+'#date_format' => 'Y-m-d',
+'#default_value' => date('Y-m-d', $node->jiscpmrisks[0]['risk_start']),
+);
+}
+}
+else {
+if (module_exists('date_api') && module_exists('date_popup')) {
+$form['group5']['timescale']['risk_start'] = array(
+'#type' => 'date_popup',
+'#title' => t('Risk Start'),
+'#date_format' => 'Y-m-d',
+'#default_value' => date('Y-m-d'),
+);
+}
+}
+if ($node->jiscpmrisks[0]['risk_end'] != '' || $node->jiscpmrisks[0]['risk_end'] != NULL || $node->jiscpmrisks[0]['risk_end'] != 0) {
+if (module_exists('date_api') && module_exists('date_popup')) {
+$form['group5']['timescale']['risk_end'] = array(
+'#type' => 'date_popup',
+'#title' => t('Risk End'),
+'#date_format' => 'Y-m-d',
+'#default_value' => date('Y-m-d', $node->jiscpmrisks[0]['risk_end']),
+);
+}
+}
+else {
+if (module_exists('date_api') && module_exists('date_popup')) {
+$form['group5']['timescale']['risk_end'] = array(
+'#type' => 'date_popup',
+'#title' => t('Risk End'),
+'#date_format' => 'Y-m-d',
+'#default_value' => date('Y-m-d'),
+);
+}
+}
+$form['group6'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -10,
+);
+
+$form['group6']['risk_residual_wrapper'] = array(
+'#type' => 'fieldset',
+'#title' => t('Residual Risk'),
+'#tree' => FALSE,
+'#collapsed' => FALSE,
+'#collapsible' => TRUE,
+);
+
+$form['group6']['risk_residual_wrapper']['risk_residual'] = array(
+'#type' => 'textarea',
+'#title' => t('Risk Residual'),
+'#prefix' => '<div id="risktext">',
+'#suffix' => '</div>',
+'#default_value' => $node->jiscpmrisks[0]['risk_residual'],
+'#description' => t('The residual risk that remains after all management steps have been taken.'),
+'#weight' => 0,
+);
+$form['group6']['risk_residual_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group6', 'risk_residual_wrapper', 'format'));
+
+$form['group7'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -10,
+);
+$form['group7']['risk_early_warning_signs_wrapper'] = array(
+'#type' => 'fieldset',
+'#title' => t('Early Warning Signs'),
+'#tree' => FALSE,
+'#collapsed' => FALSE,
+'#collapsible' => TRUE,
+);
+$form['group7']['risk_early_warning_signs_wrapper']['risk_early_warning_signs'] = array(
+'#type' => 'textarea',
+'#title' => t('Risk Early Warning Signs'),
+'#default_value' => $node->jiscpmrisks[0]['risk_early_warning_signs'],
+'#weight' => 0,
+);
+$form['group7']['risk_early_warning_signs_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group7', 'risk_early_warning_signs_wrapper', 'format'));
+
+$form['group8'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -15,
+);
+
+$form['group8']['risk_category'] = array(
+'#type' => 'select',
+'#title' => t('Risk Category'),
+'#options' => array(
+'Skills' => t('Skills'),
+'Management' => t('Management'),
+'Hardware' => t('Hardware'),
+'Software' => t('Software'),
+'User Acceptance' => t('User Acceptance'),
+),
+'#default_value' => $node->jiscpmrisks[0]['risk_category'],
+);
+$form['group9'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -13,
+);
+$form['group9']['risk_management_approach_wrapper'] = array(
+'#type' => 'fieldset',
+'#title' => t('Risk Management Approach'),
+'#tree' => FALSE,
+'#collapsed' => FALSE,
+'#collapsible' => TRUE,
+);
+$form['group9']['risk_management_approach_wrapper']['risk_management_approach'] = array(
+'#type' => 'textarea',
+'#title' => t('Risk Management Approach'),
+'#default_value' => $node->jiscpmrisks[0]['risk_management_approach'],
+);
+$form['group9']['risk_management_approach_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group9', 'risk_management_approach_wrapper', 'format'));
+return $form;
 }
 
 function jiscpmrisk_insert($node) {
-  $node->risk_start = strtotime($node->risk_start);
-  $node->risk_end = strtotime($node->risk_end);
-  db_query("INSERT INTO {jiscpmrisk}
-    (vid, nid, project_nid, risk_probability, risk_impact, risk_residual, risk_early_warning_signs, risk_owner_uid, risk_start, risk_end, risk_category, risk_management_approach)
-    VALUES
-    (%d, %d, %d, '%s', '%s', '%s', '%s', %d, %s, %s, '%s', '%s')",
-    $node->nid, $node->nid, $node->project_nid, $node->risk_probability, $node->risk_impact,
-    $node->risk_residual, $node->risk_early_warning_signs, $node->risk_owner_uid, $node->risk_start, 
-    $node->risk_end, $node->risk_category, $node->risk_management_approach);
+$node->risk_start = strtotime($node->risk_start);
+$node->risk_end = strtotime($node->risk_end);
+db_query("INSERT INTO {jiscpmrisk}
+(vid, nid, project_nid, risk_probability, risk_impact, risk_residual, risk_early_warning_signs, risk_owner_uid, risk_start, risk_end, risk_category, risk_management_approach)
+VALUES
+(%d, %d, %d, '%s', '%s', '%s', '%s', %d, %s, %s, '%s', '%s')",
+$node->nid, $node->nid, $node->project_nid, $node->risk_probability, $node->risk_impact,
+$node->risk_residual, $node->risk_early_warning_signs, $node->risk_owner_uid, $node->risk_start, 
+$node->risk_end, $node->risk_category, $node->risk_management_approach);
 }
 
 function jiscpmrisk_update($node) {
-  // if this is a new node or we're adding a new revision,
-  if ($node->revision) {
-  jiscpmrisk_insert($node);
-  }
-  else {
-    db_query('DELETE FROM {jiscpmrisk} WHERE vid = %d', $node->vid);
-    jiscpmrisk_insert($node);
-    
-  }
+// if this is a new node or we're adding a new revision,
+if ($node->revision) {
+jiscpmrisk_insert($node);
+}
+else {
+db_query('DELETE FROM {jiscpmrisk} WHERE vid = %d', $node->vid);
+jiscpmrisk_insert($node);
+
+}
 }
 
 function jiscpmrisk_nodeapi(&$node, $op, $teaser, $page) {
-  switch ($op) {
-    case 'prepare':
+switch ($op) {
+case 'prepare':
 
-      break;
-    case 'delete revision':
-      // Notice that we're matching a single revision based on the node's vid.
-      db_query('DELETE FROM {jiscpmrisk} WHERE vid = %d', $node->vid);
-      break;
-  }
+break;
+case 'delete revision':
+// Notice that we're matching a single revision based on the node's vid.
+db_query('DELETE FROM {jiscpmrisk} WHERE vid = %d', $node->vid);
+break;
+}
 }
 
 function jiscpmrisk_delete($node) {
-  // Notice that we're matching all revision, by using the node's nid.
-  db_query('DELETE FROM {jiscpmrisk} WHERE nid = %d', $node->nid);
+// Notice that we're matching all revision, by using the node's nid.
+db_query('DELETE FROM {jiscpmrisk} WHERE nid = %d', $node->nid);
 }
 
 function jiscpmrisk_load($node) {
-  $result_r = db_query('SELECT project_nid, risk_probability, risk_impact, risk_start, risk_end, risk_residual, risk_early_warning_signs, risk_owner_uid, risk_category, risk_management_approach FROM {jiscpmrisk} WHERE vid = %d', $node->vid);
-  $node->jiscpmrisks = array();
-  while ($row_r = db_fetch_object($result_r)) {
-    $jiscpmrisk = array(
-      'project_nid' => $row_r->project_nid,
-      'risk_probability' => $row_r->risk_probability,
-      'risk_impact' => $row_r->risk_impact,
-      'risk_start' => $row_r->risk_start,
-      'risk_end' => $row_r->risk_end,
-      'risk_residual' => $row_r->risk_residual,
-      'risk_early_warning_signs' => $row_r->risk_early_warning_signs,
-      'risk_owner_uid' => $row_r->risk_owner_uid,
-      'risk_category' => $row_r->risk_category,
-      'risk_management_approach' => $row_r->risk_management_approach,
-    );
-   
-    $node->jiscpmrisks[] = $jiscpmrisk;
-  }
-  return $node;
+$result_r = db_query('SELECT project_nid, risk_probability, risk_impact, risk_start, risk_end, risk_residual, risk_early_warning_signs, risk_owner_uid, risk_category, risk_management_approach FROM {jiscpmrisk} WHERE vid = %d', $node->vid);
+$node->jiscpmrisks = array();
+while ($row_r = db_fetch_object($result_r)) {
+$jiscpmrisk = array(
+'project_nid' => $row_r->project_nid,
+'risk_probability' => $row_r->risk_probability,
+'risk_impact' => $row_r->risk_impact,
+'risk_start' => $row_r->risk_start,
+'risk_end' => $row_r->risk_end,
+'risk_residual' => $row_r->risk_residual,
+'risk_early_warning_signs' => $row_r->risk_early_warning_signs,
+'risk_owner_uid' => $row_r->risk_owner_uid,
+'risk_category' => $row_r->risk_category,
+'risk_management_approach' => $row_r->risk_management_approach,
+);
+
+$node->jiscpmrisks[] = $jiscpmrisk;
+}
+return $node;
 }
 
 function jiscpmrisk_view($node, $teaser = FALSE, $page = FALSE) {
-  $breadcrumb = array();
-  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
-  $breadcrumb[] = l(t('Risks'), 'jiscpm/dashboard/risks');
-  drupal_set_breadcrumb($breadcrumb);
+$breadcrumb = array();
+$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+$breadcrumb[] = l(t('Risks'), 'jiscpm/dashboard/risks');
+drupal_set_breadcrumb($breadcrumb);
 
-  return theme('jiscpmrisk_view', $node, $teaser, $page);
+return theme('jiscpmrisk_view', $node, $teaser, $page);
 }
 
 function jiscpmrisk_views_api() {
-  return array(
-    'api' => 2,
-    'path' => drupal_get_path('module', 'jiscpmrisk'),
-  );
+return array(
+'api' => 2,
+'path' => drupal_get_path('module', 'jiscpmrisk'),
+);
 }

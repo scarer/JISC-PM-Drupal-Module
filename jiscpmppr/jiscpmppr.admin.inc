@@ -16,8 +16,8 @@ array('data' => t('Author'), 'field' => 'uid'),
 array('data' => t('Project'), 'field' => 'project_nid'),
 );
 
-$sql  = db_query(db_rewrite_sql("SELECT n.title, n.nid, n.uid, j.project_nid FROM {node} n JOIN {jiscpmppr} j ON n.nid = 
-j.nid WHERE n.status=1 AND n.type='jiscpmppr'"));
+$sql  = db_rewrite_sql("SELECT n.title, n.nid, n.uid, j.project_nid FROM {node} n JOIN {jiscpmppr} j ON n.nid = 
+j.nid WHERE n.status=1 AND n.type='jiscpmppr'");
 //$sql .= tablesort_sql($header);
 $result = pager_query($sql, 50);
 while ( $records = db_fetch_object($result) ) {

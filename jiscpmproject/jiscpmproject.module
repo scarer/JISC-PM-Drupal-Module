@@ -1340,16 +1340,17 @@ if (module_exists('date_api') && module_exists('date_popup')) {
 $form['datebegin'] = array(
 '#type' => 'date_popup',
 '#title' => t('Date begin'),
-'#date_format' =>	 'Y-m-d',
+'#date_format' => 'Y-m-d',
 '#default_value' => date('Y-m-d', $node->jiscpmprojects[0]['datebegin']),
 );
 }
-}else {
+}
+else {
 if (module_exists('date_api') && module_exists('date_popup')) {
 $form['datebegin'] = array(
 '#type' => 'date_popup',
 '#title' => t('Date begin'),
-'#date_format' =>	 'Y-m-d',
+'#date_format' => 'Y-m-d',
 '#default_value' => date('Y-m-d'),
 );
 }
@@ -1360,7 +1361,7 @@ if (module_exists('date_api') && module_exists('date_popup')) {
 $form['dateend'] = array(
 '#type' => 'date_popup',
 '#title' => t('Date end'),
-'#date_format' =>	 'Y-m-d',
+'#date_format' => 'Y-m-d',
 '#default_value' => date('Y-m-d', $node->jiscpmprojects[0]['dateend']),
 );
 }
@@ -1370,7 +1371,7 @@ if (module_exists('date_api') && module_exists('date_popup')) {
 $form['dateend'] = array(
 '#type' => 'date_popup',
 '#title' => t('Date end'),
-'#date_format' =>	 'Y-m-d',
+'#date_format' => 'Y-m-d',
 '#default_value' => date('Y-m-d'),
 );
 }

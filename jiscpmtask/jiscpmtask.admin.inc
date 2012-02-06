@@ -11,13 +11,13 @@ function jiscpmtask_list() {
   drupal_set_breadcrumb($breadcrumb);
   $header = array(
       array('data' => t('Task'), 'field' => 'title'),
-      array('data' => t('Start Date'), 'field' => 'risk_probability'),
-      array('data' => t('End Date'), 'field' => 'risk_impact'),
+      array('data' => t('Start Date'), 'field' => 'startdate'),
+      array('data' => t('End Date'), 'field' => 'enddate'),
       array('data' => t('Project'), 'field' => 'project_nid'),
   );
 
   $sql  = "SELECT n.title, n.nid, j.datebegin, j.dateend, j.project_nid FROM {node} n JOIN {jiscpmtask} j ON 
-  n.nid = j.task_nid WHERE n.status=1 AND n.type='jiscpmtask'";
+  n.nid = j.nid WHERE n.status=1 AND n.type='jiscpmtask'";
   //$sql .= tablesort_sql($header);
   $result = pager_query($sql, 50);
   while ( $records = db_fetch_object($result) ) {
