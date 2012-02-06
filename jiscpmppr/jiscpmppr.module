@@ -1,713 +1,711 @@
 <?php
 /**
- * @file
- */
+* @file
+*/
 
 /** 
- * @function
- * Implementation of hook_help
- */
+* @function
+* Implementation of hook_help
+*/
 function jiscpmppr_help($path, $arg) {
-  $o = '';
+$o = '';
 
-  switch ($path) {
-    case "admin/help#jiscpmppr":
-      $o = '<p>'.  t("Provides ppr support for jiscpm") .'</p>';
-      break;
-  }
+switch ($path) {
+case "admin/help#jiscpmppr":
+$o = '<p>'.  t("Provides ppr support for jiscpm") .'</p>';
+break;
+}
 
-  return $o;
+return $o;
 }
 
 /**
- * @function
- * Implementation of hook_perm
- */
+* @function
+* Implementation of hook_perm
+*/
 function jiscpmppr_perm() {
-  return array(
-    'jiscpm ppr: access',
-    'jiscpm ppr: add',
-    'jiscpm ppr: edit all',
-    'jiscpm ppr: edit own',
-    'jiscpm ppr: delete all',
-    'jiscpm ppr: delete own',
-  );
+return array(
+'jiscpm ppr: access',
+'jiscpm ppr: add',
+'jiscpm ppr: edit all',
+'jiscpm ppr: edit own',
+'jiscpm ppr: delete all',
+'jiscpm ppr: delete own',
+);
 }
 
 /**
- * @function
- * Implementation of hook_init
- */
+* @function
+* Implementation of hook_init
+*/
 function jiscpmppr_init() {
-  $settings = array(
-    'jiscpm' => array(
-      'organization_pprs_url' => url('jiscpm/organization_pprs_js/')
-    ),
-  );
-  drupal_add_js($settings, 'setting');
+$settings = array(
+'jiscpm' => array(
+'organization_pprs_url' => url('jiscpm/organization_pprs_js/')
+),
+);
+drupal_add_js($settings, 'setting');
 
-  drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
-  drupal_add_js(drupal_get_path('module', 'jiscpmppr') .'/jiscpmppr.js', 'module', 'header', FALSE);
+drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
+drupal_add_js(drupal_get_path('module', 'jiscpmppr') .'/jiscpmppr.js', 'module', 'header', FALSE);
 }
 
 function jiscpmppr_access($op, $node, $account=NULL) {
-  if (empty($account)) {
-    global $user;
-    $account = $user;
-  }
-    
-  if (is_numeric($node)) {
-    $node = node_load($node);
-  }
-  
-  if ($op == 'create') {
-    return user_access('jiscpm ppr: add');
-  }
-  
-  if ($op == 'delete') {
-    if (user_access('jiscpm ppr: delete all')) 
-    {
-      return TRUE;
-    } else if (user_access('jiscpm ppr: delete own') && ($account->uid == $node->uid)) 
-    {
-      return TRUE;
-    } 
-  }
-  
-  if ($op == 'update') {
-    if (user_access('jiscpm ppr: edit all')) {
-      return TRUE;
-    } 
-    else if (user_access('jiscpm ppr: edit own') && ($account->uid == $node->uid)) {
-      return TRUE;
-    } 
-  }
-  
-  if ($op == 'view') {
-    if (user_access('jiscpm ppr: view all')) {
-      return TRUE;
-    } 
-    else if (user_access('jiscpm ppr: view own') && ($account->uid == $node->uid)) {
-      return TRUE;
-    } 
-  }
-  return FALSE;
+if (empty($account)) {
+global $user;
+$account = $user;
+}
+
+if (is_numeric($node)) {
+$node = node_load($node);
+}
+
+if ($op == 'create') {
+return user_access('jiscpm ppr: add');
+}
+
+if ($op == 'delete') {
+if (user_access('jiscpm ppr: delete all')) {
+return TRUE;
+} 
+else if (user_access('jiscpm ppr: delete own') && ($account->uid == $node->uid)) {
+return TRUE;
+} 
+}
+
+if ($op == 'update') {
+if (user_access('jiscpm ppr: edit all')) {
+return TRUE;
+} 
+else if (user_access('jiscpm ppr: edit own') && ($account->uid == $node->uid)) {
+return TRUE;
+} 
+}
+
+if ($op == 'view') {
+if (user_access('jiscpm ppr: view all')) {
+return TRUE;
+} 
+else if (user_access('jiscpm ppr: view own') && ($account->uid == $node->uid)) {
+return TRUE;
+} 
+}
+return FALSE;
 }
 
 function jiscpmppr_access_sql($sql, $where = array()) {
-  if (user_access('jiscpm ppr: view all')) {
-    $where[] = "'jiscpm_access'='jiscpm_access'";
-    return jiscpm_rewrite_sql($sql, $where);
-  }
+if (user_access('jiscpm ppr: view all')) {
+$where[] = "'jiscpm_access'='jiscpm_access'";
+return jiscpm_rewrite_sql($sql, $where);
+}
 
-  global $user;
+global $user;
 
-  $cond = '';
-  if (user_access('jiscpm ppr: view own')) {
-    $cond .= 'n.uid='. $user->uid;
-  }
+$cond = '';
+if (user_access('jiscpm ppr: view own')) {
+$cond .= 'n.uid='. $user->uid;
+}
 
-  if (empty($cond)) $cond = '0=1';
-  $where[] = $cond;
+if (empty($cond)) $cond = '0=1';
+$where[] = $cond;
 
-  $where[] = "'jiscpm_access'='jiscpm_access'";
-  return jiscpm_rewrite_sql($sql, $where);
+$where[] = "'jiscpm_access'='jiscpm_access'";
+return jiscpm_rewrite_sql($sql, $where);
 }
 
 function jiscpmppr_jiscpm_rewrite_where_sql($query, $primary_table, $account) {
-  static $conds = array();
+static $conds = array();
 
-  if ($conds[$primary_table][$account->uid]) {
-    return $conds[$primary_table][$account->uid];
-  }
+if ($conds[$primary_table][$account->uid]) {
+return $conds[$primary_table][$account->uid];
+}
 
-  if (preg_match("/'jiscpm_access'='jiscpm_access'/", $query)) {
-    $cond = '';
-  }
-  else {
-    if (user_access('jiscpm ppr: view all', $account)) {
-      return '';
-    }
+if (preg_match("/'jiscpm_access'='jiscpm_access'/", $query)) {
+$cond = '';
+}
+else {
+if (user_access('jiscpm ppr: view all', $account)) {
+return '';
+}
 
-    $cond = '';
-    if (user_access('jiscpm ppr: view own', $account)) {
-      $cond .= " ${primary_table}.uid=". $account->uid;
-    }
-   
-    if ($cond) {
-      $cond = " WHEN 'jiscpmppr' THEN (SELECT IF($cond,1,0) FROM {jiscpmppr} spr1 WHERE spr1.vid=${primary_table}.vid) ";
-    }
-    else {
-      $cond = " WHEN 'jiscpmppr' THEN 0 ";
-    }
-  }
+$cond = '';
+if (user_access('jiscpm ppr: view own', $account)) {
+$cond .= " ${primary_table}.uid=". $account->uid;
+}
 
-  $conds[$primary_table][$account->uid] = $cond;
-  return $cond;
+if ($cond) {
+$cond = " WHEN 'jiscpmppr' THEN (SELECT IF($cond,1,0) FROM {jiscpmppr} spr1 WHERE spr1.vid=${primary_table}.vid) ";
+}
+else {
+$cond = " WHEN 'jiscpmppr' THEN 0 ";
+}
+}
+
+$conds[$primary_table][$account->uid] = $cond;
+return $cond;
 }
 
 function jiscpmppr_menu() {
-  $items = array();
+$items = array();
 
-  $items['jiscpm/dashboard/pprs'] = array(
-    'title' => 'PPRS',
-    'description' => 'jiscpm pprs',
-    'page callback' => 'jiscpmppr_list',
-    'access arguments' => array('jiscpm ppr: access'),
-    'file' => 'jiscpmppr.admin.inc',
-    'type' => MENU_NORMAL_ITEM
-  );
+$items['jiscpm/dashboard/pprs'] = array(
+'title' => 'PPRS',
+'description' => 'jiscpm pprs',
+'page callback' => 'jiscpmppr_list',
+'access arguments' => array('jiscpm ppr: access'),
+'file' => 'jiscpmppr.admin.inc',
+'type' => MENU_NORMAL_ITEM
+);
 
-  $items['jiscpm/project_pprs_js/%'] = array(
-    'title' => 'PPRS',
-    'page callback' => '_jiscpmppr_project_pprs_js',
-    'page arguments' => array(2),
-    'access arguments' => array('jiscpm ppr: access'),
-    'file' => 'jiscpmppr.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
+$items['jiscpm/project_pprs_js/%'] = array(
+'title' => 'PPRS',
+'page callback' => '_jiscpmppr_project_pprs_js',
+'page arguments' => array(2),
+'access arguments' => array('jiscpm ppr: access'),
+'file' => 'jiscpmppr.admin.inc',
+'type' => MENU_CALLBACK,
+);
 
-  return $items;
+return $items;
 }
 
 function jiscpmppr_theme() {
-  return array(
-    'jiscpmppr_list' => array(
-      'file'      => 'jiscpmppr.theme.inc',
-      'arguments' => array('header', 'pprs'),
-    ),
-    'jiscpmppr_view' => array(
-      'file'      => 'jiscpmppr.theme.inc',
-      'arguments' => array('node', 'teaser', 'page'),
-    ),
-  );
+return array(
+'jiscpmppr_list' => array(
+'file'      => 'jiscpmppr.theme.inc',
+'arguments' => array('header', 'pprs'),
+),
+'jiscpmppr_view' => array(
+'file'      => 'jiscpmppr.theme.inc',
+'arguments' => array('node', 'teaser', 'page'),
+),
+);
 }
 
 function jiscpmppr_node_info() {
-  return array(
-    'jiscpmppr' => array(
-      'name' => t('JISCPM PPR'),
-      'module' => 'jiscpmppr',
-      'description' => t("A post project/programme review for a jiscpm project or programme."),
-      'title_label' => t("Title"),
-      'body_label' => t("Description"),
-    )
-  );
+return array(
+'jiscpmppr' => array(
+'name' => t('JISCPM PPR'),
+'module' => 'jiscpmppr',
+'description' => t("A post project/programme review for a jiscpm project or programme."),
+'title_label' => t("Title"),
+'body_label' => t("Description"),
+)
+);
 }
 
 function jiscpmppr_content_extra_fields($type_name) {
-  if ($type_name == 'jiscpmppr') {
-    return array(
-      'group1' => array('label' => 'PPR Title', 'weight' => -22),
-      'group2' => array('label' => 'Project title', 'weight' => -21),
-      'group3' => array('label' => 'Summary of objectives', 'weight' => -18),
-      'group4' => array('label' => 'Benefits achieved', 'weight' => -17),
-      'group5' => array('label' => 'Benefits not achieved', 'weight' => -16),
-      'group6' => array('label' => 'Negative benefits factors', 'weight' => -15),
-      'group7' => array('label' => 'Underestimated tasks', 'weight' => -14),
-      'group8' => array('label' => 'Overestimated tasks', 'weight' => -13),
-      'group9' => array('label' => 'Negative time factors', 'weight' => -12),
-      'group10' => array('label' => 'Underestimated costs', 'weight' => -11),
-      'group11' => array('label' => 'Overestimated costs', 'weight' => -10),
-      'group12' => array('label' => 'Negative cost factors', 'weight' => -9),
-      'group13' => array('label' => 'Negative quality factors', 'weight' => -8),
-      'group14' => array('label' => 'Delivered outputs', 'weight' => -7),
-      'group15' => array('label' => 'Unexpected outcomes', 'weight' => -6),
-      'group16' => array('label' => 'Outcomes not fit', 'weight' => -5),
-      'group17' => array('label' => 'Lessons learned', 'weight' => -4),
-      'group18' => array('label' => 'Benefits not achieved', 'weight' => -3),
-      'group19' => array('label' => 'Recommendations for project', 'weight' => -2),
-      'group20' => array('label' => 'Recommendations for future projects', 'weight' => -1),
-    );
-  }
+if ($type_name == 'jiscpmppr') {
+return array(
+'group1' => array('label' => 'PPR Title', 'weight' => -22),
+'group2' => array('label' => 'Project title', 'weight' => -21),
+'group3' => array('label' => 'Summary of objectives', 'weight' => -18),
+'group4' => array('label' => 'Benefits achieved', 'weight' => -17),
+'group5' => array('label' => 'Benefits not achieved', 'weight' => -16),
+'group6' => array('label' => 'Negative benefits factors', 'weight' => -15),
+'group7' => array('label' => 'Underestimated tasks', 'weight' => -14),
+'group8' => array('label' => 'Overestimated tasks', 'weight' => -13),
+'group9' => array('label' => 'Negative time factors', 'weight' => -12),
+'group10' => array('label' => 'Underestimated costs', 'weight' => -11),
+'group11' => array('label' => 'Overestimated costs', 'weight' => -10),
+'group12' => array('label' => 'Negative cost factors', 'weight' => -9),
+'group13' => array('label' => 'Negative quality factors', 'weight' => -8),
+'group14' => array('label' => 'Delivered outputs', 'weight' => -7),
+'group15' => array('label' => 'Unexpected outcomes', 'weight' => -6),
+'group16' => array('label' => 'Outcomes not fit', 'weight' => -5),
+'group17' => array('label' => 'Lessons learned', 'weight' => -4),
+'group18' => array('label' => 'Benefits not achieved', 'weight' => -3),
+'group19' => array('label' => 'Recommendations for project', 'weight' => -2),
+'group20' => array('label' => 'Recommendations for future projects', 'weight' => -1),
+);
+}
 }
 
 function jiscpmppr_form(&$node) {
-  $breadcrumb = array();
-  $breadcrumb[] = l(t('JISCPM'), 'jiscpm');
-  $breadcrumb[] = l(t('pprs'), 'jiscpm/pprs');
-  drupal_set_breadcrumb($breadcrumb);
+$breadcrumb = array();
+$breadcrumb[] = l(t('JISCPM'), 'jiscpm');
+$breadcrumb[] = l(t('pprs'), 'jiscpm/pprs');
+drupal_set_breadcrumb($breadcrumb);
 
-  $s_pro = "SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid";
+$s_pro = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid"));
 
-  $type = node_get_types('type', $node);
+$type = node_get_types('type', $node);
 
-  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';
+$form['#attributes']['class'] = 'jiscpmcomponent_node_form';
 
-  $form['group2'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
-  );
-  
-  /* print out project options */
-  $s_pro = db_rewrite_sql($s_pro);
-  $r = db_query($s_pro);
-  $projects = array();
-  while ($project = db_fetch_object($r)) {
-    $projects[$project->nid] = $project->title;
-    if (!$node->project_nid) $node->project_nid = $project->nid;
-  }
-  //load current project if set
-  if ($node->project_nid != NULL || $node->project_nid != '' || $node->project_nid != 0)
-  {
-    $selected_project = node_load($node->project_nid);
-  }
-  $form['group2']['project_nid'] = array(
-    '#type' => 'select',
-    '#title' => t('Project'),
-    '#options' => $projects,
-    '#default_value' => check_plain($selected_project->title),
-    '#process' => array('jiscpm_dependent_select_process'),
-    '#required' => TRUE,
-  );
-  $form['group1'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -21,
-  );
-  
-  $form['group1']['title'] = array(
-    '#type' => 'textfield',
-    '#title' => check_plain($type->title_label),
-    '#required' => TRUE,
-    '#default_value' => check_plain($node->title),
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
-  );
-  
-  if ($type->has_body) {
-    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
-  }
+$form['group2'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -19,
+);
 
-  $form['title_old'] = array(
-    '#type' => 'hidden',
-    '#default_value' => check_plain($node->title_old),
-  );
-  
-  //summary of project objectives
-  $form['group3'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -18,
-  );
-  $form['group3']['summary_objectives'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Summary of project objectives'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group3']['summary_objectives']['summary_of_objectives'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_summary_objectives'],
-    '#process' => array('jiscpm_dependent_select_process'),
-  );
-  //benefits achieved
-  $form['group4'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -17,
-  );
-  $form['group4']['benefits_achieved'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Benefits achieved through project'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group4']['benefits_achieved']['project_benefits'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_benefits_achieved'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group4']['benefits_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group4', 'benefits_achieved', 'format'));
-  //benefits not achieved
-  $form['group5'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -16,
-  );
-  $form['group5']['benefits_not_achieved'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Benefits not achieved through project'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group5']['benefits_not_achieved']['bna'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_benefits_not_achieved'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group5']['benefits_not_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group5', 'benefits_not_achieved', 'format'));
-  //negative benefits factors
-  $form['group6'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -15,
-  );
-  $form['group6']['negative_benefits_factors'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Factors that led to negative benefits'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group6']['negative_benefits_factors']['nbf'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_negative_benefits_factors'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group6']['negative_benefits_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group6', 'negative_benefits_factors', 'format'));
-  //underestimated tasks
-  $form['group7'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -14,
-  );
-  $form['group7']['underestimated_tasks'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Underestimated project tasks'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group7']['underestimated_tasks']['uet'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_underestimated_tasks'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group7']['underestimated_tasks']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group7', 'underestimated_tasks', 'format'));
-  //overestimated tasks
-  $form['group8'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -13,
-  );
-  $form['group8']['overestimated_tasks'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Overestimated project tasks'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group8']['overestimated_tasks']['oet'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_overestimated_tasks'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group8']['overestimated_tasks']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group8', 'overestimated_tasks', 'format'));
-  //negative time factors
-  $form['group9'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -12,
-  );
-  $form['group9']['negative_time_factors'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Factors that led to delays in project'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group9']['negative_time_factors']['ntf'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_negative_time_factors'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group9']['negative_time_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group9', 'negative_time_factors', 'format'));
-  //underestimated costs
-  $form['group10'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group10') : -11,
-  );
-  $form['group10']['underestimated_costs'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Underestimated project costs'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group10']['underestimated_costs']['uec'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_underestimated_costs'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group10']['underestimated_costs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group10', 'underestimated_costs', 'format'));
-  //overestimated costs
-  $form['group11'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group11') : -10,
-  );
-  $form['group11']['overestimated_costs'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Overestimated project costs'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group11']['overestimated_costs']['oepc'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_overestimated_costs'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group11']['overestimated_costs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group11', 'overestimated_costs', 'format'));
-  //negative cost factors
-  $form['group12'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group12') : -9,
-  );
-  $form['group12']['negative_cost_factors'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Incorrect Assumptions and Common Factors Affecting Cost Estimates'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group12']['negative_cost_factors']['ncf'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_negative_cost_factors'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group12']['negative_cost_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group12', 'negative_cost_factors', 'format'));
-  //negative quality factors
-  $form['group13'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group13') : -8,
-  );
-  $form['group13']['negative_quality_factors'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Quality factors in the project that were not met'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group13']['negative_quality_factors']['nqf'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_negative_quality_factors'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group13']['negative_quality_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group13', 'negative_quality_factors', 'format'));
-  //delivered outputs
-  $form['group14'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group14') : -7,
-  );
-  $form['group14']['delivered_outputs'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Delivered project outputs'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group14']['delivered_outputs']['do'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_delivered_outputs'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group14']['delivered_outputs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group14', 'delivered_outputs', 'format'));
-  //unexpected outcomes
-  $form['group15'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group15') : -6,
-  );
-  $form['group15']['unexpected_outcomes'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Unexpected project outcomes'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group15']['unexpected_outcomes']['uo'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_unexpected_outcomes'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group15']['unexpected_outcomes']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group15', 'unexpected_outcomes', 'format'));
-  //outcomes not fit
-  $form['group16'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group15') : -5,
-  );
-  $form['group16']['outputs_not_fit'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Project Outputs Not Fit'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group16']['outputs_not_fit']['onf'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_outputs_not_fit'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group16']['outputs_not_fit']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group16', 'outputs_not_fit', 'format'));
-  //lessons learned
-  $form['group17'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group16') : -4,
-  );
-  $form['group17']['lessons_learned'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Lessons learned in the project'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group17']['lessons_learned']['ll'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_lessons_learned'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group17']['lessons_learned']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group17', 'lessons_learned', 'format'));
-  //recommendations for project
-  $form['group18'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group17') : -3,
-  );
-  $form['group18']['recommendations_for_project'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Project recommendations'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group18']['recommendations_for_project']['rfp'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_recommendations_for_project'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group18']['recommendations_for_project']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group18', 'recommendations_for_project', 'format'));
-  //recommendations for future projects
-  $form['group19'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group19') : -2,
-  );
-  $form['group19']['recommendations_for_future_projects'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Recommendations for future projects'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-  );
-  $form['group19']['recommendations_for_future_projects']['rffp'] = array(
-    '#type' => 'textarea',
-    '#default_value' => $node->pprs[0]['ppr_recommendations_for_future_projects'],
-    '#process' => array('jiscpm_dependent_select_process'),
-	'#weight' => 0,
-  );
-  $form['group19']['recommendations_for_future_projects']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group19', 'recommendations_for_future_projects', 'format'));
+/* print out project options */
+$s_pro = db_rewrite_sql($s_pro);
+$r = db_query($s_pro);
+$projects = array();
+while ($project = db_fetch_object($r)) {
+$projects[$project->nid] = $project->title;
+if (!$node->project_nid) $node->project_nid = $project->nid;
+}
+//load current project if set
+if ($node->project_nid != NULL || $node->project_nid != '' || $node->project_nid != 0) {
+$selected_project = node_load($node->project_nid);
+}
+$form['group2']['project_nid'] = array(
+'#type' => 'select',
+'#title' => t('Project'),
+'#options' => $projects,
+'#default_value' => check_plain($selected_project->title),
+'#process' => array('jiscpm_dependent_select_process'),
+'#required' => TRUE,
+);
+$form['group1'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -21,
+);
 
-  return $form;
+$form['group1']['title'] = array(
+'#type' => 'textfield',
+'#title' => check_plain($type->title_label),
+'#required' => TRUE,
+'#default_value' => check_plain($node->title),
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
+);
+
+if ($type->has_body) {
+$form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+}
+
+$form['title_old'] = array(
+'#type' => 'hidden',
+'#default_value' => check_plain($node->title_old),
+);
+
+//summary of project objectives
+$form['group3'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -18,
+);
+$form['group3']['summary_objectives'] = array(
+'#type' => 'fieldset',
+'#title' => t('Summary of project objectives'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group3']['summary_objectives']['summary_of_objectives'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_summary_objectives'],
+'#process' => array('jiscpm_dependent_select_process'),
+);
+//benefits achieved
+$form['group4'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -17,
+);
+$form['group4']['benefits_achieved'] = array(
+'#type' => 'fieldset',
+'#title' => t('Benefits achieved through project'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group4']['benefits_achieved']['project_benefits'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_benefits_achieved'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group4']['benefits_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group4', 'benefits_achieved', 'format'));
+//benefits not achieved
+$form['group5'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group5') : -16,
+);
+$form['group5']['benefits_not_achieved'] = array(
+'#type' => 'fieldset',
+'#title' => t('Benefits not achieved through project'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group5']['benefits_not_achieved']['bna'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_benefits_not_achieved'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group5']['benefits_not_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group5', 'benefits_not_achieved', 'format'));
+//negative benefits factors
+$form['group6'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group6') : -15,
+);
+$form['group6']['negative_benefits_factors'] = array(
+'#type' => 'fieldset',
+'#title' => t('Factors that led to negative benefits'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group6']['negative_benefits_factors']['nbf'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_negative_benefits_factors'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group6']['negative_benefits_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group6', 'negative_benefits_factors', 'format'));
+//underestimated tasks
+$form['group7'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group7') : -14,
+);
+$form['group7']['underestimated_tasks'] = array(
+'#type' => 'fieldset',
+'#title' => t('Underestimated project tasks'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group7']['underestimated_tasks']['uet'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_underestimated_tasks'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group7']['underestimated_tasks']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group7', 'underestimated_tasks', 'format'));
+//overestimated tasks
+$form['group8'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group8') : -13,
+);
+$form['group8']['overestimated_tasks'] = array(
+'#type' => 'fieldset',
+'#title' => t('Overestimated project tasks'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group8']['overestimated_tasks']['oet'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_overestimated_tasks'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group8']['overestimated_tasks']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group8', 'overestimated_tasks', 'format'));
+//negative time factors
+$form['group9'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group9') : -12,
+);
+$form['group9']['negative_time_factors'] = array(
+'#type' => 'fieldset',
+'#title' => t('Factors that led to delays in project'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group9']['negative_time_factors']['ntf'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_negative_time_factors'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group9']['negative_time_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group9', 'negative_time_factors', 'format'));
+//underestimated costs
+$form['group10'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group10') : -11,
+);
+$form['group10']['underestimated_costs'] = array(
+'#type' => 'fieldset',
+'#title' => t('Underestimated project costs'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group10']['underestimated_costs']['uec'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_underestimated_costs'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group10']['underestimated_costs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group10', 'underestimated_costs', 'format'));
+//overestimated costs
+$form['group11'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group11') : -10,
+);
+$form['group11']['overestimated_costs'] = array(
+'#type' => 'fieldset',
+'#title' => t('Overestimated project costs'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group11']['overestimated_costs']['oepc'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_overestimated_costs'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group11']['overestimated_costs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group11', 'overestimated_costs', 'format'));
+//negative cost factors
+$form['group12'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group12') : -9,
+);
+$form['group12']['negative_cost_factors'] = array(
+'#type' => 'fieldset',
+'#title' => t('Incorrect Assumptions and Common Factors Affecting Cost Estimates'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group12']['negative_cost_factors']['ncf'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_negative_cost_factors'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group12']['negative_cost_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group12', 'negative_cost_factors', 'format'));
+//negative quality factors
+$form['group13'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group13') : -8,
+);
+$form['group13']['negative_quality_factors'] = array(
+'#type' => 'fieldset',
+'#title' => t('Quality factors in the project that were not met'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group13']['negative_quality_factors']['nqf'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_negative_quality_factors'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group13']['negative_quality_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group13', 'negative_quality_factors', 'format'));
+//delivered outputs
+$form['group14'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group14') : -7,
+);
+$form['group14']['delivered_outputs'] = array(
+'#type' => 'fieldset',
+'#title' => t('Delivered project outputs'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group14']['delivered_outputs']['do'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_delivered_outputs'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group14']['delivered_outputs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group14', 'delivered_outputs', 'format'));
+//unexpected outcomes
+$form['group15'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group15') : -6,
+);
+$form['group15']['unexpected_outcomes'] = array(
+'#type' => 'fieldset',
+'#title' => t('Unexpected project outcomes'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group15']['unexpected_outcomes']['uo'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_unexpected_outcomes'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group15']['unexpected_outcomes']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group15', 'unexpected_outcomes', 'format'));
+//outcomes not fit
+$form['group16'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group15') : -5,
+);
+$form['group16']['outputs_not_fit'] = array(
+'#type' => 'fieldset',
+'#title' => t('Project Outputs Not Fit'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group16']['outputs_not_fit']['onf'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_outputs_not_fit'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group16']['outputs_not_fit']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group16', 'outputs_not_fit', 'format'));
+//lessons learned
+$form['group17'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group16') : -4,
+);
+$form['group17']['lessons_learned'] = array(
+'#type' => 'fieldset',
+'#title' => t('Lessons learned in the project'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group17']['lessons_learned']['ll'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_lessons_learned'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group17']['lessons_learned']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group17', 'lessons_learned', 'format'));
+//recommendations for project
+$form['group18'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group17') : -3,
+);
+$form['group18']['recommendations_for_project'] = array(
+'#type' => 'fieldset',
+'#title' => t('Project recommendations'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group18']['recommendations_for_project']['rfp'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_recommendations_for_project'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group18']['recommendations_for_project']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group18', 'recommendations_for_project', 'format'));
+//recommendations for future projects
+$form['group19'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group19') : -2,
+);
+$form['group19']['recommendations_for_future_projects'] = array(
+'#type' => 'fieldset',
+'#title' => t('Recommendations for future projects'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+);
+$form['group19']['recommendations_for_future_projects']['rffp'] = array(
+'#type' => 'textarea',
+'#default_value' => $node->pprs[0]['ppr_recommendations_for_future_projects'],
+'#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
+);
+$form['group19']['recommendations_for_future_projects']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group19', 'recommendations_for_future_projects', 'format'));
+
+return $form;
 }
 
 function jiscpmppr_insert($node) {
-  
-  db_query("INSERT INTO {jiscpmppr}
-    (nid, vid, project_nid, ppr_summary_objectives, ppr_benefits_achieved, ppr_benefits_not_achieved, ppr_negative_benefits_factors, ppr_underestimated_tasks, ppr_overestimated_tasks, ppr_negative_time_factors, 
-    ppr_underestimated_costs, ppr_overestimated_costs, ppr_negative_cost_factors, ppr_negative_quality_factors, ppr_delivered_outputs, ppr_unexpected_outcomes, ppr_outputs_not_fit, ppr_lessons_learned, ppr_recommendations_for_project,
-    ppr_recommendations_for_future_projects)
-    VALUES
-    (%d, %d, %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
-    $node->nid, $node->nid, $node->project_nid, $node->summary_objectives, $node->benefits_achieved, $node->benefits_not_achieved, $node->negative_benefits_factors, $node->underestimated_tasks,
-    $node->overestimated_tasks, $node->negative_time_factors, $node->underestimated_costs, $node->overestimated_costs,  $node->negative_cost_factors, $node->negative_quality_factors, $node->delivered_outputs, $node->unexpected_outcomes, $node->outputs_not_fit,
-    $node->lessons_learned, $node->recommendations_for_project, $node->recommendations_for_future_projects);
+
+db_query("INSERT INTO {jiscpmppr}
+(nid, vid, project_nid, ppr_summary_objectives, ppr_benefits_achieved, ppr_benefits_not_achieved, ppr_negative_benefits_factors, ppr_underestimated_tasks, ppr_overestimated_tasks, ppr_negative_time_factors, 
+ppr_underestimated_costs, ppr_overestimated_costs, ppr_negative_cost_factors, ppr_negative_quality_factors, ppr_delivered_outputs, ppr_unexpected_outcomes, ppr_outputs_not_fit, ppr_lessons_learned, ppr_recommendations_for_project,
+ppr_recommendations_for_future_projects)
+VALUES
+(%d, %d, %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+$node->nid, $node->nid, $node->project_nid, $node->summary_objectives, $node->benefits_achieved, $node->benefits_not_achieved, $node->negative_benefits_factors, $node->underestimated_tasks,
+$node->overestimated_tasks, $node->negative_time_factors, $node->underestimated_costs, $node->overestimated_costs,  $node->negative_cost_factors, $node->negative_quality_factors, $node->delivered_outputs, $node->unexpected_outcomes, $node->outputs_not_fit,
+$node->lessons_learned, $node->recommendations_for_project, $node->recommendations_for_future_projects);
 }
 
 function jiscpmppr_update($node) {
 
-  
-  // if this is a new node or we're adding a new revision,
-  if ($node->revision) {
-    jiscpmppr_insert($node);
-  }
-  else {
-    
-    db_query("UPDATE {jiscpmppr} SET
-      project_nid=%d, ppr_summary_objectives='%s', ppr_benefits_achieved='%s', ppr_benefits_not_achieved='%s', ppr_negative_benefits_factors='%s', ppr_underestimated_tasks='%s', ppr_overestimated_tasks='%s',
-      ppr_negative_time_factors='%s', ppr_underestimated_costs='%s', ppr_overestimated_costs='%s', ppr_negative_cost_factors='%s', ppr_negative_quality_factors='%s', ppr_delivered_outputs='%s', 
-      ppr_unexpected_outcomes='%s', ppr_outputs_not_fit='%s', ppr_lessons_learned='%s', ppr_recommendations_for_project='%s', ppr_recommendations_for_future_projects='%s' WHERE nid = %d",
-      $node->project_nid, $node->summary_objectives, $node->benefits_achieved, $node->benefits_not_achieved, $node->negative_benefits_factors, $node->underestimated_tasks, $node->overestimated_tasks,
-    $node->negative_time_factors, $node->underestimated_costs, $node->overestimated_costs, $node->negative_cost_factors, $node->negative_quality_factors, $node->delivered_outputs, $node->unexpected_outcomes, $node->outputs_not_fit,
-    $node->lessons_learned, $node->recommendations_for_project, $node->recommendations_for_future_projects, $node->nid
-    );
-    
-    /*if ($node->title != $node->title_old) {
-      module_invoke_all('jiscpmppr_change', $node->nid, $node->title);
-    }
-    */
-  }
+
+// if this is a new node or we're adding a new revision,
+if ($node->revision) {
+jiscpmppr_insert($node);
+}
+else {
+
+db_query("UPDATE {jiscpmppr} SET
+project_nid=%d, ppr_summary_objectives='%s', ppr_benefits_achieved='%s', ppr_benefits_not_achieved='%s', ppr_negative_benefits_factors='%s', ppr_underestimated_tasks='%s', ppr_overestimated_tasks='%s',
+ppr_negative_time_factors='%s', ppr_underestimated_costs='%s', ppr_overestimated_costs='%s', ppr_negative_cost_factors='%s', ppr_negative_quality_factors='%s', ppr_delivered_outputs='%s', 
+ppr_unexpected_outcomes='%s', ppr_outputs_not_fit='%s', ppr_lessons_learned='%s', ppr_recommendations_for_project='%s', ppr_recommendations_for_future_projects='%s' WHERE nid = %d",
+$node->project_nid, $node->summary_objectives, $node->benefits_achieved, $node->benefits_not_achieved, $node->negative_benefits_factors, $node->underestimated_tasks, $node->overestimated_tasks,
+$node->negative_time_factors, $node->underestimated_costs, $node->overestimated_costs, $node->negative_cost_factors, $node->negative_quality_factors, $node->delivered_outputs, $node->unexpected_outcomes, $node->outputs_not_fit,
+$node->lessons_learned, $node->recommendations_for_project, $node->recommendations_for_future_projects, $node->nid
+);
+
+/*if ($node->title != $node->title_old) {
+module_invoke_all('jiscpmppr_change', $node->nid, $node->title);
+}
+*/
+}
 }
 
 function jiscpmppr_nodeapi(&$node, $op, $teaser, $page) {
-  switch ($op) {
-    case 'prepare':
+switch ($op) {
+case 'prepare':
 
-      break;
-    case 'delete revision':
-      // Notice that we're matching a single revision based on the node's vid.
-      db_query('DELETE FROM {jiscpmppr} WHERE nid = %d', $node->nid);
-      break;
-  }
+break;
+case 'delete revision':
+// Notice that we're matching a single revision based on the node's vid.
+db_query('DELETE FROM {jiscpmppr} WHERE nid = %d', $node->nid);
+break;
+}
 }
 
 function jiscpmppr_delete($node) {
-  // Notice that we're matching all revision, by using the node's nid.
-  db_query('DELETE FROM {jiscpmppr} WHERE nid = %d', $node->nid);
+// Notice that we're matching all revision, by using the node's nid.
+db_query('DELETE FROM {jiscpmppr} WHERE nid = %d', $node->nid);
 }
 
 function jiscpmppr_load($node) {
-  $result_ppr = db_query('SELECT project_nid, ppr_summary_objectives, ppr_benefits_achieved, ppr_benefits_not_achieved, ppr_negative_benefits_factors, ppr_underestimated_tasks, ppr_overestimated_tasks, ppr_negative_time_factors,
-  ppr_underestimated_costs, ppr_overestimated_costs, ppr_negative_cost_factors, ppr_negative_quality_factors, ppr_delivered_outputs, ppr_unexpected_outcomes, ppr_outputs_not_fit, ppr_lessons_learned, ppr_recommendations_for_project,
-  ppr_recommendations_for_future_projects FROM {jiscpmppr} WHERE nid = %d', $node->nid);
-  $node->pprs = array();
-  while ($row_ppr = db_fetch_object($result_ppr)) {
-    $ppr = array(
-      'project_nid' => check_plain($row_ppr->project_nid),
-      'ppr_summary_objectives' => check_plain($row_ppr->ppr_summary_objectives),
-      'ppr_benefits_achieved' => check_plain($row_ppr->ppr_benefits_achieved),
-      'ppr_benefits_not_achieved' => check_plain($row_ppr->ppr_benefits_not_achieved),
-      'ppr_negative_benefits_factors' => check_plain($row_ppr->ppr_negative_benefits_factors),
-      'ppr_underestimated_tasks' => check_plain($row_ppr->ppr_underestimated_tasks),
-      'ppr_overestimated_tasks' => check_plain($row_ppr->ppr_underestimated_tasks),
-      'ppr_negative_time_factors' => check_plain($row_ppr->ppr_negative_time_factors),
-      'ppr_underestimated_costs' => check_plain($row_ppr->ppr_underestimated_costs),
-      'ppr_overestimated_costs' => check_plain($row_ppr->ppr_overestimated_costs),
-      'ppr_negative_cost_factors' => check_plain($row_ppr->ppr_negative_cost_factors),
-      'ppr_negative_quality_factors' => check_plain($row_ppr->ppr_negative_quality_factors),
-      'ppr_delivered_outputs' => check_plain($row_ppr->ppr_delivered_outputs),
-      'ppr_unexpected_outcomes' => check_plain($row_ppr->ppr_unexpected_outcomes),
-      'ppr_outputs_not_fit' => check_plain($row_ppr->ppr_outputs_not_fit),
-      'ppr_lessons_learned' => check_plain($row_ppr->ppr_lessons_learned),
-      'ppr_recommendations_for_project' => check_plain($row_ppr->ppr_recommendations_for_project),
-      'ppr_recommendations_for_future_projects' => check_plain($row_ppr->ppr_recommendations_for_future_projects),  
-    );
-   
-    $node->pprs[0] = $ppr;
-  }
-  return $node;
+$result_ppr = db_query('SELECT project_nid, ppr_summary_objectives, ppr_benefits_achieved, ppr_benefits_not_achieved, ppr_negative_benefits_factors, ppr_underestimated_tasks, ppr_overestimated_tasks, ppr_negative_time_factors,
+ppr_underestimated_costs, ppr_overestimated_costs, ppr_negative_cost_factors, ppr_negative_quality_factors, ppr_delivered_outputs, ppr_unexpected_outcomes, ppr_outputs_not_fit, ppr_lessons_learned, ppr_recommendations_for_project,
+ppr_recommendations_for_future_projects FROM {jiscpmppr} WHERE nid = %d', $node->nid);
+$node->pprs = array();
+while ($row_ppr = db_fetch_object($result_ppr)) {
+$ppr = array(
+'project_nid' => check_plain($row_ppr->project_nid),
+'ppr_summary_objectives' => check_plain($row_ppr->ppr_summary_objectives),
+'ppr_benefits_achieved' => check_plain($row_ppr->ppr_benefits_achieved),
+'ppr_benefits_not_achieved' => check_plain($row_ppr->ppr_benefits_not_achieved),
+'ppr_negative_benefits_factors' => check_plain($row_ppr->ppr_negative_benefits_factors),
+'ppr_underestimated_tasks' => check_plain($row_ppr->ppr_underestimated_tasks),
+'ppr_overestimated_tasks' => check_plain($row_ppr->ppr_underestimated_tasks),
+'ppr_negative_time_factors' => check_plain($row_ppr->ppr_negative_time_factors),
+'ppr_underestimated_costs' => check_plain($row_ppr->ppr_underestimated_costs),
+'ppr_overestimated_costs' => check_plain($row_ppr->ppr_overestimated_costs),
+'ppr_negative_cost_factors' => check_plain($row_ppr->ppr_negative_cost_factors),
+'ppr_negative_quality_factors' => check_plain($row_ppr->ppr_negative_quality_factors),
+'ppr_delivered_outputs' => check_plain($row_ppr->ppr_delivered_outputs),
+'ppr_unexpected_outcomes' => check_plain($row_ppr->ppr_unexpected_outcomes),
+'ppr_outputs_not_fit' => check_plain($row_ppr->ppr_outputs_not_fit),
+'ppr_lessons_learned' => check_plain($row_ppr->ppr_lessons_learned),
+'ppr_recommendations_for_project' => check_plain($row_ppr->ppr_recommendations_for_project),
+'ppr_recommendations_for_future_projects' => check_plain($row_ppr->ppr_recommendations_for_future_projects),  
+);
+
+$node->pprs[0] = $ppr;
+}
+return $node;
 }
 
 function jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
-  $breadcrumb = array();
-  $breadcrumb[] = l(t('jiscpm/dashboard'), 'jiscpm');
-  $breadcrumb[] = l(t('Post Project Reviews'), 'jiscpm/dashboard/pprs');
-  drupal_set_breadcrumb($breadcrumb);
+$breadcrumb = array();
+$breadcrumb[] = l(t('jiscpm/dashboard'), 'jiscpm');
+$breadcrumb[] = l(t('Post Project Reviews'), 'jiscpm/dashboard/pprs');
+drupal_set_breadcrumb($breadcrumb);
 
-  return theme('jiscpmppr_view', $node, $teaser, $page);
+return theme('jiscpmppr_view', $node, $teaser, $page);
 }
 
 function jiscpmppr_views_api() {
-  return array(
-    'api' => 2,
-    'path' => drupal_get_path('module', 'jiscpmppr'),
-  );
+return array(
+'api' => 2,
+'path' => drupal_get_path('module', 'jiscpmppr'),
+);
 }

@@ -110,9 +110,9 @@ function jiscpmattribute_attributes_bydomain($domain) {
   while ($attribute = db_fetch_object($r)) {
     // The variable is deliberately passed through t() for translatability
     $attributes['values'][$attribute->akey] = t($attribute->avalue);
-    if($attribute->isdefault) $attributes['default'] = $attribute->akey;
+    if ($attribute->isdefault) $attributes['default'] = $attribute->akey;
   }
-  if(is_array($attributes['values']) && !array_key_exists('default', $attributes)) {
+  if (is_array($attributes['values']) && !array_key_exists('default', $attributes)) {
     $v = array_flip($attributes['values']);
     $attributes['default'] = array_shift($v);
   }

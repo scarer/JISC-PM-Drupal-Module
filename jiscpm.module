@@ -6,1284 +6,1218 @@
 
 // HOOKS
 function jiscpm_help($path, $arg) {
-  $output = '';
-
-  switch ($path) {
-    case "admin/help#jiscpm":
-      $output = '<p>'.  t("Provides a complete project management environment for managing projects using the JISC framework.") .'</p>';
-      break;
-  }
-
-  return $output;
+$output = '';
+switch ($path) {
+case "admin/help#jiscpm":
+$output = '<p>'.  t("Provides a complete project management environment for managing projects using the JISC framework.") .'</p>';
+break;
+}
+return $output;
 }
 function jiscpm_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id == 'jiscpm-export-form') {
-    $form['#submit'][] = 'jiscpm_export_form_submit';
-  }
+if ($form_id == 'jiscpm-export-form') {
+$form['#submit'][] = 'jiscpm_export_form_submit';
+}
 }
 /**
  * @function
  * Implementation of hook_perm
  */
 function jiscpm_perm() {
-  return array(
-    'jiscpm: access administration pages',
-    'jiscpm: access data',
-    'jiscpm: export documents',
-  );
+return array(
+'jiscpm: access administration pages',
+'jiscpm: access data',
+'jiscpm: export documents',
+);
 }
 
 /* @function
  * Implementation of hook_menu
  */
 function jiscpm_menu() {
-  $items = array();
-
-
-  $items['admin/settings/jiscpm'] = array(
-    'title' => 'jiscpm',
-    'description' => 'jiscpm Administration Page',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('jiscpm_admin_settings'),
-    'access arguments' => array('jiscpm: access administration pages'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-  
-  $items['admin/settings/jiscpm/jiscpm'] = array(
-    'title' => 'jiscpm',
-    'description' => 'jiscpm Administration Page',
-    'access arguments' => array('jiscpm: access administration pages'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -100,
-  );
-  /* add a view for all jiscpm related activity */
-  $items['jiscpm/dashboard'] = array(
-    'title' => 'JISC PM',
-    'description' => 'JISC PM',
-    'page callback' => 'jiscpm_list',
-    'access arguments' => array('jiscpm: access data'),
-    'type' => MENU_NORMAL_ITEM
-  );
-  /* add a view for exporting jiscpmdocuments */
-  $items['jiscpm_export'] = array(
-    'title' => 'JISC PM Export',
-    'description' => 'JISCPM Export',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('jiscpm_export_form'),
-    'access arguments' => array('jiscpm: access administration pages'),
-  );
-  return $items;
+$items = array();
+$items['admin/settings/jiscpm'] = array(
+'title' => 'jiscpm',
+'description' => 'jiscpm Administration Page',
+'page callback' => 'drupal_get_form',
+'page arguments' => array('jiscpm_admin_settings'),
+'access arguments' => array('jiscpm: access administration pages'),
+'type' => MENU_NORMAL_ITEM);	
+$items['admin/settings/jiscpm/jiscpm'] = array(
+'title' => 'jiscpm',
+'description' => 'jiscpm Administration Page',
+'access arguments' => array('jiscpm: access administration pages'),
+'type' => MENU_DEFAULT_LOCAL_TASK,
+'weight' => -100);
+/* add a view for all jiscpm related activity */
+$items['jiscpm/dashboard'] = array(
+'title' => 'JISC PM',
+'description' => 'JISC PM',
+'page callback' => 'jiscpm_list',
+'access arguments' => array('jiscpm: access data'),
+'type' => MENU_NORMAL_ITEM);
+/* add a view for exporting jiscpmdocuments */
+$items['jiscpm_export'] = array(
+'title' => 'JISC PM Export',
+'description' => 'JISCPM Export',
+'page callback' => 'drupal_get_form',
+'page arguments' => array('jiscpm_export_form'),
+'access arguments' => array('jiscpm: access administration pages'));
+return $items;
 }
 
 function jiscpm_theme() {
-  return array(
-    'jiscpm_form_group' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array('header', 'form'),
-    ),
-    'datetime' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array('element'),
-    ),
-    'dateext' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array('element'),
-    ),
-    'jiscpm_link' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array('source_module', 'destination_module', 'node_nid', 'weight'),
-    ),
-    'jiscpm_list_report' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array('header', 'rows', 'title', 'footer', 'headtitle'),
-    ),
-    'jiscpm_report' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array('header', 'content', 'title', 'footer'),
-    ),
-    'jiscpm_view_item' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array('label', 'value'),
-    ),
-    'jiscpm_dashboard' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array(),
-    ),
-    /*'jiscpm_list' => array(
-      'file'      => 'jiscpm.theme.inc',
-      'arguments' => array(),
-    ),*/
-  );
+return array(
+'jiscpm_form_group' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array('header', 'form'),
+),
+'datetime' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array('element'),
+),
+'dateext' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array('element'),
+),
+'jiscpm_link' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array('source_module', 'destination_module', 'node_nid', 'weight'),
+),
+'jiscpm_list_report' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array('header', 'rows', 'title', 'footer', 'headtitle'),
+),
+'jiscpm_report' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array('header', 'content', 'title', 'footer'),
+),
+'jiscpm_view_item' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array('label', 'value'),
+),
+'jiscpm_dashboard' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array(),
+),
+/*'jiscpm_list' => array(
+'file'      => 'jiscpm.theme.inc',
+'arguments' => array(),
+),*/
+);
 }
 
 
 // FUNCTION TO CREATE jiscpm DASHBOARD
 function jiscpm_dashboard() {
-  drupal_set_title(t('jiscpm Dashboard'));
-  drupal_add_css(drupal_get_path('module', 'jiscpm'). '/jiscpm-dashboard.css');
-  return theme('jiscpm_dashboard');
+drupal_set_title(t('jiscpm Dashboard'));
+drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm-dashboard.css');
+return theme('jiscpm_dashboard');
 }
 
 
 // ADMIN SETTINGS FORM
 function jiscpm_admin_settings() {
-  $form = array();
-  //$w = -10;
-  
-  $form['icons'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Icons'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-    '#weight' => $w++,
-  );
-  
-  $form['icons']['jiscpm_icons_display'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Display jiscpm icons'),
-    '#default_value' => variable_get('jiscpm_icons_display', TRUE),
-    '#description' => t('The icons that ship with jiscpm may not fit well with some themes. If this box is unchecked, icons will be hidden.'),
-    '#weight' => $w++,
-  );
-  
-  $form['icons']['jiscpm_icons_path'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Icons directory'),
-    '#default_value' => variable_get('jiscpm_icons_path', drupal_get_path('module', 'jiscpm') .'/icons'),
-    '#description' => t("The directory that contains jiscpm's icons."),
-    '#weight' => $w++,
-  );
-  
-  /* prefilled values for PID */
-   $form['prefilled'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Prefilled values'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-    '#weight' => $w++,
-  );
-  
-  $form['prefilled']['jiscpm_risk_management_approach'] = array(
-  '#type' => 'textarea',
-  '#title' => t('Risk Management approach'),
-  '#default_value' => variable_get('jiscpm_risk_management_approach', ''),
-  '#description' => t('Default Risk Management Approach description that populates Project Initiation Document template'),
-  '#weight' => $w++,
-);
-  $form['prefilled']['jiscpm_risk_project_control'] = array( 
-  '#type' => 'textarea',
-  '#title' => t('Project Control'),
-  '#default_value' => variable_get('jiscpm_project_control', ''),
-  '#description' => t('Default Project Control description that populates Project Initiation Document template'),
-  '#weight' => $w++,
-);
-  $form['prefilled']['jiscpm_issue_control'] = array(
-  '#type' => 'textarea',
-  '#title' => t('Issue Control'),
-  '#default_value' => variable_get('jiscpm_issue_control', ''),
-  '#description' => t('Default Issue Control description that populates Project Initiation Document template'),
-  '#weight' => $w++,
-);
-  $form['prefilled']['jiscpm_change_control'] = array(
-  '#type' => 'textarea',
-  '#title' => t('Change Control'),
-  '#default_value' => variable_get('jiscpm_change_control', ''),
-  '#description' => t('Default Change Control description that populates Project Initiation Document template'),
-  '#weight' => $w++,
-);
-  $form['prefilled']['jiscpm_information_management'] = array(
-  '#type' => 'textarea',
-  '#title' => t('Information Management'),
-  '#default_value' => variable_get('jiscpm_information_management', ''),
-  '#description' => t('Default Information Management description that populates Project Initiation Document template'),
-  '#weight' => $w++,
-);
-  $form['prefilled']['jiscpm_reporting_project_team'] = array(
-  '#type' => 'textarea',
-  '#title' => t('Reporting within the Project Team'),
-  '#default_value' => variable_get('jiscpm_reporting_project_team', ''),
-  '#description' => t('Default Reporting within the Project Team description that populates Project Initiation Document template'),
-  '#weight' => $w++,
-);
-  $form['prefilled']['jiscpm_management_reporting'] = array(
-  '#type' => 'textarea',
-  '#title' => t('Management Reporting'),
-  '#default_value' => variable_get('jiscpm_management_reporting', ''),
-  '#description' => t('Default Management Reporting description that populates Project Initiation Document template'),
-  '#weight' => $w++,
-);
-  $form['prefilled']['jiscpm_quality_assurance'] = array(
-  '#type' => 'textarea',
-  '#title' => t('Quality Assurance'),
-  '#default_value' => variable_get('jiscpm_quality_assurance', ''),
-  '#description' => t('Default Quality Assurance description that populates Project Initiation Document template'),
-  '#weight' => $w++,
-);
-  $form['prefilled']['jiscpm_approach'] = array(
-  '#type' => 'textarea',
-  '#title' => t('Project Approach'),
-  '#default_value' => variable_get('jiscpm_approach', ''),
-  '#description' => t('Default Project Approach description that populates Project Initiation Document template'),
-  '#weight' => $w++,
+$form = array();
+//$w = -10;
+
+$form['icons'] = array(
+'#type' => 'fieldset',
+'#title' => t('Icons'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+'#weight' => $w++,
 );
 
-  $form['lists'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Lists'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-    '#weight' => $w++,
-  );
-  
-  $form['lists']['jiscpm_default_items_per_page'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Default Items per Page'),
-    '#default_value' => variable_get('jiscpm_default_items_per_page', 10),
-    '#description' => t('Default items per page when viewing lists'),
-    '#size' => 5,
-    '#weight' => $w++
-  );
-  
-  $form['reports'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Reports'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-    '#weight' => $w++,
-  );
-  
-  $form['reports']['jiscpm_report_header'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Report header'),
-    '#default_value' => variable_get('jiscpm_report_header', ''),
-    '#description' => t('The header that will appear on jiscpm reports'),
-    '#weight' => $w++,
-  );
-  
-  $form['yearsrange'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Years range in dates'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
-    '#weight' => $w++,
-  );
-  
-  $form['yearsrange']['group0'] = array(
-    '#type' => 'markup',
-    '#theme' => 'jiscpm_form_group',
-    '#weight' => $w++,
-  );
+$form['icons']['jiscpm_icons_display'] = array(
+'#type' => 'checkbox',
+'#title' => t('Display jiscpm icons'),
+'#default_value' => variable_get('jiscpm_icons_display', TRUE),
+'#description' => t('The icons that ship with jiscpm may not fit well with some themes. If this box is unchecked, icons will be hidden.'),
+'#weight' => $w++,
+);
 
-  $form['yearsrange']['group0']['jiscpm_yearsrangebegin'] = array(
-    '#type' => 'select',
-    '#title' => t('Begin'),
-    '#options' => drupal_map_assoc(range(1970, 2037)),
-    '#default_value' => variable_get('jiscpm_yearsrangebegin', 2001),
-  );
+$form['icons']['jiscpm_icons_path'] = array(
+'#type' => 'textfield',
+'#title' => t('Icons directory'),
+'#default_value' => variable_get('jiscpm_icons_path', drupal_get_path('module', 'jiscpm') .'/icons'),
+'#description' => t("The directory that contains jiscpm's icons."),
+'#weight' => $w++,
+);
 
-  $form['yearsrange']['group0']['jiscpm_yearsrangeend'] = array(
-    '#type' => 'select',
-    '#title' => t('End'),
-    '#options' => drupal_map_assoc(range(1970, 2037)),
-    '#default_value' => variable_get('jiscpm_yearsrangeend', 2012),
-  );
+/* prefilled values for PID */
+$form['prefilled'] = array(
+'#type' => 'fieldset',
+'#title' => t('Prefilled values'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+'#weight' => $w++,
+);
 
+$form['prefilled']['jiscpm_risk_management_approach'] = array(
+'#type' => 'textarea',
+'#title' => t('Risk Management approach'),
+'#default_value' => variable_get('jiscpm_risk_management_approach', ''),
+'#description' => t('Default Risk Management Approach description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
+$form['prefilled']['jiscpm_risk_project_control'] = array( 
+'#type' => 'textarea',
+'#title' => t('Project Control'),
+'#default_value' => variable_get('jiscpm_project_control', ''),
+'#description' => t('Default Project Control description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
+$form['prefilled']['jiscpm_issue_control'] = array(
+'#type' => 'textarea',
+'#title' => t('Issue Control'),
+'#default_value' => variable_get('jiscpm_issue_control', ''),
+'#description' => t('Default Issue Control description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
+$form['prefilled']['jiscpm_change_control'] = array(
+'#type' => 'textarea',
+'#title' => t('Change Control'),
+'#default_value' => variable_get('jiscpm_change_control', ''),
+'#description' => t('Default Change Control description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
+$form['prefilled']['jiscpm_information_management'] = array(
+'#type' => 'textarea',
+'#title' => t('Information Management'),
+'#default_value' => variable_get('jiscpm_information_management', ''),
+'#description' => t('Default Information Management description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
+$form['prefilled']['jiscpm_reporting_project_team'] = array(
+'#type' => 'textarea',
+'#title' => t('Reporting within the Project Team'),
+'#default_value' => variable_get('jiscpm_reporting_project_team', ''),
+'#description' => t('Default Reporting within the Project Team description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
+$form['prefilled']['jiscpm_management_reporting'] = array(
+'#type' => 'textarea',
+'#title' => t('Management Reporting'),
+'#default_value' => variable_get('jiscpm_management_reporting', ''),
+'#description' => t('Default Management Reporting description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
+$form['prefilled']['jiscpm_quality_assurance'] = array(
+'#type' => 'textarea',
+'#title' => t('Quality Assurance'),
+'#default_value' => variable_get('jiscpm_quality_assurance', ''),
+'#description' => t('Default Quality Assurance description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
+$form['prefilled']['jiscpm_approach'] = array(
+'#type' => 'textarea',
+'#title' => t('Project Approach'),
+'#default_value' => variable_get('jiscpm_approach', ''),
+'#description' => t('Default Project Approach description that populates Project Initiation Document template'),
+'#weight' => $w++,
+);
 
-  return system_settings_form($form);
+$form['lists'] = array(
+'#type' => 'fieldset',
+'#title' => t('Lists'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+'#weight' => $w++,
+);
+
+$form['lists']['jiscpm_default_items_per_page'] = array(
+'#type' => 'textfield',
+'#title' => t('Default Items per Page'),
+'#default_value' => variable_get('jiscpm_default_items_per_page', 10),
+'#description' => t('Default items per page when viewing lists'),
+'#size' => 5,
+'#weight' => $w++
+);
+
+$form['reports'] = array(
+'#type' => 'fieldset',
+'#title' => t('Reports'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+'#weight' => $w++,
+);
+
+$form['reports']['jiscpm_report_header'] = array(
+'#type' => 'textarea',
+'#title' => t('Report header'),
+'#default_value' => variable_get('jiscpm_report_header', ''),
+'#description' => t('The header that will appear on jiscpm reports'),
+'#weight' => $w++,
+);
+
+$form['yearsrange'] = array(
+'#type' => 'fieldset',
+'#title' => t('Years range in dates'),
+'#collapsed' => TRUE,
+'#collapsible' => TRUE,
+'#weight' => $w++,
+);
+
+$form['yearsrange']['group0'] = array(
+'#type' => 'markup',
+'#theme' => 'jiscpm_form_group',
+'#weight' => $w++,
+);
+
+$form['yearsrange']['group0']['jiscpm_yearsrangebegin'] = array(
+'#type' => 'select',
+'#title' => t('Begin'),
+'#options' => drupal_map_assoc(range(1970, 2037)),
+'#default_value' => variable_get('jiscpm_yearsrangebegin', 2001),
+);
+
+$form['yearsrange']['group0']['jiscpm_yearsrangeend'] = array(
+'#type' => 'select',
+'#title' => t('End'),
+'#options' => drupal_map_assoc(range(1970, 2037)),
+'#default_value' => variable_get('jiscpm_yearsrangeend', 2012),
+);
+return system_settings_form($form);
 }
 
 
 
 function jiscpm_dependent_select_process($form, $edit, $form_state, $complete_form) {
-  unset($form['#needs_validation']);
-  return $form;
+unset($form['#needs_validation']);
+return $form;
 }
 
 // jiscpm ICON ADD / EDIT / LINK FUNCTIONS
 function jiscpm_icon_add_node($node, $params=array()) {
-  return jiscpm_icon_add('node/add/'. $node->type, $node, $params);
+return jiscpm_icon_add('node/add/'. $node->type, $node, $params);
 }
 
 function jiscpm_icon_edit_node($node, $params=array()) {
-  return jiscpm_icon_edit('node/'. $node->nid .'/edit', $node, $params);
+return jiscpm_icon_edit('node/'. $node->nid .'/edit', $node, $params);
 }
 
 function jiscpm_icon_delete_node($node, $params=array()) {
-  return jiscpm_icon_delete('node/'. $node->nid .'/delete', $node, $params);
+return jiscpm_icon_delete('node/'. $node->nid .'/delete', $node, $params);
 }
 
 function jiscpm_icon_add($path, $item, $params=array()) {
-  global $user;
-  $type = $item->type;
-  $af = $type .'_access';
-  if (!$af('create', $item, $user)) return '';
-  $attributes = array('class' => 'popups-form');
-  return jiscpm_icon_l('application_add', $path, t('Add'), '', $params, $attributes);
+global $user;
+$type = $item->type;
+$af = $type .'_access';
+if (!$af('create', $item, $user)) return '';
+$attributes = array('class' => 'popups-form');
+return jiscpm_icon_l('application_add', $path, t('Add'), '', $params, $attributes);
 }
 
 function jiscpm_icon_edit($path, $item, $params=array()) {
-  global $user;
-  $type = $item->type;
-  $af = $type .'_access';
-  if (!$af('update', $item, $user)) return '';
-  $attributes = array('class' => 'popups-form');
-  return jiscpm_icon_l('application_edit', $path, t('Edit'), '', $params, $attributes);
+global $user;
+$type = $item->type;
+$af = $type .'_access';
+if (!$af('update', $item, $user)) return '';
+$attributes = array('class' => 'popups-form');
+return jiscpm_icon_l('application_edit', $path, t('Edit'), '', $params, $attributes);
 }
 
 function jiscpm_icon_delete($path, $item, $params=array()) {
-  global $user;
-  $type = $item->type;
-  $af = $type .'_access';
-  if (!$af('delete', $item, $user)) return '';
-  $attributes = array('class' => 'popups-form');
-  return jiscpm_icon_l('application_delete', $path, t('Delete'), '', $params, $attributes);
+global $user;
+$type = $item->type;
+$af = $type .'_access';
+if (!$af('delete', $item, $user)) return '';
+$attributes = array('class' => 'popups-form');
+return jiscpm_icon_l('application_delete', $path, t('Delete'), '', $params, $attributes);
 }
 
 function jiscpm_icon_l($icon, $path, $title, $permission='', $params=array(), $attributes=array()) {
-  if ($permission && !user_access($permission)) return '';
-  $icon = jiscpm_icon($icon, $title);
-  $attributes ['title'] = $title;
+if ($permission && !user_access($permission)) return '';
+$icon = jiscpm_icon($icon, $title);
+$attributes ['title'] = $title;
 
-  $query = '';
+$query = '';
 
-  if (array_key_exists('q', $params)) {
-    $destination = $params['q'];
-    unset($params['q']);
-    $c = 0;
-    if (array_key_exists('page', $params)) {
-      $destination .= '?page='. $params['page'];
-      unset($params['page']);
-      $c++;
-    }
-    if (array_key_exists('sort', $params)) {
-      if ($c) {
-        $destination .= '&';
-      }
-      else {
-        $destination .= '?';
-      }
-      $destination .= 'sort='. $params['sort'];
-      unset($params['sort']);
-      $c++;
-    }
-    if (array_key_exists('order', $params)) {
-      if ($c) {
-        $destination .= '&';
-      }
-      else {
-        $destination .= '?';
-      }
-      $destination .= 'order='. $params['order'];
-      unset($params['order']);
-      $c++;
-    }
-    $query .= 'destination='. urlencode($destination);
-  }
+if (array_key_exists('q', $params)) {
+$destination = $params['q'];
+unset($params['q']);
+$c = 0;
+if (array_key_exists('page', $params)) {
+$destination .= '?page='. $params['page'];
+unset($params['page']);
+$c++;
+}
+if (array_key_exists('sort', $params)) {
+if ($c) {
+$destination .= '&';
+}
+else {
+$destination .= '?';
+}
+$destination .= 'sort='. $params['sort'];
+unset($params['sort']);
+$c++;
+}
+if (array_key_exists('order', $params)) {
+if ($c) {
+$destination .= '&';
+}
+else {
+$destination .= '?';
+}
+$destination .= 'order='. $params['order'];
+unset($params['order']);
+$c++;
+}
+$query .= 'destination='. urlencode($destination);
+}
 
-  foreach ($params as $key => $value) {
-    if ($query) $query .= '&';
-    $query .= $key .'='. urlencode($value);
-  }
+foreach ($params as $key => $value) {
+if ($query) $query .= '&';
+$query .= $key .'='. urlencode($value);
+}
 
-  $o = l($icon, $path, array('attributes' => $attributes, 'query' => $query, 'html' => TRUE));
-  return $o;
+$o = l($icon, $path, array('attributes' => $attributes, 'query' => $query, 'html' => TRUE));
+return $o;
 }
 
 function jiscpm_icon($icon, $title) {
-  global $base_path;
-  $icon = str_replace(' ', '_', $icon);
-  if (variable_get('jiscpm_icons_display', TRUE) == TRUE) {
-    $img_src = $base_path . variable_get('jiscpm_icons_path', drupal_get_path('module', 'jiscpm') .'/icons') .'/'. $icon .'.png';
-    $o = '<img src="'. $img_src .'" alt="'. $title .'" title="'. $title .'" />';
-  } else {
-    $o = $title;
-  }
-  return $o;
+global $base_path;
+$icon = str_replace(' ', '_', $icon);
+if (variable_get('jiscpm_icons_display', TRUE) == TRUE) {
+$img_src = $base_path . variable_get('jiscpm_icons_path', drupal_get_path('module', 'jiscpm') .'/icons') .'/'. $icon .'.png';
+$o = '<img src="'. $img_src .'" alt="'. $title .'" title="'. $title .'" />';
+} 
+else {
+$o = $title;
+}
+return $o;
 }
 
 /* jiscpm dashboard */
-function jiscpm_list()
-{
-  $output .= jiscpm_projects() . jiscpm_risks() . jiscpm_rfcs() . jiscpm_issues();
-  print theme('page', $output);
+function jiscpm_list() {
+$output .= jiscpm_projects() . jiscpm_risks() . jiscpm_rfcs() . jiscpm_issues();
+print theme('page', $output);
 }
 
 /* This function returns a list of all projects in a paginated display 
- * TODO: Pagination
- */
-function jiscpm_projects()
-{
-  global $base_url;
-  $header = array(
-      array('data' => t('Project'), 'field' => 'nid'),
-      array('data' => t('Status'), 'field' => 'projectstatus'),
-      array('data' => t('End Date'), 'field' => 'dateend'),
-      array('data' => t('Project Manager'), 'field' => 'project_manager_uid'),
-  );
+* TODO: Pagination
+*/
+function jiscpm_projects() {
+global $base_url;
+$header = array(
+array('data' => t('Project'), 'field' => 'nid'),
+array('data' => t('Status'), 'field' => 'projectstatus'),
+array('data' => t('End Date'), 'field' => 'dateend'),
+array('data' => t('Project Manager'), 'field' => 'project_manager_uid'),
+);
 
-  $sql  = "SELECT n.nid, n.title, jp.projectstatus, jp.dateend, jp.project_manager_uid FROM {node} 
-  n JOIN {jiscpmproject} jp ON n.nid = jp.nid WHERE n.type = 'jiscpmproject'";
-  //$sql .= tablesort_sql($header);
-  $result = pager_query($sql, 50);
-  while ( $records = db_fetch_object($result) )
-  {
-    $owner = user_load($records->project_manager_uid);
-  	$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
-  	$records->projectstatus, date('d-m-Y', $records->dateend),  
-  	'<a href="' . $base_url .'/user/' . $owner->uid . '">' . $owner->name . '</a>');
-  }
-  $pager = theme('pager', NULL, 50, 0);
-  if ( count($rows) && !empty($pager))
-  {
-    $rows[] = array(array('data' => $pager, 'colspan' => '4'));
-  }
-  
-  if ( count($rows) )
-  {
-    $output = theme('table', $header, $rows);
-  }
-  else
-  {
-    drupal_set_message("There are no projects", 'status');
-  }
-  return $output;
+$sql  = db_query(db_rewrite_sql("SELECT n.nid, n.title, jp.projectstatus, jp.dateend, jp.project_manager_uid FROM {node} 
+n JOIN {jiscpmproject} jp ON n.nid = jp.nid WHERE n.type = 'jiscpmproject'"));
+//$sql .= tablesort_sql($header);
+$result = pager_query($sql, 50);
+while ( $records = db_fetch_object($result) ) {
+$owner = user_load($records->project_manager_uid);
+$rows[] = array(
+'<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
+$records->projectstatus, date('d-m-Y', $records->dateend),  
+'<a href="' . $base_url .'/user/' . $owner->uid . '">' . $owner->name . '</a>'
+);
+}
+$pager = theme('pager', NULL, 50, 0);
+if ( count($rows) && !empty($pager)) {
+$rows[] = array(array('data' => $pager, 'colspan' => '4'));
+}
+
+if ( count($rows) ) {
+$output = theme('table', $header, $rows);
+}
+else {
+drupal_set_message("There are no projects", 'status');
+}
+return $output;
 }
 
 /* This function returns a list of all projects in a paginated display */
-function jiscpm_risks()
-{
-  global $base_url;
-  $header = array(
-      array('data' => t('Risk'), 'field' => 'nid'),
-      array('data' => t('Probability'), 'field' => 'risk_probability'),
-      array('data' => t('Impact'), 'field' => 'risk_impact'),
-      array('data' => t('Risk Start'), 'field' => 'risk_start'),
-      array('data' => t('Risk End'), 'field' => 'risk_end'),
-      array('data' => t('Risk Owner'), 'field' => 'risk_owner_uid'),
-      array('data' => t('Project'), 'field' => 'project_nid'),
-  );
+function jiscpm_risks() {
+global $base_url;
+$header = array(
+array('data' => t('Risk'), 'field' => 'nid'),
+array('data' => t('Probability'), 'field' => 'risk_probability'),
+array('data' => t('Impact'), 'field' => 'risk_impact'),
+array('data' => t('Risk Start'), 'field' => 'risk_start'),
+array('data' => t('Risk End'), 'field' => 'risk_end'),
+array('data' => t('Risk Owner'), 'field' => 'risk_owner_uid'),
+array('data' => t('Project'), 'field' => 'project_nid'),
+);
 
-  $sql  = "SELECT n.nid, n.title, jr.project_nid, jr.risk_probability, jr.risk_impact, 
-  jr.risk_start, jr.risk_end, jr.risk_owner_uid, jr.project_nid FROM {node} n JOIN {jiscpmrisk} jr ON n.nid = 
-  jr.nid WHERE n.type = 'jiscpmrisk'";
-  //$sql .= tablesort_sql($header);
-  $result = pager_query($sql, 50);
-  while ( $records = db_fetch_object($result) )
-  {
-    $project = node_load($records->project_nid);
-    $owner = user_load($records->risk_owner_uid);
-  	$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
-  	$records->risk_probability, $records->risk_impact, date('d-m-Y', $records->risk_start), 
-  	date('d-m-Y', $records->risk_end), '<a href="' . $base_url . '/user/' . $owner->uid . '">' . $owner->name . 
-  	'</a>', '<a href="' . $base_url . '/node/' . $project->nid . '">' . $project->title . '</a>');
-  }
-  $pager = theme('pager', NULL, 50, 0);
-  if ( count($rows) && !empty($pager))
-  {
-    $rows[] = array(array('data' => $pager, 'colspan' => '7'));
-  }
-  
-  if ( count($rows) )
-  {
-    $output = theme('table', $header, $rows);
-  }
-  else
-  {
-    drupal_set_message("There are no risks", 'status');
-  }
-  return $output;
+$sql  = "SELECT n.nid, n.title, jr.project_nid, jr.risk_probability, jr.risk_impact, 
+jr.risk_start, jr.risk_end, jr.risk_owner_uid, jr.project_nid FROM {node} n JOIN {jiscpmrisk} jr ON n.nid = 
+jr.nid WHERE n.type = 'jiscpmrisk'";
+//$sql .= tablesort_sql($header);
+$result = pager_query($sql, 50);
+while ( $records = db_fetch_object($result) ) {
+$project = node_load($records->project_nid);
+$owner = user_load($records->risk_owner_uid);
+$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
+$records->risk_probability, $records->risk_impact, date('d-m-Y', $records->risk_start), 
+date('d-m-Y', $records->risk_end), '<a href="' . $base_url . '/user/' . $owner->uid . '">' . $owner->name . 
+'</a>', '<a href="' . $base_url . '/node/' . $project->nid . '">' . $project->title . '</a>');
+}
+$pager = theme('pager', NULL, 50, 0);
+if ( count($rows) && !empty($pager)) {
+$rows[] = array(array('data' => $pager, 'colspan' => '7'));
+}
+
+if ( count($rows) ) {
+$output = theme('table', $header, $rows);
+}
+else {
+drupal_set_message("There are no risks", 'status');
+}
+return $output;
 }
 
 /* This function returns a list of all requests for change */
-function jiscpm_rfcs()
-{
-  global $base_url;
-  $header = array(
-      array('data' => t('RFC'), 'field' => 'nid'),
-      array('data' => t('Rationale'), 'field' => 'rfc_rationale'),
-      array('data' => t('Requestor'), 'field' => 'rfc_requestor_uid'),
-      array('data' => t('Project'), 'field' => 'project_nid'),
-  );
+function jiscpm_rfcs() {
+global $base_url;
+$header = array(
+array('data' => t('RFC'), 'field' => 'nid'),
+array('data' => t('Rationale'), 'field' => 'rfc_rationale'),
+array('data' => t('Requestor'), 'field' => 'rfc_requestor_uid'),
+array('data' => t('Project'), 'field' => 'project_nid'),
+);
 
-  $sql  = "SELECT n.nid, n.title, rfc.project_nid, rfc.rfc_rationale, rfc.rfc_requestor_uid FROM 
-  {node} n JOIN {jiscpmrfc} rfc ON n.nid = rfc.nid WHERE n.type = 'jiscpmrfc'";
-  //$sql .= tablesort_sql($header);
-  $result = pager_query($sql, 50);
-  while ( $records = db_fetch_object($result) )
-  {
-    $project = node_load($records->project_nid);
-    $requestor = user_load($records->rfc_requestor_uid);
-  	$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
-  	$records->rfc_rationale, '<a href="' . $base_url . '/user/' . $requestor->uid . '">' . $requestor->name . 
-  	'</a>', '<a href="' . $base_url .'/node/' . $project->nid . '">' . $project->title . '</a>');
-  }
-  $pager = theme('pager', NULL, 50, 0);
-  if ( count($rows) && !empty($pager))
-  {
-    $rows[] = array(array('data' => $pager, 'colspan' => '4'));
-  }
-  
-  if ( count($rows) )
-  {
-    $output = theme('table', $header, $rows);
-  }
-  else
-  {
-    drupal_set_message("There are no requests for change", 'status');
-  }
-  return $output;
+$sql  = "SELECT n.nid, n.title, rfc.project_nid, rfc.rfc_rationale, rfc.rfc_requestor_uid FROM 
+{node} n JOIN {jiscpmrfc} rfc ON n.nid = rfc.nid WHERE n.type = 'jiscpmrfc'";
+//$sql .= tablesort_sql($header);
+$result = pager_query($sql, 50);
+while ( $records = db_fetch_object($result) ) {
+$project = node_load($records->project_nid);
+$requestor = user_load($records->rfc_requestor_uid);
+$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
+$records->rfc_rationale, '<a href="' . $base_url . '/user/' . $requestor->uid . '">' . $requestor->name . 
+'</a>', '<a href="' . $base_url .'/node/' . $project->nid . '">' . $project->title . '</a>');
+}
+$pager = theme('pager', NULL, 50, 0);
+if ( count($rows) && !empty($pager)) {
+$rows[] = array(array('data' => $pager, 'colspan' => '4'));
+}
+
+if ( count($rows) ) {
+$output = theme('table', $header, $rows);
+}
+else {
+drupal_set_message("There are no requests for change", 'status');
+}
+return $output;
 }
 
 /* This function returns a list of all issues */
-function jiscpm_issues()
-{
-  global $base_url;
-  $header = array(
-      array('data' => t('Issue'), 'field' => 'nid'),
-      array('data' => t('Owner'), 'field' => 'issue_owner_uid'),
-      array('data' => t('Project'), 'field' => 'project_nid'),
-  );
+function jiscpm_issues() {
+global $base_url;
+$header = array(
+array('data' => t('Issue'), 'field' => 'nid'),
+array('data' => t('Owner'), 'field' => 'issue_owner_uid'),
+array('data' => t('Project'), 'field' => 'project_nid'),
+);
 
-  $sql  = "SELECT n.nid, n.title, i.project_nid, i.issue_owner_uid FROM {node} n JOIN {jiscpmissue} 
-  i ON n.nid = i.nid WHERE n.type = 'jiscpmissue' AND i.issue_resolved = 'no'";
-  //$sql .= tablesort_sql($header);
-  $result = pager_query($sql, 50);
-  while ( $records = db_fetch_object($result) )
-  {
-    $project = node_load($records->project_nid);
-    $owner = user_load($records->issue_owner_uid);
-  	$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
-  	'<a href="' . $base_url . '/user/' . $owner->uid . '">' . $owner->name . '</a>', 
-  	'<a href="' . $base_url . '/node/' . $project->nid . '">' . $project->title . '</a>');
-  }
-  $pager = theme('pager', NULL, 50, 0);
-  if ( count($rows) && !empty($pager))
-  {
-    $rows[] = array(array('data' => $pager, 'colspan' => '3'));
-  }
-  
-  if ( count($rows) )
-  {
-    $output = theme('table', $header, $rows);
-  }
-  else
-  {
-    drupal_set_message("There are no issues", 'status');
-  }
-  return $output;
+$sql  = db_query(db_rewrite_sql("SELECT n.nid, n.title, i.project_nid, i.issue_owner_uid FROM {node} n JOIN {jiscpmissue} 
+i ON n.nid = i.nid WHERE n.type = 'jiscpmissue' AND i.issue_resolved = 'no'"));
+//$sql .= tablesort_sql($header);
+$result = pager_query($sql, 50);
+while ( $records = db_fetch_object($result) ) {
+$project = node_load($records->project_nid);
+$owner = user_load($records->issue_owner_uid);
+$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
+'<a href="' . $base_url . '/user/' . $owner->uid . '">' . $owner->name . '</a>', 
+'<a href="' . $base_url . '/node/' . $project->nid . '">' . $project->title . '</a>');
+}
+$pager = theme('pager', NULL, 50, 0);
+if ( count($rows) && !empty($pager)) {
+$rows[] = array(array('data' => $pager, 'colspan' => '3'));
 }
 
-function jiscpm_export_form($form_state)
-{
-   $form = array();
-   $projects = array();
-   $projects[-1] = '--SELECT A PROJECT--';
-   $result = db_query("SELECT n.nid, n.title FROM {node} n WHERE n.type = 'jiscpmproject' ORDER BY n.title ASC");
-   while ($rows = db_fetch_object($result)) {
-  	 $projects[$rows->nid] = check_plain($rows->title);
-   }
-   $form['project']= array(
-   '#prefix' => t('Please use the form below to export data for a project. Once you select a project and click the button labelled "Create Documents" the documents will be 
-	collated and stored in a temporary zip folder that you will be prompted to save to your computer.'),
-   '#type' => 'select',
-   '#title' => t('Project'),
-   '#description' => t('Please select a project'),
-   '#options' => $projects,
-   '#default_value' => isset($form_state['values']['project']) ? $form_state['values']['project'] : array(),
-   '#required' => TRUE,
-   );
-   $form['stakeholders'] = array (
-   '#suffix' => '<div>Select "NO" if you want to omit stakeholders from the document and "YES" if you want to leave them in.</div>',
-   '#type' => 'select',
-   '#title' => t('Do you want to include the stakeholders in the output?'),
-   '#description' => t('Please select YES or NO'),
-   '#options' => array(
-    'YES' => t('YES'),
-    'NO' => t('NO'), 
-    ),
-   '#required' => TRUE,
-   );
-   $form['bca'] = array (
-   '#suffix' => '<div>Select "NO" if you do not need a Business Case document and "YES" if you need one.</div>',
-   '#type' => 'select',
-   '#title' => t('Do you want to include a BCA in the output?'),
-   '#description' => t('Please select YES or NO'),
-   '#options' => array(
-    'YES' => t('YES'),
-    'NO' => t('NO'), 
-    ),
-   '#required' => TRUE,
-   );
-   $form['pid'] = array (
-   '#suffix' => '<div>Select "NO" if you do not need a Project Initiation Document and "YES" if you need one.</div>',
-   '#type' => 'select',
-   '#title' => t('Do you want to include a PID in the output?'),
-   '#description' => t('Please select YES or NO'),
-   '#options' => array(
-    'YES' => t('YES'),
-    'NO' => t('NO'), 
-    ),
-   '#required' => TRUE,
-   );
-   $form['ppr'] = array (
-   '#suffix' => '<div>Select "NO" if you do not need a Post Project Review and "YES" if you need one.</div>',
-   '#type' => 'select',
-   '#title' => t('Do you want to include a PPR in the output?'),
-   '#description' => t('Please select YES or NO'),
-   '#options' => array(
-    'YES' => t('YES'),
-    'NO' => t('NO'), 
-    ),
-   '#required' => TRUE,
-   );
-   $form['sr'] = array (
-   '#suffix' => '<div>Select "NO" if you do not need Status Reports and "YES" if you do.</div>',
-   '#type' => 'select',
-   '#title' => t('Do you want to include Status Reports in the output?'),
-   '#description' => t('Please select YES or NO'),
-   '#options' => array(
-    'YES' => t('YES'),
-    'NO' => t('NO'), 
-    ),
-   '#required' => TRUE,
-   );
-   $form['documents'] = array(
-   '#input' => TRUE,
-   '#value' => t('Create Documents'),
-   '#type' => 'submit',
-   //'#submit' => TRUE,
-   //'#disabled' => TRUE,
-   );
-   return $form;
+if ( count($rows) ) {
+$output = theme('table', $header, $rows);
+}
+else {
+drupal_set_message("There are no issues", 'status');
+}
+return $output;
+}
+
+function jiscpm_export_form($form_state) {
+$form = array();
+$projects = array();
+$projects[-1] = '--SELECT A PROJECT--';
+$result = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE n.type = 'jiscpmproject' ORDER BY n.title ASC"));
+while ($rows = db_fetch_object($result)) {
+$projects[$rows->nid] = check_plain($rows->title);
+}
+$form['project']= array(
+'#prefix' => t('Please use the form below to export data for a project. Once you select a project and click the button labelled "Create Documents" the documents will be 
+collated and stored in a temporary zip folder that you will be prompted to save to your computer.'),
+'#type' => 'select',
+'#title' => t('Project'),
+'#description' => t('Please select a project'),
+'#options' => $projects,
+'#default_value' => isset($form_state['values']['project']) ? $form_state['values']['project'] : array(),
+'#required' => TRUE,
+);
+$form['stakeholders'] = array(
+'#suffix' => '<div>Select "NO" if you want to omit stakeholders from the document and "YES" if you want to leave them in.</div>',
+'#type' => 'select',
+'#title' => t('Do you want to include the stakeholders in the output?'),
+'#description' => t('Please select YES or NO'),
+'#options' => array(
+'YES' => t('YES'),
+'NO' => t('NO'), 
+),
+'#required' => TRUE,
+);
+$form['bca'] = array(
+'#suffix' => '<div>Select "NO" if you do not need a Business Case document and "YES" if you need one.</div>',
+'#type' => 'select',
+'#title' => t('Do you want to include a BCA in the output?'),
+'#description' => t('Please select YES or NO'),
+'#options' => array(
+'YES' => t('YES'),
+'NO' => t('NO'), 
+),
+'#required' => TRUE,
+);
+$form['pid'] = array(
+'#suffix' => '<div>Select "NO" if you do not need a Project Initiation Document and "YES" if you need one.</div>',
+'#type' => 'select',
+'#title' => t('Do you want to include a PID in the output?'),
+'#description' => t('Please select YES or NO'),
+'#options' => array(
+'YES' => t('YES'),
+'NO' => t('NO'), 
+),
+'#required' => TRUE,
+);
+$form['ppr'] = array(
+'#suffix' => '<div>Select "NO" if you do not need a Post Project Review and "YES" if you need one.</div>',
+'#type' => 'select',
+'#title' => t('Do you want to include a PPR in the output?'),
+'#description' => t('Please select YES or NO'),
+'#options' => array(
+'YES' => t('YES'),
+'NO' => t('NO'), 
+),
+'#required' => TRUE,
+);
+$form['sr'] = array(
+'#suffix' => '<div>Select "NO" if you do not need Status Reports and "YES" if you do.</div>',
+'#type' => 'select',
+'#title' => t('Do you want to include Status Reports in the output?'),
+'#description' => t('Please select YES or NO'),
+'#options' => array(
+'YES' => t('YES'),
+'NO' => t('NO'), 
+),
+'#required' => TRUE,
+);
+$form['documents'] = array(
+'#input' => TRUE,
+'#value' => t('Create Documents'),
+'#type' => 'submit',
+//'#submit' => TRUE,
+//'#disabled' => TRUE,
+);
+return $form;
 }
 
 /* Validate export form to see that the project has been selected. If a project has not been selected the form returns an error.*/
-function jiscpm_export_form_validate($form, &$form_state)
-{
-  $id = $form_state['values']['project'];
-  if ($form_state['values']['project'] == '-1')
-  {
-    form_set_error('project', t('Please select a project.'));
-  }
+function jiscpm_export_form_validate($form, &$form_state) {
+$id = $form_state['values']['project'];
+if ($form_state['values']['project'] == '-1') {
+form_set_error('project', t('Please select a project.'));
+}
 }
 
-function jiscpm_export_form_submit($form, &$form_state)
-{ 
-    //include php zipfile class
-    include(drupal_get_path('module', 'jiscpm') . '/' . 'jiscpm_zipfile.php');
-    $zipfile = new zipfile();
-    $zipfile->add_dir("project_docs/");
-    //if stakeholders are omitted
-    if ($form_state['values']['stakeholders'] == 'NO')
-    {
-      //check if the BCA is set to yes or no
-      if ($form_state['values']['bca'] == 'YES')
-      {
-      	jiscpm_generate_bca($zipfile, $form_state['values']['project']);
-      }
-      //check if the PID is set to yes or no
-      if ($form_state['values']['pid'] == 'YES')
-      {
-       jiscpm_generate_pid('NO', $zipfile, $form_state['values']['project']);
-      }
-      //check if the PPR is set to yes or no
-      if ($form_state['values']['ppr'] == 'YES')
-      {
-        jiscpm_generate_ppr($zipfile, $form_state['values']['project']);
-      }
-      //check if the SR is set to yes or no
-      if ($form_state['values']['sr'] == 'YES')
-      {
-        jiscpm_generate_sr($zipfile, $form_state['values']['project']);
-      }
-    }
-    else if ($form_state['values']['stakeholders'] == 'YES')
-    {
-	  //if stakeholders are included
-      //check if the BCA is set to yes or no
-      if ($form_state['values']['bca'] == 'YES')
-      {
-      	jiscpm_generate_bca($zipfile, $form_state['values']['project']);
-      }
-      //check if the PID is set to yes or no
-      if ($form_state['values']['pid'] == 'YES')
-      {
-       jiscpm_generate_pid('YES', $zipfile, $form_state['values']['project']);
-      }
-      //check if the PPR is set to yes or no
-      if ($form_state['values']['ppr'] == 'YES')
-      {
-        jiscpm_generate_ppr($zipfile, $form_state['values']['project']);
-      }
-      //check if the SR is set to yes or no
-      if ($form_state['values']['sr'] == 'YES')
-      {
-        jiscpm_generate_sr($zipfile, $form_state['values']['project']);
-      }
-    }
-  //load project data
-  $project = node_load($form_state['values']['project']);
-  Header("Content-type: application/octet-stream");
-  Header("Content-disposition: attachment; filename=ProjectDocuments.zip");
-  echo $zipfile->file();
-  exit(0);
+function jiscpm_export_form_submit($form, &$form_state) { 
+//include php zipfile class
+include(drupal_get_path('module', 'jiscpm') . '/' . 'jiscpm_zipfile.php');
+$zipfile = new zipfile();
+$zipfile->add_dir("project_docs/");
+//if stakeholders are omitted
+if ($form_state['values']['stakeholders'] == 'NO') {
+//check if the BCA is set to yes or no
+if ($form_state['values']['bca'] == 'YES') {
+jiscpm_generate_bca($zipfile, $form_state['values']['project']);
+}
+//check if the PID is set to yes or no
+if ($form_state['values']['pid'] == 'YES') {
+jiscpm_generate_pid('NO', $zipfile, $form_state['values']['project']);
+}
+//check if the PPR is set to yes or no
+if ($form_state['values']['ppr'] == 'YES') {
+jiscpm_generate_ppr($zipfile, $form_state['values']['project']);
+}
+//check if the SR is set to yes or no
+if ($form_state['values']['sr'] == 'YES') {
+jiscpm_generate_sr($zipfile, $form_state['values']['project']);
+}
+}
+else if ($form_state['values']['stakeholders'] == 'YES') {
+//if stakeholders are included
+//check if the BCA is set to yes or no
+if ($form_state['values']['bca'] == 'YES') {
+jiscpm_generate_bca($zipfile, $form_state['values']['project']);
+}
+//check if the PID is set to yes or no
+if ($form_state['values']['pid'] == 'YES') {
+jiscpm_generate_pid('YES', $zipfile, $form_state['values']['project']);
+}
+//check if the PPR is set to yes or no
+if ($form_state['values']['ppr'] == 'YES') {
+jiscpm_generate_ppr($zipfile, $form_state['values']['project']);
+}
+//check if the SR is set to yes or no
+if ($form_state['values']['sr'] == 'YES') {
+jiscpm_generate_sr($zipfile, $form_state['values']['project']);
+}
+}
+//load project data
+$project = node_load($form_state['values']['project']);
+Header("Content-type: application/octet-stream");
+Header("Content-disposition: attachment; filename=ProjectDocuments.zip");
+echo $zipfile->file();
+exit(0);
 }
 
 /* This function generates the Business Case Assessment */
-function jiscpm_generate_bca($zipfile, $id)
-{
-      //load project data
-      $project = node_load($id);
-      $thisfilename = date('ymd') . '_' . $project->title . '_BCA.doc';
-      //creates a word document
-      //drupal_set_message("id =" . $id);
-      Header("Content-type: application/vnd.ms-doc");
-      Header("Content-Disposition: attachment;$thisfilename");
-      //get data for BCA for project
-      $thisproject = array();
-      $results_bca = db_query("SELECT n.title, bca.bca_strategies, bca.bca_benefits, 
-      bca.bca_implications, bca.bca_alternatives, bca.bca_payback, 
-      bca.bca_staff_changes, bca.bca_hr_related_issues, bca.bca_changes_technology, 
-      bca.bca_process_changes, bca.bca_internal_support, bca.bca_external_support
-      FROM {node} n JOIN {jiscpmbca} bca ON n.nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_bca = db_fetch_object($results_bca)) {
-          $thisproject = array(
-            'title' => $row_bca->title,
-            'bca_strategies' => $row_bca->bca_strategies,
-            'bca_benefits' => $row_bca->bca_benefits,
-            'bca_implications' => $row_bca->bca_implications,
-            'bca_alternatives' => $row_bca->bca_alternatives,
-            'bca_payback' => $row_bca->bca_payback,
-            'bca_staff_changes' => $row_bca->bca_staff_changes,
-            'bca_hr_related_issues' => $row_bca->bca_hr_related_issues,
-            'bca_changes_technology' => $row_bca->bca_changes_technology,
-            'bca_process_changes' => $row_bca->bca_process_changes,
-            'bca_internal_support' => $row_bca->bca_internal_support,
-            'bca_external_support' => $row_bca->bca_external_support
-          );
-      }
-      $results.= "<html>";
-      $results.= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\">";
-      $results.= "<body>";
-      //generate document body
-      $results.= '<p><div align="center"><h1>Business Case Assessment</h1><p>&nbsp;</p><h2>Project name: ' . $project->title . '</h2><p>&nbsp;</p><h3>Date: ' . 
-     date('d-m-Y') . '</h3></div></p><p>&nbsp;</p><p>&nbsp;</p>';
-      $results.= "<p><h1>Introduction</h1></p><p>&nbsp;</p><p>The objectives of the " . $project->title . " include:</p><p>&nbsp;</p>";
-      //print out actions and descriptions for project
-      $results_a = db_query("SELECT a.action_title, a.action_description, a.action_deliverydate 
-      FROM {jiscpmbca_action} a JOIN {jiscpmbca} bca ON a.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_a= db_fetch_object($results_a)) {
-        $results.= "<h2>Action: " . $row_a->action_title . "</h2><h3>Description: </h3><p>" . $row_a->action_description . "<h3>Delivery Date: </h3>" . 
-        date('D d M Y', $row_a->action_deliverydate) . "</p><p>&nbsp;</p>";
-      }
-      //Project strategies
-      $results.= "<p><h1>Strategies</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_strategies'] . "</p><p>&nbsp;</p>";
-      //Project Benefits
-      $results.= "<p><h1>Benefits</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_benefits']  . "</p><p>&nbsp;</p>";
-      //Implications of not undertaking project
-      $results.= "<p><h1>Implications</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_implications'] . "</p><p>&nbsp;</p>";
-      //Alternatives for project
-      $results.= "<p><h1>Alternatives</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_alternatives'] . "</p><p>&nbsp;</p>";
-      //Organisational areas affected by project
-      $results.= "<p><h1>Organisational Areas</h1></p><p>&nbsp;</p>";
-      //Staff Changes
-      $results.= "<p><h2>Staff Changes</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_staff_changes'] . "</p><p>&nbsp;</p>";
-      //HR Related Issues
-      $results.= "<p><h2>HR Related Issues</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_hr_related_issues'] . "</p><p>&nbsp;</p>";
-      //Changes to Technology
-      $results.= "<p><h2>Changes to Technology</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_changes_technology'] . "</p><p>&nbsp;</p>";
-      //Process Changes
-      $results.= "<p><h2>Process Changes</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_process_changes'] . "</p><p>&nbsp;</p>";
-      //Internal Support Implications
-      $results.= "<p><h2>Internal Support Implications</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_internal_support'] . "</p><p>&nbsp;</p>";
-      //External Support Implications
-      $results.= "<p><h2>External Support Implications</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_external_support'] . "</p><p>&nbsp;</p>";
-      //Risks
-      $results .= "<p><h1>Risks</h1></p><p>&nbsp;</p><p><table><th>Risk</th><th>Description</th><th>Probability</th><th>Impact</th><th>Timescale</th><th>Residual Risk</th><th>Early Warning Signs</th><th>Owner</th><th>Category</th><th>Management Approach</th>";
-      $results_risk = db_query("SELECT n.title, r.risk_probability, r.risk_impact, r.risk_start, r.risk_end, r.risk_residual, r.risk_early_warning_signs, r.risk_owner_uid, r.risk_category, r.risk_management_approach FROM {node} n JOIN {jiscpmrisk} r ON n.nid = r.project_nid WHERE n.nid = $id");
-      while ($row_r= db_fetch_object($results_risk)) {
-        $owner = user_load($row_r->risk_owner_uid);
-        $results.= "<tr><td>" . $row_r->title . "</td><td>" . $row_r->body . "</td><td>" . $row_r->risk_probability . "</td><td>" . $row_r->risk_impact . "</td><td>"
-         . $row_r->risk_start . " - " . $row_r->risk_end . "</td><td>" . $row_r->risk_residual . "</td><td>" . $risk->risk_early_warning_signs . "</td><td>"
-         . $owner->name . "</td><td>" . $row_r->risk_category . "</td><td>" . $row_r->risk_management_approach . "</td></tr>";
-      }
-      $results.= "</table></p><p>&nbsp;</p>";
-      //Investment Costs
-      $results.= "<p><h1>Investment Costs</h1></p><p>&nbsp;</p><h2>Investment Costs - Staff</h2><p>&nbsp;</p><p><table><th>Resource</th><th>Quantity</th><th>Hours</th><th>Rate</th><th>Full Cost</th><th>Contingency(30%)</th><th>Full Cost + Contingency</th>";
-      //Investment Costs - Staff
-      $totalstaffcost = 0;
-      $results_s = db_query("SELECT s.staff_cost_title, s.staff_cost_quantity, s.staff_cost_hours, s.staff_cost_rate
-      FROM {jiscpmbca_staff_cost} s JOIN {jiscpmbca} bca ON s.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_s= db_fetch_object($results_s)) {
-        //Calculate full cost
-        $fullcost = $row_s->staff_cost_quantity * ($row_s->staff_cost_hours * $row_s->staff_cost_rate);
-        $contingency = $fullcost / 100 * 30;
-        $fcpluscont = $fullcost + $contingency;
-        $staffmember = user_load($row_s->staff_cost_title);
-        $results.= "<tr><td>" . $staffmember->name . "</td><td>" . $row_s->staff_cost_quantity . "</td><td>" . $row_s->staff_cost_hours . "</td><td>" . $row_s->staff_cost_rate . 
-        "</td><td>" . $fullcost. "</td><td>" . $contingency . "</td><td>" . $fcpluscont . "</td></tr>";
-        $totalstaffcost = $totalstaffcost + $fcpluscont;
-      }
-      $results.="<tr><td>Total</td><td></td><td></td><td></td><td></td><td></td><td>" . $totalstaffcost . "</td></tr></table></p><p>&nbsp;</p>";
-      //Investment Costs - Training
-      $results.= "<p><h2>Investment Costs - Training</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
-      $totaltrainingcost = 0;
-      $results_t = db_query("SELECT t.training_cost_title, t.training_cost_description, t.training_cost_total 
-      FROM {jiscpmbca_training_cost} t JOIN {jiscpmbca} bca ON t.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_t= db_fetch_object($results_t)) {
-        //Calculate full cost
-        $results.= "<tr><td>" . $row_t->training_cost_title . "</td><td>" . $row_t->training_cost_description . "</td><td>" . $row_t->training_cost_total . "</td></tr>";
-        $totaltrainingcost = $totaltrainingcost + $row_t->training_cost_total;
-      }
-      $results.="<tr><td>Total</td><td></td><td>" . $totaltrainingcost . "</td></tr></table></p><p>&nbsp;</p>";
-      //Investment Costs - Equipment
-      $results.= "<p><h2>Investment Costs - Equipment</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
-      $totalequipmentcost = 0;
-      $results_e = db_query("SELECT e.equipment_cost_title, e.equipment_cost_description, e.equipment_cost_total 
-      FROM {jiscpmbca_equipment_cost} e JOIN {jiscpmbca} bca ON e.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_e= db_fetch_object($results_e)) {
-        //Calculate full cost
-        $results.= "<tr><td>" . $row_e->equipment_cost_title . "</td><td>" . $row_e->equipment_cost_description . "</td><td>" . $row_e->equipment_cost_total . "</td></tr>";
-        $totalequipmentcost = $totalequipmentcost + $row_e->equipment_cost_total;
-      }
-      $results.="<tr><td>Total</td><td></td><td>" . $totalequipmentcost . "</td></tr></table></p><p>&nbsp;</p>";
-      //Investment Costs - Other
-      $results.= "<p><h2>Investment Costs - Other</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
-      $totalothercost = 0;
-      $results_o = db_query("SELECT o.other_cost_title, o.other_cost_description, o.other_cost_total 
-      FROM {jiscpmbca_other_cost} o JOIN {jiscpmbca} bca ON o.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_o= db_fetch_object($results_o)) {
-        //Calculate full cost
-        $results.= "<tr><td>" . $row_o->other_cost_title . "</td><td>" . $row_o->other_cost_description . "</td><td>" . $row_o->other_cost_total . "</td></tr>";
-        $totalothercost = $totalothercost + $row_o->other_cost_total;
-      }
-      $results.="<tr><td>Total</td><td></td><td>" . $totalothercost . "</td></tr></table></p><p>&nbsp;</p>";
-      //Running Costs
-      //Running Costs - Training
-      $results.= "<p><h2>Running Costs - Training</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
-      $totaltrcost = 0;
-      $results_tr = db_query("SELECT rct.running_cost_training_title, rct.running_cost_training_description, rct.running_cost_training_total 
-      FROM {jiscpmbca_running_cost_training} rct JOIN {jiscpmbca} bca ON rct.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_tr= db_fetch_object($results_tr)) {
-        //Calculate full cost
-        $results.= "<tr><td>" . $row_tr->running_cost_training_title . "</td><td>" . $row_tr->running_cost_training_description . "</td><td>" . $row_tr->running_cost_training_total . "</td></tr>";
-        $totaltrcost = $totaltrcost + $row_tr->running_cost_training_total;
-      }
-      $results.="<tr><td>Total</td><td></td><td>" . $totaltrcost . "</td></tr></table></p><p>&nbsp;</p>";
-      //Running Costs - Licensing
-      $results.= "<p><h2>Running Costs - Licensing</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
-      $totallcost = 0;
-      $results_l = db_query("SELECT l.running_cost_licensing_title, l.running_cost_licensing_description, l.running_cost_licensing_total 
-      FROM {jiscpmbca_running_cost_licensing} l JOIN {jiscpmbca} bca ON l.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_l = db_fetch_object($results_l)) {
-        //Calculate full cost
-        $results.= "<tr><td>" . $row_l->running_cost_licensing_title . "</td><td>" . $row_l->running_cost_licensing_description . "</td><td>" . $row_l->running_cost_licensing_total . "</td></tr>";
-        $totallcost = $totallcost + $row_l->running_cost_licensing_total;
-      }
-      $results.="<tr><td>Total</td><td></td><td>" . $totallcost . "</td></tr></table></p><p>&nbsp;</p>";
-      //Running Costs - Maintenance
-      $results.= "<p><h2>Running Costs - Maintenance</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
-      $totalmcost = 0;
-      $results_m = db_query("SELECT m.running_cost_maintenance_title, m.running_cost_maintenance_description, m.running_cost_maintenance_total 
-      FROM {jiscpmbca_running_cost_maintenance} m JOIN {jiscpmbca} bca ON m.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_m = db_fetch_object($results_m)) {
-        //Calculate full cost
-        $results.= "<tr><td>" . $row_m->running_cost_maintenance_title . "</td><td>" . $row_m->running_cost_maintenance_description . "</td><td>" . $row_m->running_cost_maintenance_total . "</td></tr>";
-        $totalmcost = $totalmcost + $row_m->running_cost_maintenance_total;
-      }
-      $results.="<tr><td>Total</td><td></td><td>" . $totalmcost . "</td></tr></table></p><p>&nbsp;</p>";
-      //Running Costs - Other
-      $results.= "<p><h2>Running Costs - Other</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
-      $totalrocost = 0;
-      $results_ro = db_query("SELECT ro.running_cost_other_title, ro.running_cost_other_description, ro.running_cost_other_total 
-      FROM {jiscpmbca_running_cost_other} ro JOIN {jiscpmbca} bca ON ro.bca_nid = bca.nid WHERE bca.project_nid = $id");
-      while ($row_ro = db_fetch_object($results_ro)) {
-        //Calculate full cost
-        $results.= "<tr><td>" . $row_ro->running_cost_other_title . "</td><td>" . $row_ro->running_cost_other_description . "</td><td>" . $row_ro->running_cost_other_total . "</td></tr>";
-        $totalrocost = $totalrocost + $row_ro->running_cost_other_total;
-      }
-      $results.="<tr><td>Total</td><td></td><td>" . $totalrocost . "</td></tr></table></p><p>&nbsp;</p>";
-      //Payback for project
-      $results.= "<p><h1>Payback</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_payback'] . "</p><p>&nbsp;</p>";
-      $results.= "</body>";
-      $results.= "</html>";
-      //Phases
-      $zipfile->add_file($results, "project_docs/" . $thisfilename);
-      return $zipfile;
+function jiscpm_generate_bca($zipfile, $id) {
+//load project data
+$project = node_load($id);
+$thisfilename = date('ymd') . '_' . $project->title . '_BCA.doc';
+//creates a word document
+//drupal_set_message("id =" . $id);
+Header("Content-type: application/vnd.ms-doc");
+Header("Content-Disposition: attachment;$thisfilename");
+//get data for BCA for project
+$thisproject = array();
+$results_bca = db_query("SELECT n.title, bca.bca_strategies, bca.bca_benefits, 
+bca.bca_implications, bca.bca_alternatives, bca.bca_payback, 
+bca.bca_staff_changes, bca.bca_hr_related_issues, bca.bca_changes_technology, 
+bca.bca_process_changes, bca.bca_internal_support, bca.bca_external_support
+FROM {node} n JOIN {jiscpmbca} bca ON n.nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_bca = db_fetch_object($results_bca)) {
+$thisproject = array(
+'title' => $row_bca->title,
+'bca_strategies' => $row_bca->bca_strategies,
+'bca_benefits' => $row_bca->bca_benefits,
+'bca_implications' => $row_bca->bca_implications,
+'bca_alternatives' => $row_bca->bca_alternatives,
+'bca_payback' => $row_bca->bca_payback,
+'bca_staff_changes' => $row_bca->bca_staff_changes,
+'bca_hr_related_issues' => $row_bca->bca_hr_related_issues,
+'bca_changes_technology' => $row_bca->bca_changes_technology,
+'bca_process_changes' => $row_bca->bca_process_changes,
+'bca_internal_support' => $row_bca->bca_internal_support,
+'bca_external_support' => $row_bca->bca_external_support
+);
+}
+$results .= "<html>";
+$results .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\">";
+$results .= "<body>";
+//generate document body
+$results .= '<p><div align="center"><h1>Business Case Assessment</h1><p>&nbsp;</p><h2>Project name: ' . $project->title . '</h2><p>&nbsp;</p><h3>Date: ' . 
+date('d-m-Y') . '</h3></div></p><p>&nbsp;</p><p>&nbsp;</p>';
+$results .= "<p><h1>Introduction</h1></p><p>&nbsp;</p><p>The objectives of the " . $project->title . " include:</p><p>&nbsp;</p>";
+//print out actions and descriptions for project
+$results_a = db_query("SELECT a.action_title, a.action_description, a.action_deliverydate 
+FROM {jiscpmbca_action} a JOIN {jiscpmbca} bca ON a.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_a= db_fetch_object($results_a)) {
+$results .= "<h2>Action: " . $row_a->action_title . "</h2><h3>Description: </h3><p>" . $row_a->action_description . "<h3>Delivery Date: </h3>" . 
+date('D d M Y', $row_a->action_deliverydate) . "</p><p>&nbsp;</p>";
+}
+//Project strategies
+$results .= "<p><h1>Strategies</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_strategies'] . "</p><p>&nbsp;</p>";
+//Project Benefits
+$results .= "<p><h1>Benefits</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_benefits']  . "</p><p>&nbsp;</p>";
+//Implications of not undertaking project
+$results .= "<p><h1>Implications</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_implications'] . "</p><p>&nbsp;</p>";
+//Alternatives for project
+$results .= "<p><h1>Alternatives</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_alternatives'] . "</p><p>&nbsp;</p>";
+//Organisational areas affected by project
+$results .= "<p><h1>Organisational Areas</h1></p><p>&nbsp;</p>";
+//Staff Changes
+$results .= "<p><h2>Staff Changes</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_staff_changes'] . "</p><p>&nbsp;</p>";
+//HR Related Issues
+$results .= "<p><h2>HR Related Issues</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_hr_related_issues'] . "</p><p>&nbsp;</p>";
+//Changes to Technology
+$results .= "<p><h2>Changes to Technology</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_changes_technology'] . "</p><p>&nbsp;</p>";
+//Process Changes
+$results .= "<p><h2>Process Changes</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_process_changes'] . "</p><p>&nbsp;</p>";
+//Internal Support Implications
+$results .= "<p><h2>Internal Support Implications</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_internal_support'] . "</p><p>&nbsp;</p>";
+//External Support Implications
+$results .= "<p><h2>External Support Implications</h2></p><p>&nbsp;</p><p>" . $thisproject['bca_external_support'] . "</p><p>&nbsp;</p>";
+//Risks
+$results .= "<p><h1>Risks</h1></p><p>&nbsp;</p><p><table><th>Risk</th><th>Description</th><th>Probability</th><th>Impact</th><th>Timescale</th><th>Residual Risk</th><th>Early Warning Signs</th><th>Owner</th><th>Category</th><th>Management Approach</th>";
+$results_risk = db_query(db_rewrite_sql("SELECT n.title, r.risk_probability, r.risk_impact, r.risk_start, r.risk_end, r.risk_residual, r.risk_early_warning_signs, r.risk_owner_uid, r.risk_category, r.risk_management_approach FROM {node} n JOIN {jiscpmrisk} r ON n.nid = r.project_nid WHERE n.nid = %d", $id));
+while ($row_r= db_fetch_object($results_risk)) {
+$owner = user_load($row_r->risk_owner_uid);
+$results .= "<tr><td>" . $row_r->title . "</td><td>" . $row_r->body . "</td><td>" . $row_r->risk_probability . "</td><td>" . $row_r->risk_impact . "</td><td>"
+. $row_r->risk_start . " - " . $row_r->risk_end . "</td><td>" . $row_r->risk_residual . "</td><td>" . $risk->risk_early_warning_signs . "</td><td>"
+. $owner->name . "</td><td>" . $row_r->risk_category . "</td><td>" . $row_r->risk_management_approach . "</td></tr>";
+}
+$results .= "</table></p><p>&nbsp;</p>";
+//Investment Costs
+$results .= "<p><h1>Investment Costs</h1></p><p>&nbsp;</p><h2>Investment Costs - Staff</h2><p>&nbsp;</p><p><table><th>Resource</th><th>Quantity</th><th>Hours</th><th>Rate</th><th>Full Cost</th><th>Contingency(30%)</th><th>Full Cost + Contingency</th>";
+//Investment Costs - Staff
+$totalstaffcost = 0;
+$results_s = db_query("SELECT s.staff_cost_title, s.staff_cost_quantity, s.staff_cost_hours, s.staff_cost_rate
+FROM {jiscpmbca_staff_cost} s JOIN {jiscpmbca} bca ON s.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_s= db_fetch_object($results_s)) {
+//Calculate full cost
+$fullcost = $row_s->staff_cost_quantity * ($row_s->staff_cost_hours * $row_s->staff_cost_rate);
+$contingency = $fullcost / 100 * 30;
+$fcpluscont = $fullcost + $contingency;
+$staffmember = user_load($row_s->staff_cost_title);
+$results .= "<tr><td>" . $staffmember->name . "</td><td>" . $row_s->staff_cost_quantity . "</td><td>" . $row_s->staff_cost_hours . "</td><td>" . $row_s->staff_cost_rate . 
+"</td><td>" . $fullcost . "</td><td>" . $contingency . "</td><td>" . $fcpluscont . "</td></tr>";
+$totalstaffcost = $totalstaffcost + $fcpluscont;
+}
+$results .="<tr><td>Total</td><td></td><td></td><td></td><td></td><td></td><td>" . $totalstaffcost . "</td></tr></table></p><p>&nbsp;</p>";
+//Investment Costs - Training
+$results .= "<p><h2>Investment Costs - Training</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
+$totaltrainingcost = 0;
+$results_t = db_query("SELECT t.training_cost_title, t.training_cost_description, t.training_cost_total 
+FROM {jiscpmbca_training_cost} t JOIN {jiscpmbca} bca ON t.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_t= db_fetch_object($results_t)) {
+//Calculate full cost
+$results .= "<tr><td>" . $row_t->training_cost_title . "</td><td>" . $row_t->training_cost_description . "</td><td>" . $row_t->training_cost_total . "</td></tr>";
+$totaltrainingcost = $totaltrainingcost + $row_t->training_cost_total;
+}
+$results .="<tr><td>Total</td><td></td><td>" . $totaltrainingcost . "</td></tr></table></p><p>&nbsp;</p>";
+//Investment Costs - Equipment
+$results .= "<p><h2>Investment Costs - Equipment</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
+$totalequipmentcost = 0;
+$results_e = db_query("SELECT e.equipment_cost_title, e.equipment_cost_description, e.equipment_cost_total 
+FROM {jiscpmbca_equipment_cost} e JOIN {jiscpmbca} bca ON e.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_e= db_fetch_object($results_e)) {
+//Calculate full cost
+$results .= "<tr><td>" . $row_e->equipment_cost_title . "</td><td>" . $row_e->equipment_cost_description . "</td><td>" . $row_e->equipment_cost_total . "</td></tr>";
+$totalequipmentcost = $totalequipmentcost + $row_e->equipment_cost_total;
+}
+$results .="<tr><td>Total</td><td></td><td>" . $totalequipmentcost . "</td></tr></table></p><p>&nbsp;</p>";
+//Investment Costs - Other
+$results .= "<p><h2>Investment Costs - Other</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
+$totalothercost = 0;
+$results_o = db_query("SELECT o.other_cost_title, o.other_cost_description, o.other_cost_total 
+FROM {jiscpmbca_other_cost} o JOIN {jiscpmbca} bca ON o.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_o= db_fetch_object($results_o)) {
+//Calculate full cost
+$results .= "<tr><td>" . $row_o->other_cost_title . "</td><td>" . $row_o->other_cost_description . "</td><td>" . $row_o->other_cost_total . "</td></tr>";
+$totalothercost = $totalothercost + $row_o->other_cost_total;
+}
+$results .="<tr><td>Total</td><td></td><td>" . $totalothercost . "</td></tr></table></p><p>&nbsp;</p>";
+//Running Costs
+//Running Costs - Training
+$results .= "<p><h2>Running Costs - Training</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
+$totaltrcost = 0;
+$results_tr = db_query("SELECT rct.running_cost_training_title, rct.running_cost_training_description, rct.running_cost_training_total 
+FROM {jiscpmbca_running_cost_training} rct JOIN {jiscpmbca} bca ON rct.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_tr= db_fetch_object($results_tr)) {
+//Calculate full cost
+$results .= "<tr><td>" . $row_tr->running_cost_training_title . "</td><td>" . $row_tr->running_cost_training_description . "</td><td>" . $row_tr->running_cost_training_total . "</td></tr>";
+$totaltrcost = $totaltrcost + $row_tr->running_cost_training_total;
+}
+$results .="<tr><td>Total</td><td></td><td>" . $totaltrcost . "</td></tr></table></p><p>&nbsp;</p>";
+//Running Costs - Licensing
+$results .= "<p><h2>Running Costs - Licensing</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
+$totallcost = 0;
+$results_l = db_query("SELECT l.running_cost_licensing_title, l.running_cost_licensing_description, l.running_cost_licensing_total 
+FROM {jiscpmbca_running_cost_licensing} l JOIN {jiscpmbca} bca ON l.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_l = db_fetch_object($results_l)) {
+//Calculate full cost
+$results .= "<tr><td>" . $row_l->running_cost_licensing_title . "</td><td>" . $row_l->running_cost_licensing_description . "</td><td>" . $row_l->running_cost_licensing_total . "</td></tr>";
+$totallcost = $totallcost + $row_l->running_cost_licensing_total;
+}
+$results .="<tr><td>Total</td><td></td><td>" . $totallcost . "</td></tr></table></p><p>&nbsp;</p>";
+//Running Costs - Maintenance
+$results .= "<p><h2>Running Costs - Maintenance</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
+$totalmcost = 0;
+$results_m = db_query("SELECT m.running_cost_maintenance_title, m.running_cost_maintenance_description, m.running_cost_maintenance_total 
+FROM {jiscpmbca_running_cost_maintenance} m JOIN {jiscpmbca} bca ON m.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_m = db_fetch_object($results_m)) {
+//Calculate full cost
+$results .= "<tr><td>" . $row_m->running_cost_maintenance_title . "</td><td>" . $row_m->running_cost_maintenance_description . "</td><td>" . $row_m->running_cost_maintenance_total . "</td></tr>";
+$totalmcost = $totalmcost + $row_m->running_cost_maintenance_total;
+}
+$results .="<tr><td>Total</td><td></td><td>" . $totalmcost . "</td></tr></table></p><p>&nbsp;</p>";
+//Running Costs - Other
+$results .= "<p><h2>Running Costs - Other</h2></p><p>&nbsp;</p><p><table><th>Title</th><th>Description</th><th>Total</th>";
+$totalrocost = 0;
+$results_ro = db_query("SELECT ro.running_cost_other_title, ro.running_cost_other_description, ro.running_cost_other_total 
+FROM {jiscpmbca_running_cost_other} ro JOIN {jiscpmbca} bca ON ro.bca_nid = bca.nid WHERE bca.project_nid = $id");
+while ($row_ro = db_fetch_object($results_ro)) {
+//Calculate full cost
+$results .= "<tr><td>" . $row_ro->running_cost_other_title . "</td><td>" . $row_ro->running_cost_other_description . "</td><td>" . $row_ro->running_cost_other_total . "</td></tr>";
+$totalrocost = $totalrocost + $row_ro->running_cost_other_total;
+}
+$results .="<tr><td>Total</td><td></td><td>" . $totalrocost . "</td></tr></table></p><p>&nbsp;</p>";
+//Payback for project
+$results .= "<p><h1>Payback</h1></p><p>&nbsp;</p><p>" . $thisproject['bca_payback'] . "</p><p>&nbsp;</p>";
+$results .= "</body>";
+$results .= "</html>";
+//Phases
+$zipfile->add_file($results, "project_docs/" . $thisfilename);
+return $zipfile;
 }
 
 /* This function generates the Project Iniation Document */
-function jiscpm_generate_pid($stakeholders, $zipfile, $id)
-{
-    //load project data
-    $project = node_load($id);
-    $pidfile = date('ymd') . '_' . $project->title .  '_PID.doc';
-  	//creates a word document
-	header("Content-Type: application/vnd.ms-doc");
-	header("Expires: 0");
-	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	header("content-disposition: attachment;filename=$pidfile");
-	$results.= "<html>";
-	$results.= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\">";
-	$results.= "<body>";
-     //Insert document content
-     $results .= '<p><div align="center"><h1>Project Initiation Document</h1><p>&nbsp;</p><h2>Project name: ' . $project->title . '</h2><p>&nbsp;</p><h3>Date: ' . 
-     date('d-m-Y') . '</h3></div></p><p>&nbsp;</p><p>&nbsp;</p>';
-     //Introduction
-     $results .= '<p><h1>Introduction</h1></p><p>&nbsp;</p>';
-     $results_i = db_query("SELECT nr.body FROM {node_revisions} nr WHERE nr.nid = $id");
-     while($row_i = db_fetch_object($results_i))
-     {
-     	$results.= '<p>' . $row_i->body . '</p><p>&nbsp;</p>';
-     }
-     //Project Objectives
-     $results .= '<p><h1>Project Objectives</h1></p><p>&nbsp;</p>';
-     //Goals and Objectives
-     $results .= '<p><h2>Goals and Objectives</h2></p><p>&nbsp;</p>';
-     $results .= '<p><table><th>Goals</th><th>Objectives</th>';
-     $results_g = db_query("SELECT g.goal_title, g.goal_objectives FROM {jiscpmproject_goal} g WHERE g.project_nid = $id");
-     while ($row_g = db_fetch_object($results_g))
-     {
-     	$results .= '<tr><td>' . $row_g->goal_title . '</td><td>' . $row_g->goal_objectives . '</td></tr>';
-     }
-     $results .= '</table></p><p>&nbsp;</p>';
-     //Critical Success Factors
-     $results .= '<p><h2>Critical Success Factors</h2></p><p>&nbsp;</p>';
-     $results .= '<p><table><th>Factor</th><th>Description</th>';
-     $results_c = db_query("SELECT c.factor_title, c.factor_description FROM {jiscpmproject_factor} c WHERE c.project_nid = $id");
-     while ($row_c = db_fetch_object($results_c))
-     {
-     	$results .= '<tr><td>' . $row_c->factor_title . '</td><td>' . $row_c->factor_description . '</td></tr>';
-     }
-     $results .= '</table></p><p>&nbsp;</p>';
-     //Scope
-     $results .= '<p><h1>Scope</h1></p><p>&nbsp;</p>';
-     //Organisational Scope
-     $results .= '<p><h2>Organisational Scope</h2></p><p>&nbsp;</p>';
-     $results_org = db_query("SELECT j.organisational_scope FROM {jiscpmproject} j WHERE j.vid = $id");
-     while ($row_org = db_fetch_object($results_org))
-     {
-     	$results .= '<p>' . $row_org->organisational_scope . '</p><p>&nbsp;</p>';
-     }
-     //Logical Scope
-     $results .= '<p><h2>Logical Scope</h2></p><p>&nbsp;</p>';
-     $results_log = db_query("SELECT j.logical_scope FROM {jiscpmproject} j WHERE j.vid = $id");
-     while ($row_log = db_fetch_object($results_log))
-     {
-     	$results .= '<p>' . $row_log->logical_scope . '</p><p>&nbsp;</p>';
-     }
-     //Temporal Scope / Phasing
-     $results .= '<p><h2>Temporal Scope/Phasing</h2></p><p>&nbsp;</p>';
-     $results .= '<p><table><th>Phase</th><th>Scope</th><th>Begin</th><th>End</th>';
-     $results_p = db_query("SELECT p.phase_title, p.phase_scope, p.phase_datebegin, p.phase_dateend FROM {jiscpmproject_phase} p WHERE p.project_nid = $id");
-     while ($row_p = db_fetch_object($results_p))
-     {
-     	$results .= '<tr><td>' . $row_p->phase_title . '</td><td>' . $row_p->phase_scope . '</td><td>' . date('D d M Y', $row_p->phase_datebegin) . '</td><td>' . date('D d M Y', $row_p->phase_dateend) . '</td></tr>';
-     }
-     $results .= '</table></p><p>&nbsp;</p>';
-     //Related Projects
-     $results .= '<p><h2>Related Projects</h2></p><p>&nbsp;</p>';
-     $results .= '<p><table><th>Project</th><th>Description</th>';
-     $results_rel = db_query("SELECT rel.relationship_nid, rel.relationship_description FROM {jiscpmproject_relationship} rel WHERE rel.project_nid = $id");
-     while ($row_rel = db_fetch_object($results_rel))
-     {
-        //load project
-        $nodeproject = node_load($row_rel->relationship_nid);
-     	$results .= '<tr><td>' . $nodeproject->title . '</td><td>' . $row_rel->relationship_description . '</td></tr>';
-     }
-     $results .= '</table></p><p>&nbsp;</p>';
-     //Out of Scope
-     $results .= '<p><h2>Out of Scope</h2></p><p>&nbsp;</p>';
-     $results_out = db_query("SELECT o.out_of_scope FROM {jiscpmproject} o WHERE o.vid = $id");
-     while ($row_out = db_fetch_object($results_out))
-     {
-     	$results .= '<p>' . $row_out->out_of_scope . '</p><p>&nbsp;</p>';
-     }
-     //Risks, Constraints and Assumptions
-     $results .= '<p><h1>Risks, Constraints and Assumptions</h1></p><p>&nbsp;</p>';
-     //Risk Management Approach
-     $results .= '<p><h2>Risk Management Approach</h2></p><p>&nbsp;</p>';
-     //Risks
-     $results .= '<p><h2>Risks</h2></p><p>&nbsp;</p>';
-     $results .= '<p><table><th>Risk</th><th>Probability</th><th>Impact</th><th>Timescale</th><th>Residual</th><th>Early Warning Signs</th><th>Owner</th>';
-     $results_risk = db_query("SELECT r.vid, r.risk_probability, r.risk_impact, r.risk_start, r.risk_end, r.risk_residual, r.risk_early_warning_signs, r.risk_owner_uid FROM {jiscpmrisk} r WHERE r.project_nid = $id");
-     while ($row_risk = db_fetch_object($results_risk))
-     {
-        //load project
-        $noderisk = node_load($row_risk->vid);
-        //load user
-        $owner = user_load($row_risk->risk_owner_uid);
-     	$results .= '<tr><td>' . $noderisk->title . '</td><td>' . $row_risk->risk_probability . 
-     	'</td><td>' . $row_risk->risk_impact . '</td><td>' . date('d-m-Y', $row_risk->risk_start) . 
-     	' - ' . date('d-m-Y', $row_risk->risk_end) . '</td><td>' . $row_risk->risk_residual . '</td><td>' . $row_risk->risk_early_warning_signs . '</td><td>' . $owner->name . '</td></tr>';
-     }
-     $results .= '</table></p><p>&nbsp;</p>';
-     //Constraints
-     $results .= '<p><h2>Constraints</h2></p><p>&nbsp;</p>';
-     $results .= '<p><table><th>Constraint</th><th>Description</th>';
-     $results_con = db_query("SELECT con.constraint_title, con.constraint_description FROM {jiscpmproject_constraint} con WHERE con.project_nid = $id");
-     while ($row_con = db_fetch_object($results_con))
-     {
-     	$results .= '<tr><td>' . $row_con->constraint_title . '</td><td>' . $row_con->constraint_description . '</td></tr>';
-     }
-     $results .= '</table></p><p>&nbsp;</p>';
-     //Assumptions
-     $results .= '<p><h2>Assumptions</h2></p><p>&nbsp;</p>';
-     $results .= '<p><table><th>Assumption</th><th>Description</th>';
-     $results_ass = db_query("SELECT ass.assumption_title, ass.assumption_description FROM {jiscpmproject_assumption} ass WHERE ass.project_nid = $id");
-     while ($row_ass = db_fetch_object($results_ass))
-     {
-     	$results .= '<tr><td>' . $row_ass->assumption_title . '</td><td>' . $row_ass->assumption_description . '</td></tr>';
-     }
-     $results .= '</table></p><p>&nbsp;</p>';
-     //Project Organisation
-     $results .= '<p><h1>Project Organisation</h1></p><p>&nbsp;</p>';
-     //Project Structure
-     $results .= '<p><h2>Project Structure</h2></p><p>&nbsp;</p>';
-     //Roles and Responsibilities
-     $results .= '<p><h2>Roles and Responsibilities</h2></p><p>&nbsp;</p>';
-     //Project Board
-     $results .= '<p><h3>Project Board</h3></p><p>&nbsp;</p>';
-     //Project Team
-     $results .= '<p><h3>Project Team</h3></p><p>&nbsp;</p>';
-     $results_team = db_query("SELECT t.vid FROM {jiscpmteam} t WHERE t.project_nid = $id");
-     $teams = array();
-     while($row_team = db_fetch_object($results_team))
-     {
-     	$teams[] = $row_team->vid;
-     }
-     //if $teams is set
-     if ($teams[0] != NULL)
-     {
-		 //for each team get the team members
-		 for ($i = 0; $i < count($teams); $i ++)
-		 {
-			$current = $teams[$i];
-			$teamnode = node_load($current);
-			$results .= '<p><h3>' . $teamnode->title . '</h3></p><p>&nbsp;</p><table><th>Member</th><th>Description</th>';
-			$results_members = db_query("SELECT jtm.member_uid, jtm.member_description FROM {jiscpmteam_members} jtm WHERE jtm.team_nid = $current");
-			while ($row_members = db_fetch_object($results_members))
-			{
-					//load user
-					$member = user_load($row_members->member_uid);
-				$results.= '<tr><td>' . $member->name . '</td><td>' . $row_members->member_description . '</td></tr>';
-			}
-			$results.='</table><p>&nbsp;</p>';
-		 }
-     }
-     //Project Control
-     $results .= '<p><h1>Project Control</h1></p><p>&nbsp;</p><p>' . variable_get('jiscpm_project_control', '') . '</p><p>&nbsp;</p>';
-     //Issue Control
-     $results .= '<p><h2>Issue Control</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_issue_control', '') . '</p><p>&nbsp;</p>';
-     //Change Control
-     $results .= '<p><h2>Change Control</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_change_control', '') . '</p><p>&nbsp;</p>';
-     //Quality Assurance
-     $results .= '<p><h2>Quality Assurance</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_quality_assurance', '') . '</p><p>&nbsp;</p>';
-     //Financial Control
-     $results .= '<p><h2>Financial Control</h2></p><p>&nbsp;</p>';
-     //Information Management
-     $results .= '<p><h2>Information Management</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_information_management', '') . '</p><p>&nbsp;</p>';
-     //Reporting
-     $results .= '<p><h1>Reporting</h1></p><p>&nbsp;</p>';
-     //Reporting Within the Project Team
-     $results .= '<p><h2>Reporting Within the Project Team</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_reporting_project_team', '') . '</p><p>&nbsp;</p>';
-     //Management Reporting
-     $results .= '<p><h2>Management Reporting</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_management_reporting', '') . '</p><p>&nbsp;</p>';
-     if ($stakeholders == 'YES')
-     {
-        //insert stakeholders
-        $results .= '<p><h1>Stakeholders</h1></p><p>&nbsp;</p>';
-        //Identification and Analysis
-        $results .= '<p><h2>Identification and Analysis</h2></p><p>&nbsp;</p>';
-        //Communication
-        $results .= '<p><h2>Communication</h2></p><p>&nbsp;</p>';
-     }
-     //Planning
-     $results .= '<p><h1>Planning</h1></p><p>&nbsp;</p>';
-     //Approach
-     $results .= '<p><h2>Approach</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_approach', '') . '</p><p>&nbsp;</p>';
-     //Milestone Plan
-     $results .= '<p><h2>Milestone Plan</h2></p><p>&nbsp;</p>';
-     $results .= '<p><table><th>Milestone</th><th>Delivery Date</th>';
-     //Project Milestones
-     $result_mile = db_query("SELECT m.milestone_title, m.milestone_deliverydate FROM {jiscpmproject_milestone} m WHERE m.project_nid = $id");
-     while($row_mile = db_fetch_object($result_mile))
-     {
-         $results.= '<tr><td>' . $row_mile->milestone_title . '</td><td>' . date('d D M Y', $row_mile->milestone_deliverydate) . '</td></tr>';
-     }
-     $results.='</table><p>&nbsp;</p>';
-     
-	 $results.= "</body>";
-	 $results.= "</html>";
-     $zipfile->add_file($results, "project_docs/" . $pidfile);
-  return $zipfile;
+function jiscpm_generate_pid($stakeholders, $zipfile, $id) {
+//load project data
+$project = node_load($id);
+$pidfile = date('ymd') . '_' . $project->title .  '_PID.doc';
+//creates a word document
+header("Content-Type: application/vnd.ms-doc");
+header("Expires: 0");
+header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+header("content-disposition: attachment;filename=$pidfile");
+$results .= "<html>";
+$results .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\">";
+$results .= "<body>";
+//Insert document content
+$results .= '<p><div align="center"><h1>Project Initiation Document</h1><p>&nbsp;</p><h2>Project name: ' . $project->title . '</h2><p>&nbsp;</p><h3>Date: ' . 
+date('d-m-Y') . '</h3></div></p><p>&nbsp;</p><p>&nbsp;</p>';
+//Introduction
+$results .= '<p><h1>Introduction</h1></p><p>&nbsp;</p>';
+$results_i = db_query(db_rewrite_sql("SELECT nr.body FROM {node_revisions} nr WHERE nr.nid = %d", $id));
+while($row_i = db_fetch_object($results_i)) {
+$results .= '<p>' . $row_i->body . '</p><p>&nbsp;</p>';
+}
+//Project Objectives
+$results .= '<p><h1>Project Objectives</h1></p><p>&nbsp;</p>';
+//Goals and Objectives
+$results .= '<p><h2>Goals and Objectives</h2></p><p>&nbsp;</p>';
+$results .= '<p><table><th>Goals</th><th>Objectives</th>';
+$results_g = db_query(db_rewrite_sql("SELECT g.goal_title, g.goal_objectives FROM {jiscpmproject_goal} g WHERE g.project_nid = %d", $id));
+while ($row_g = db_fetch_object($results_g)) {
+$results .= '<tr><td>' . $row_g->goal_title . '</td><td>' . $row_g->goal_objectives . '</td></tr>';
+}
+$results .= '</table></p><p>&nbsp;</p>';
+//Critical Success Factors
+$results .= '<p><h2>Critical Success Factors</h2></p><p>&nbsp;</p>';
+$results .= '<p><table><th>Factor</th><th>Description</th>';
+$results_c = db_query(db_rewrite_sql("SELECT c.factor_title, c.factor_description FROM {jiscpmproject_factor} c WHERE c.project_nid = %d", $id));
+while ($row_c = db_fetch_object($results_c)) {
+$results .= '<tr><td>' . $row_c->factor_title . '</td><td>' . $row_c->factor_description . '</td></tr>';
+}
+$results .= '</table></p><p>&nbsp;</p>';
+//Scope
+$results .= '<p><h1>Scope</h1></p><p>&nbsp;</p>';
+//Organisational Scope
+$results .= '<p><h2>Organisational Scope</h2></p><p>&nbsp;</p>';
+$results_org = db_query(db_rewrite_sql("SELECT j.organisational_scope FROM {jiscpmproject} j WHERE j.vid = %d", $id));
+while ($row_org = db_fetch_object($results_org)) {
+$results .= '<p>' . $row_org->organisational_scope . '</p><p>&nbsp;</p>';
+}
+//Logical Scope
+$results .= '<p><h2>Logical Scope</h2></p><p>&nbsp;</p>';
+$results_log = db_query(db_rewrite_sql("SELECT j.logical_scope FROM {jiscpmproject} j WHERE j.vid = %d", $id));
+while ($row_log = db_fetch_object($results_log)) {
+$results .= '<p>' . $row_log->logical_scope . '</p><p>&nbsp;</p>';
+}
+//Temporal Scope / Phasing
+$results .= '<p><h2>Temporal Scope/Phasing</h2></p><p>&nbsp;</p>';
+$results .= '<p><table><th>Phase</th><th>Scope</th><th>Begin</th><th>End</th>';
+$results_p = db_query(db_rewrite_sql("SELECT p.phase_title, p.phase_scope, p.phase_datebegin, p.phase_dateend FROM {jiscpmproject_phase} p WHERE p.project_nid = %d", $id));
+while ($row_p = db_fetch_object($results_p)) {
+$results .= '<tr><td>' . $row_p->phase_title . '</td><td>' . $row_p->phase_scope . '</td><td>' . date('D d M Y', $row_p->phase_datebegin) . '</td><td>' . date('D d M Y', $row_p->phase_dateend) . '</td></tr>';
+}
+$results .= '</table></p><p>&nbsp;</p>';
+//Related Projects
+$results .= '<p><h2>Related Projects</h2></p><p>&nbsp;</p>';
+$results .= '<p><table><th>Project</th><th>Description</th>';
+$results_rel = db_query(db_rewrite_sql("SELECT rel.relationship_nid, rel.relationship_description FROM {jiscpmproject_relationship} rel WHERE rel.project_nid = %d", $id));
+while ($row_rel = db_fetch_object($results_rel)) {
+//load project
+$nodeproject = node_load($row_rel->relationship_nid);
+$results .= '<tr><td>' . $nodeproject->title . '</td><td>' . $row_rel->relationship_description . '</td></tr>';
+}
+$results .= '</table></p><p>&nbsp;</p>';
+//Out of Scope
+$results .= '<p><h2>Out of Scope</h2></p><p>&nbsp;</p>';
+$results_out = db_query(db_rewrite_sql("SELECT o.out_of_scope FROM {jiscpmproject} o WHERE o.vid = %d", $id));
+while ($row_out = db_fetch_object($results_out)) {
+$results .= '<p>' . $row_out->out_of_scope . '</p><p>&nbsp;</p>';
+}
+//Risks, Constraints and Assumptions
+$results .= '<p><h1>Risks, Constraints and Assumptions</h1></p><p>&nbsp;</p>';
+//Risk Management Approach
+$results .= '<p><h2>Risk Management Approach</h2></p><p>&nbsp;</p>';
+//Risks
+$results .= '<p><h2>Risks</h2></p><p>&nbsp;</p>';
+$results .= '<p><table><th>Risk</th><th>Probability</th><th>Impact</th><th>Timescale</th><th>Residual</th><th>Early Warning Signs</th><th>Owner</th>';
+$results_risk = db_query(db_rewrite_sql("SELECT r.vid, r.risk_probability, r.risk_impact, r.risk_start, r.risk_end, r.risk_residual, r.risk_early_warning_signs, r.risk_owner_uid FROM {jiscpmrisk} r WHERE r.project_nid = %d", $id));
+while ($row_risk = db_fetch_object($results_risk)) {
+//load project
+$noderisk = node_load($row_risk->vid);
+//load user
+$owner = user_load($row_risk->risk_owner_uid);
+$results .= '<tr><td>' . $noderisk->title . '</td><td>' . $row_risk->risk_probability . 
+'</td><td>' . $row_risk->risk_impact . '</td><td>' . date('d-m-Y', $row_risk->risk_start) . 
+' - ' . date('d-m-Y', $row_risk->risk_end) . '</td><td>' . $row_risk->risk_residual . '</td><td>' . $row_risk->risk_early_warning_signs . '</td><td>' . $owner->name . '</td></tr>';
+}
+$results .= '</table></p><p>&nbsp;</p>';
+//Constraints
+$results .= '<p><h2>Constraints</h2></p><p>&nbsp;</p>';
+$results .= '<p><table><th>Constraint</th><th>Description</th>';
+$results_con = db_query("SELECT con.constraint_title, con.constraint_description FROM {jiscpmproject_constraint} con WHERE con.project_nid = %d", $id);
+while ($row_con = db_fetch_object($results_con)) {
+$results .= '<tr><td>' . $row_con->constraint_title . '</td><td>' . $row_con->constraint_description . '</td></tr>';
+}
+$results .= '</table></p><p>&nbsp;</p>';
+//Assumptions
+$results .= '<p><h2>Assumptions</h2></p><p>&nbsp;</p>';
+$results .= '<p><table><th>Assumption</th><th>Description</th>';
+$results_ass = db_query("SELECT ass.assumption_title, ass.assumption_description FROM {jiscpmproject_assumption} ass WHERE ass.project_nid = %d", $id);
+while ($row_ass = db_fetch_object($results_ass)) {
+$results .= '<tr><td>' . $row_ass->assumption_title . '</td><td>' . $row_ass->assumption_description . '</td></tr>';
+}
+$results .= '</table></p><p>&nbsp;</p>';
+//Project Organisation
+$results .= '<p><h1>Project Organisation</h1></p><p>&nbsp;</p>';
+//Project Structure
+$results .= '<p><h2>Project Structure</h2></p><p>&nbsp;</p>';
+//Roles and Responsibilities
+$results .= '<p><h2>Roles and Responsibilities</h2></p><p>&nbsp;</p>';
+//Project Board
+$results .= '<p><h3>Project Board</h3></p><p>&nbsp;</p>';
+//Project Team
+$results .= '<p><h3>Project Team</h3></p><p>&nbsp;</p>';
+$results_team = db_query("SELECT t.vid FROM {jiscpmteam} t WHERE t.project_nid = %d", $id);
+$teams = array();
+while($row_team = db_fetch_object($results_team)) {
+$teams[] = $row_team->vid;
+}
+//if $teams is set
+if ($teams[0] != NULL) {
+//for each team get the team members
+for ($i = 0; $i < count($teams); $i ++) {
+$current = $teams[$i];
+$teamnode = node_load($current);
+$results .= '<p><h3>' . $teamnode->title . '</h3></p><p>&nbsp;</p><table><th>Member</th><th>Description</th>';
+$results_members = db_query("SELECT jtm.member_uid, jtm.member_description FROM {jiscpmteam_members} jtm WHERE jtm.team_nid = %f", $current);
+while ($row_members = db_fetch_object($results_members)) {
+//load user
+$member = user_load($row_members->member_uid);
+$results .= '<tr><td>' . $member->name . '</td><td>' . $row_members->member_description . '</td></tr>';
+}
+$results .='</table><p>&nbsp;</p>';
+}
+}
+//Project Control
+$results .= '<p><h1>Project Control</h1></p><p>&nbsp;</p><p>' . variable_get('jiscpm_project_control', '') . '</p><p>&nbsp;</p>';
+//Issue Control
+$results .= '<p><h2>Issue Control</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_issue_control', '') . '</p><p>&nbsp;</p>';
+//Change Control
+$results .= '<p><h2>Change Control</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_change_control', '') . '</p><p>&nbsp;</p>';
+//Quality Assurance
+$results .= '<p><h2>Quality Assurance</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_quality_assurance', '') . '</p><p>&nbsp;</p>';
+//Financial Control
+$results .= '<p><h2>Financial Control</h2></p><p>&nbsp;</p>';
+//Information Management
+$results .= '<p><h2>Information Management</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_information_management', '') . '</p><p>&nbsp;</p>';
+//Reporting
+$results .= '<p><h1>Reporting</h1></p><p>&nbsp;</p>';
+//Reporting Within the Project Team
+$results .= '<p><h2>Reporting Within the Project Team</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_reporting_project_team', '') . '</p><p>&nbsp;</p>';
+//Management Reporting
+$results .= '<p><h2>Management Reporting</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_management_reporting', '') . '</p><p>&nbsp;</p>';
+if ($stakeholders == 'YES') {
+//insert stakeholders
+$results .= '<p><h1>Stakeholders</h1></p><p>&nbsp;</p>';
+//Identification and Analysis
+$results .= '<p><h2>Identification and Analysis</h2></p><p>&nbsp;</p>';
+//Communication
+$results .= '<p><h2>Communication</h2></p><p>&nbsp;</p>';
+}
+//Planning
+$results .= '<p><h1>Planning</h1></p><p>&nbsp;</p>';
+//Approach
+$results .= '<p><h2>Approach</h2></p><p>&nbsp;</p><p>' . variable_get('jiscpm_approach', '') . '</p><p>&nbsp;</p>';
+//Milestone Plan
+$results .= '<p><h2>Milestone Plan</h2></p><p>&nbsp;</p>';
+$results .= '<p><table><th>Milestone</th><th>Delivery Date</th>';
+//Project Milestones
+$result_mile = db_query("SELECT m.milestone_title, m.milestone_deliverydate FROM {jiscpmproject_milestone} m WHERE m.project_nid = %d", $id);
+while($row_mile = db_fetch_object($result_mile)) {
+$results .= '<tr><td>' . $row_mile->milestone_title . '</td><td>' . date('d D M Y', $row_mile->milestone_deliverydate) . '</td></tr>';
+}
+$results .='</table><p>&nbsp;</p>';
+
+$results .= "</body>";
+$results .= "</html>";
+$zipfile->add_file($results, "project_docs/" . $pidfile);
+return $zipfile;
 }
 
 /* This function generates the Post-Project Review */
-function jiscpm_generate_ppr($zipfile, $id)
-{
-      //load project data
-      $project = node_load($id);
-      $thisname = date('ymd') . '_' . $project->title . '_PPR.doc';
-  	  //creates a word document
-	  header("Content-Type: application/vnd.ms-doc");
-	  header("Expires: 0");
-	  header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	  header("content-disposition: attachment;filename=$thisname");
-	  $results.= "<html>";
-	  $results.= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\">";
-	  $results.= "<body>";
-      //Insert document content
-      $results .= '<p><div align="center"><h1>Post Project Review</h1><p>&nbsp;</p><h2>Project name: ' . $project->title . '</h2><p>&nbsp;</p><h3>Date: ' . 
-     date('d-m-Y') . '</h3></div></p><p>&nbsp;</p><p>&nbsp;</p>';
-      $results_ppr = db_query("SELECT p.ppr_summary_objectives, p.ppr_benefits_achieved, 
-      p.ppr_benefits_not_achieved, p.ppr_negative_benefits_factors, p.ppr_underestimated_tasks, 
-      p.ppr_overestimated_tasks, p.ppr_negative_time_factors, p.ppr_underestimated_costs, p.ppr_overestimated_costs, p.ppr_negative_cost_factors,
-      p.ppr_negative_quality_factors, p.ppr_delivered_outputs, p.ppr_unexpected_outcomes, p.ppr_outputs_not_fit,
-      p.ppr_lessons_learned, p.ppr_recommendations_for_project, 
-      p.ppr_recommendations_for_future_projects FROM {jiscpmppr} p WHERE p.project_nid = $id");
-      while($row_ppr = db_fetch_object($results_ppr))
-      {
-        $ppr = array(
-          'ppr_summary_objectives' => $row_ppr->ppr_summary_objectives,
-          'ppr_benefits_achieved' => $row_ppr->ppr_benefits_achieved,
-          'ppr_benefits_not_achieved' => $row_ppr->ppr_benefits_not_achieved,
-          'ppr_negative_benefits_factors' => $row_ppr->ppr_negative_benefits_factors,
-          'ppr_underestimated_tasks' => $row_ppr->ppr_underestimated_tasks,
-          'ppr_overestimated_tasks' => $row_ppr->ppr_overestimated_tasks,
-          'ppr_negative_time_factors' => $row_ppr->ppr_negative_time_factors,
-          'ppr_underestimated_costs' => $row_ppr->ppr_underestimated_costs,
-          'ppr_overestimated_costs' => $row_ppr->ppr_overestimated_costs,
-          'ppr_negative_cost_factors' => $row_ppr->ppr_negative_cost_factors,
-          'ppr_negative_quality_factors' => $row_ppr->ppr_negative_quality_factors,
-          'ppr_delivered_outputs' => $row_ppr->ppr_delivered_outputs,
-          'ppr_unexpected_outcomes' => $row_ppr->ppr_unexpected_outcomes,
-          'ppr_outputs_not_fit' => $row_ppr->ppr_outputs_not_fit,
-          'ppr_lessons_learned' => $row_ppr->ppr_lessons_learned,
-          'ppr_recommendations_for_project' => $row_ppr->ppr_recommendations_for_project,
-          'ppr_recommendations_for_future_projects' => $row_ppr->ppr_recommendations_for_future_projects,
-        );
-      }
-      //Summary of Project Objectives
-      $results.= '<p><h1>Summary of Project Objectives</h1></p><p>&nbsp;</p><p>' . $ppr['ppr_summary_objectives'] . '</p><p>&nbsp;</p>';
-      //Achievement of Planned Benefits
-      $results.= '<p><h1>Achievement of Planned Benefits</h1></p><p>&nbsp;</p>';
-      //Benefits Achieved
-      $results .= '<p><h2>Benefits Achieved</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_benefits_achieved'] . '</p><p>&nbsp;</p>';
-      //Benefits Not Achieved
-      $results .= '<p><h2>Benefits Not Achieved</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_benefits_not_achieved'] . '</p><p>&nbsp;</p>';
-      //Incorrect assumptions and common factors affecting benefits realisation
-      $results .= '<p><h2>Incorrect Assumptions and Common Factors Affecting Benefits Realisation</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_negative_benefits_factors'] . '</p><p>&nbsp;</p>';
-      //Time
-      $results.= '<p><h1>Time</h1></p><p>&nbsp;</p>';
-      //Tasks Exceeding Time Estimates
-      $results .= '<p><h2>Tasks Exceeding Time Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_underestimated_tasks'] . '</p><p>&nbsp;</p>';
-      //Tasks Taking Less Than Estimated Time
-      $results .= '<p><h2>Tasks Taking Less Than Estimated Time</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_overestimated_tasks'] . '</p><p>&nbsp;</p>';
-      //Incorrect Assumptions and Common Factors Affecting Time Estimates
-      $results .= '<p><h2>Incorrect Assumptions and Common Factors Affecting Time Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_negative_time_factors'] . '</p><p>&nbsp;</p>';
-      //Costs
-      $results.= '<p><h1>Costs</h1></p><p>&nbsp;</p>';
-      //Costs Exceeding Estimates
-      $results .= '<p><h2>Costs Exceeding Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_underestimated_costs'] . '</p><p>&nbsp;</p>';
-      //Costs Lower Than Estimates
-      $results .= '<p><h2>Costs Lower Than Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_overestimated_costs'] . '</p><p>&nbsp;</p>';
-      //Incorrect Assumptions and Common Factors Affecting Cost Estimates
-      $results .= '<p><h2>Incorrect Assumptions and Common Factors Affecting Cost Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_negative_cost_factors'] . '</p><p>&nbsp;</p>';
-      //Quality
-      $results.= '<p><h1>Quality</h1></p><p>&nbsp;</p>';
-      //Outputs That Met or Exceeded User Requirements
-      $results .= '<p><h2>Outputs That Met or Exceeded User Requirements</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_delivered_outputs'] . '</p><p>&nbsp;</p>';
-      //Outputs That Were Not Fit For Purpose
-      $results .= '<p><h2>Outputs That Were Not Fit For Purpose</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_outputs_not_fit'] . '</p><p>&nbsp;</p>';
-      //Incorrect Assumptions and Common Factors Affecting Quality
-      $results .= '<p><h2>Incorrect Assumptions and Common Factors Affecting Quality</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_negative_quality_factors'] . '</p><p>&nbsp;</p>';
-      //Lessons Learned
-      $results.= '<p><h1>Lessons Learned</h1></p><p>&nbsp;</p>';
-      //Give Details of Any Unexpected Outcomes of the Project (Positive or Negative)
-      $results .= '<p><h2>Give Details of Any Unexpected Outcomes of the Project (Positive or Negative)</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_unexpected_outcomes'] . '</p><p>&nbsp;</p>';
-      //Give Details of Any Lessons Learned as a Result of the Project
-      $results .= '<p><h2>Give Details of Any Lessons Learned as a Result of the Project</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_lessons_learned'] . '</p><p>&nbsp;</p>';
-      //Recommendations
-      $results.= '<p><h1>Recommendations</h1></p><p>&nbsp;</p>';
-      //Give Details of Any Recommendations For Action in Relation to This Project
-      $results .= '<p><h2>Give Details of Any Recommendations For Action in Relation to This Project</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_recommendations_for_project'] . '</p><p>&nbsp;</p>';
-      //Give Details of Any Recommendations For Action in Relation to Future Projects
-      $results .= '<p><h2>Give Details of Any Recommendations For Action in Relation to Future Projects</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_recommendations_for_future_projects'] . '</p><p>&nbsp;</p>';
-	  $results.= "</body>";
-	  $results.= "</html>";
-	  $zipfile->add_file($results, "project_docs/" . $thisname);
-      return $zipfile;
+function jiscpm_generate_ppr($zipfile, $id) {
+//load project data
+$project = node_load($id);
+$thisname = date('ymd') . '_' . $project->title . '_PPR.doc';
+//creates a word document
+header("Content-Type: application/vnd.ms-doc");
+header("Expires: 0");
+header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+header("content-disposition: attachment;filename=$thisname");
+$results .= "<html>";
+$results .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\">";
+$results .= "<body>";
+//Insert document content
+$results .= '<p><div align="center"><h1>Post Project Review</h1><p>&nbsp;</p><h2>Project name: ' . $project->title . '</h2><p>&nbsp;</p><h3>Date: ' . 
+date('d-m-Y') . '</h3></div></p><p>&nbsp;</p><p>&nbsp;</p>';
+$results_ppr = db_query("SELECT p.ppr_summary_objectives, p.ppr_benefits_achieved, 
+p.ppr_benefits_not_achieved, p.ppr_negative_benefits_factors, p.ppr_underestimated_tasks, 
+p.ppr_overestimated_tasks, p.ppr_negative_time_factors, p.ppr_underestimated_costs, p.ppr_overestimated_costs, p.ppr_negative_cost_factors,
+p.ppr_negative_quality_factors, p.ppr_delivered_outputs, p.ppr_unexpected_outcomes, p.ppr_outputs_not_fit,
+p.ppr_lessons_learned, p.ppr_recommendations_for_project, 
+p.ppr_recommendations_for_future_projects FROM {jiscpmppr} p WHERE p.project_nid = $id");
+while($row_ppr = db_fetch_object($results_ppr)) {
+$ppr = array(
+'ppr_summary_objectives' => $row_ppr->ppr_summary_objectives,
+'ppr_benefits_achieved' => $row_ppr->ppr_benefits_achieved,
+'ppr_benefits_not_achieved' => $row_ppr->ppr_benefits_not_achieved,
+'ppr_negative_benefits_factors' => $row_ppr->ppr_negative_benefits_factors,
+'ppr_underestimated_tasks' => $row_ppr->ppr_underestimated_tasks,
+'ppr_overestimated_tasks' => $row_ppr->ppr_overestimated_tasks,
+'ppr_negative_time_factors' => $row_ppr->ppr_negative_time_factors,
+'ppr_underestimated_costs' => $row_ppr->ppr_underestimated_costs,
+'ppr_overestimated_costs' => $row_ppr->ppr_overestimated_costs,
+'ppr_negative_cost_factors' => $row_ppr->ppr_negative_cost_factors,
+'ppr_negative_quality_factors' => $row_ppr->ppr_negative_quality_factors,
+'ppr_delivered_outputs' => $row_ppr->ppr_delivered_outputs,
+'ppr_unexpected_outcomes' => $row_ppr->ppr_unexpected_outcomes,
+'ppr_outputs_not_fit' => $row_ppr->ppr_outputs_not_fit,
+'ppr_lessons_learned' => $row_ppr->ppr_lessons_learned,
+'ppr_recommendations_for_project' => $row_ppr->ppr_recommendations_for_project,
+'ppr_recommendations_for_future_projects' => $row_ppr->ppr_recommendations_for_future_projects,
+);
+}
+//Summary of Project Objectives
+$results .= '<p><h1>Summary of Project Objectives</h1></p><p>&nbsp;</p><p>' . $ppr['ppr_summary_objectives'] . '</p><p>&nbsp;</p>';
+//Achievement of Planned Benefits
+$results .= '<p><h1>Achievement of Planned Benefits</h1></p><p>&nbsp;</p>';
+//Benefits Achieved
+$results .= '<p><h2>Benefits Achieved</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_benefits_achieved'] . '</p><p>&nbsp;</p>';
+//Benefits Not Achieved
+$results .= '<p><h2>Benefits Not Achieved</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_benefits_not_achieved'] . '</p><p>&nbsp;</p>';
+//Incorrect assumptions and common factors affecting benefits realisation
+$results .= '<p><h2>Incorrect Assumptions and Common Factors Affecting Benefits Realisation</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_negative_benefits_factors'] . '</p><p>&nbsp;</p>';
+//Time
+$results .= '<p><h1>Time</h1></p><p>&nbsp;</p>';
+//Tasks Exceeding Time Estimates
+$results .= '<p><h2>Tasks Exceeding Time Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_underestimated_tasks'] . '</p><p>&nbsp;</p>';
+//Tasks Taking Less Than Estimated Time
+$results .= '<p><h2>Tasks Taking Less Than Estimated Time</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_overestimated_tasks'] . '</p><p>&nbsp;</p>';
+//Incorrect Assumptions and Common Factors Affecting Time Estimates
+$results .= '<p><h2>Incorrect Assumptions and Common Factors Affecting Time Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_negative_time_factors'] . '</p><p>&nbsp;</p>';
+//Costs
+$results .= '<p><h1>Costs</h1></p><p>&nbsp;</p>';
+//Costs Exceeding Estimates
+$results .= '<p><h2>Costs Exceeding Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_underestimated_costs'] . '</p><p>&nbsp;</p>';
+//Costs Lower Than Estimates
+$results .= '<p><h2>Costs Lower Than Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_overestimated_costs'] . '</p><p>&nbsp;</p>';
+//Incorrect Assumptions and Common Factors Affecting Cost Estimates
+$results .= '<p><h2>Incorrect Assumptions and Common Factors Affecting Cost Estimates</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_negative_cost_factors'] . '</p><p>&nbsp;</p>';
+//Quality
+$results .= '<p><h1>Quality</h1></p><p>&nbsp;</p>';
+//Outputs That Met or Exceeded User Requirements
+$results .= '<p><h2>Outputs That Met or Exceeded User Requirements</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_delivered_outputs'] . '</p><p>&nbsp;</p>';
+//Outputs That Were Not Fit For Purpose
+$results .= '<p><h2>Outputs That Were Not Fit For Purpose</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_outputs_not_fit'] . '</p><p>&nbsp;</p>';
+//Incorrect Assumptions and Common Factors Affecting Quality
+$results .= '<p><h2>Incorrect Assumptions and Common Factors Affecting Quality</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_negative_quality_factors'] . '</p><p>&nbsp;</p>';
+//Lessons Learned
+$results .= '<p><h1>Lessons Learned</h1></p><p>&nbsp;</p>';
+//Give Details of Any Unexpected Outcomes of the Project (Positive or Negative)
+$results .= '<p><h2>Give Details of Any Unexpected Outcomes of the Project (Positive or Negative)</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_unexpected_outcomes'] . '</p><p>&nbsp;</p>';
+//Give Details of Any Lessons Learned as a Result of the Project
+$results .= '<p><h2>Give Details of Any Lessons Learned as a Result of the Project</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_lessons_learned'] . '</p><p>&nbsp;</p>';
+//Recommendations
+$results .= '<p><h1>Recommendations</h1></p><p>&nbsp;</p>';
+//Give Details of Any Recommendations For Action in Relation to This Project
+$results .= '<p><h2>Give Details of Any Recommendations For Action in Relation to This Project</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_recommendations_for_project'] . '</p><p>&nbsp;</p>';
+//Give Details of Any Recommendations For Action in Relation to Future Projects
+$results .= '<p><h2>Give Details of Any Recommendations For Action in Relation to Future Projects</h2></p><p>&nbsp;</p><p>' . $ppr['ppr_recommendations_for_future_projects'] . '</p><p>&nbsp;</p>';
+$results .= "</body>";
+$results .= "</html>";
+$zipfile->add_file($results, "project_docs/" . $thisname);
+return $zipfile;
 }
 
 /* This function generates the Status Reports for the project */
-function jiscpm_generate_sr($zipfile, $id)
-{
-  //load project data
-  $project = node_load($id);
-  //get the status report reporting period
-  $results_sr = db_query("SELECT s.sr_focus_area, s.sr_product_process, s.sr_overview,
-      s.sr_milestone_report, s.sr_risk_management_report, s.sr_issues_report, 
-      s.sr_project_recommendations, s.sr_start, s.sr_end, s.sr_overall_status, s.sr_project_summary,
-      s.sr_objectives_for_next_sr, s.sr_related_project_information
-       FROM {jiscpmsr} s WHERE s.project_nid = $id");
-      while($row_sr = db_fetch_object($results_sr))
-      {
-        $sr = array(
-          'sr_focus_area' => $row_sr->sr_focus_area,
-          'sr_product_process' => $row_sr->sr_product_process,
-          'sr_overview' => $row_sr->sr_overview,
-          'sr_milestone_report' => $row_sr->sr_milestone_report,
-          'sr_risk_management_report' => $row_sr->sr_risk_management_report,
-          'sr_issues_report' => $row_sr->sr_issues_report,
-          'sr_project_recommendations' => $row_sr->sr_project_recommendations,
-          'sr_start' => $row_sr->sr_start,
-          'sr_end' => $row_sr->sr_end,
-          'sr_overall_status' => $row_sr->sr_overall_status,
-          'sr_project_summary' => $row_sr->sr_project_summary,
-          'sr_objectives_for_next_sr' => $row_sr->sr_objectives_for_next_sr,
-          'sr_related_project_information' => $row_sr->sr_related_project_information, 
-        );
-        //output each status report and add to zip
-        $thisname = date('ymd', $sr['sr_end']) . '_' . $project->title . '_StatusReport.doc';
-        header("Content-Type: application/vnd.ms-doc");
-	    header("Expires: 0");
-	    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	    header("content-disposition: attachment;filename=$thisname");
-	    $results.= "<html>";
-	    $results.= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\">";
-	    $results.= "<body>";
-        //Insert document content
-        $results .= '<p><h1>Status Report</h1></p><p>&nbsp;</p><p><h2>Project name: ' . $project->title . '</h2></p><p>&nbsp;</p>';
-        //Focus Area
-        $results .= '<p><h2>Focus Area: ' . $sr['sr_focus_area'] . '</h2></p><p>&nbsp;</p>';
-        //Product / Process
-        $results .= '<p><h2>Product/ Process: ' . $sr['sr_product_process'] . '</h2></p><p>&nbsp;</p>';
-        //Start of reporting Period
-        $results .= '<p><h2>Start of Reporting Period: ' . date('D d M Y', $sr['sr_start']) . '</h2></p><p>&nbsp;</p>';
-        //End of Reporting Period
-        $results .= '<p><h2>End of Reporting Period: ' . date('D d M Y', $sr['sr_end']) . '</h2></p><p>&nbsp;</p>';
-        //Overview
-        $results .= '<p><h2>Overview: ' . $sr['sr_overview'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_overview'] . '</p><p>&nbsp;</p>';
-        //Milestone Report
-        $results .= '<p><h2>Milestone Report: ' . $sr['sr_milestone_report'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_milestone_report'] . '</p><p>&nbsp;</p>';
-        //Risk Management Report
-        $results .= '<p><h2>Risk Management Report: ' . $sr['sr_risk_management_report'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_risk_management_report'] . '</p><p>&nbsp;</p>';
-        //Issues Report
-        $results .= '<p><h2>Issues Report: ' . $sr['sr_issues_report'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_issues_report'] . '</p><p>&nbsp;</p>';
-        //Project Recommendations
-        $results .= '<p><h2>Project Recommendations: ' . $sr['sr_project_recommendations'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_project_recommendations'] . '</p><p>&nbsp;</p>';
-        //Related Project Information
-        $results .= '<p><h2>Related Project Information: ' . $sr['sr_related_project_information'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_related_project_information'] . '</p><p>&nbsp;</p>';
-        //Objectives for Next Status Report
-        $results .= '<p><h2>Objectives for Next Status Report: ' . $sr['sr_objectives_for_next_sr'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_objectives_for_next_sr'] . '</p><p>&nbsp;</p>';
-        //Overall Status of Project
-        $results .= '<p><h2>Overall Status of Project: ' . $sr['sr_overall_status'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_overall_status'] . '</p><p>&nbsp;</p>';
-        //Project Summary
-        $results .= '<p><h2>Project Summary: ' . $sr['sr_project_summary'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_project_summary'] . '</p><p>&nbsp;</p>';
-        $results.= "</body>";
-	    $results.= "</html>";
-	    $zipfile->add_file($results, "project_docs/" . $thisname);
-      }
-  return $zipfile;
+function jiscpm_generate_sr($zipfile, $id) {
+//load project data
+$project = node_load($id);
+//get the status report reporting period
+$results_sr = db_query("SELECT s.sr_focus_area, s.sr_product_process, s.sr_overview,
+s.sr_milestone_report, s.sr_risk_management_report, s.sr_issues_report, 
+s.sr_project_recommendations, s.sr_start, s.sr_end, s.sr_overall_status, s.sr_project_summary,
+s.sr_objectives_for_next_sr, s.sr_related_project_information
+FROM {jiscpmsr} s WHERE s.project_nid = $id");
+while($row_sr = db_fetch_object($results_sr)) {
+$sr = array(
+'sr_focus_area' => $row_sr->sr_focus_area,
+'sr_product_process' => $row_sr->sr_product_process,
+'sr_overview' => $row_sr->sr_overview,
+'sr_milestone_report' => $row_sr->sr_milestone_report,
+'sr_risk_management_report' => $row_sr->sr_risk_management_report,
+'sr_issues_report' => $row_sr->sr_issues_report,
+'sr_project_recommendations' => $row_sr->sr_project_recommendations,
+'sr_start' => $row_sr->sr_start,
+'sr_end' => $row_sr->sr_end,
+'sr_overall_status' => $row_sr->sr_overall_status,
+'sr_project_summary' => $row_sr->sr_project_summary,
+'sr_objectives_for_next_sr' => $row_sr->sr_objectives_for_next_sr,
+'sr_related_project_information' => $row_sr->sr_related_project_information, 
+);
+//output each status report and add to zip
+$thisname = date('ymd', $sr['sr_end']) . '_' . $project->title . '_StatusReport.doc';
+header("Content-Type: application/vnd.ms-doc");
+header("Expires: 0");
+header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+header("content-disposition: attachment;filename=$thisname");
+$results .= "<html>";
+$results .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=Windows-1252\">";
+$results .= "<body>";
+//Insert document content
+$results .= '<p><h1>Status Report</h1></p><p>&nbsp;</p><p><h2>Project name: ' . $project->title . '</h2></p><p>&nbsp;</p>';
+//Focus Area
+$results .= '<p><h2>Focus Area: ' . $sr['sr_focus_area'] . '</h2></p><p>&nbsp;</p>';
+//Product / Process
+$results .= '<p><h2>Product/ Process: ' . $sr['sr_product_process'] . '</h2></p><p>&nbsp;</p>';
+//Start of reporting Period
+$results .= '<p><h2>Start of Reporting Period: ' . date('D d M Y', $sr['sr_start']) . '</h2></p><p>&nbsp;</p>';
+//End of Reporting Period
+$results .= '<p><h2>End of Reporting Period: ' . date('D d M Y', $sr['sr_end']) . '</h2></p><p>&nbsp;</p>';
+//Overview
+$results .= '<p><h2>Overview: ' . $sr['sr_overview'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_overview'] . '</p><p>&nbsp;</p>';
+//Milestone Report
+$results .= '<p><h2>Milestone Report: ' . $sr['sr_milestone_report'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_milestone_report'] . '</p><p>&nbsp;</p>';
+//Risk Management Report
+$results .= '<p><h2>Risk Management Report: ' . $sr['sr_risk_management_report'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_risk_management_report'] . '</p><p>&nbsp;</p>';
+//Issues Report
+$results .= '<p><h2>Issues Report: ' . $sr['sr_issues_report'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_issues_report'] . '</p><p>&nbsp;</p>';
+//Project Recommendations
+$results .= '<p><h2>Project Recommendations: ' . $sr['sr_project_recommendations'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_project_recommendations'] . '</p><p>&nbsp;</p>';
+//Related Project Information
+$results .= '<p><h2>Related Project Information: ' . $sr['sr_related_project_information'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_related_project_information'] . '</p><p>&nbsp;</p>';
+//Objectives for Next Status Report
+$results .= '<p><h2>Objectives for Next Status Report: ' . $sr['sr_objectives_for_next_sr'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_objectives_for_next_sr'] . '</p><p>&nbsp;</p>';
+//Overall Status of Project
+$results .= '<p><h2>Overall Status of Project: ' . $sr['sr_overall_status'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_overall_status'] . '</p><p>&nbsp;</p>';
+//Project Summary
+$results .= '<p><h2>Project Summary: ' . $sr['sr_project_summary'] . '</h2></p><p>&nbsp;</p><p>' . $sr['sr_project_summary'] . '</p><p>&nbsp;</p>';
+$results .= "</body>";
+$results .= "</html>";
+$zipfile->add_file($results, "project_docs/" . $thisname);
+}
+return $zipfile;
 }

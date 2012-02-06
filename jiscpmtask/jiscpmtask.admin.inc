@@ -20,25 +20,21 @@ function jiscpmtask_list() {
   n.nid = j.task_nid WHERE n.status=1 AND n.type='jiscpmtask'";
   //$sql .= tablesort_sql($header);
   $result = pager_query($sql, 50);
-  while ( $records = db_fetch_object($result) )
-  {
+  while ( $records = db_fetch_object($result) ) {
     $project = node_load($records->project_nid);
-  	$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
-  	date('d-m-Y', $records->datebegin), date('d-m-Y', $records->dateend), '<a href="' . $base_url . '/node/' . 
-  	$project->nid . '">' . $project->title . '</a>');
+$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
+date('d-m-Y', $records->datebegin), date('d-m-Y', $records->dateend), '<a href="' . $base_url . '/node/' . 
+$project->nid . '">' . $project->title . '</a>');
   }
   $pager = theme('pager', NULL, 50, 0);
-  if ( count($rows) && !empty($pager))
-  {
+  if ( count($rows) && !empty($pager)) {
     $rows[] = array(array('data' => $pager, 'colspan' => '4'));
   }
   
-  if ( count($rows) )
-  {
+  if ( count($rows) ) {
     $output = theme('table', $header, $rows);
   }
-  else
-  {
+  else {
     drupal_set_message("There are no tasks", 'status');
   }
   $module_path = drupal_get_path('module', 'jiscpm');

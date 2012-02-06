@@ -59,18 +59,15 @@ function theme_jiscpmsr_view($node, $teaser = FALSE, $page = FALSE) {
   while ($rows = db_fetch_object($results)) {
     $project_manager = user_load($rows->project_manager_uid);
   }
-  if ($project_manager->uid != -1)
-  {
-  	$node->content['projectmanager'] = array(
-    	'#prefix' => '<div class="jiscpmfields">',
-    	'#suffix' => '</div>',
-    	'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'projectmanager') : -19,
-		'#value' => theme('jiscpm_view_item', t('Project Manager'), l($project_manager->name, 'user/'. $project_manager->uid)),
-  	);
+  if ($project_manager->uid != -1) {
+$node->content['projectmanager'] = array(
+'#prefix' => '<div class="jiscpmfields">',
+'#suffix' => '</div>',
+'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'projectmanager') : -19,
+'#value' => theme('jiscpm_view_item', t('Project Manager'), l($project_manager->name, 'user/'. $project_manager->uid)),
+);
   }
-  else
-  {
-	  
+  else {  
   }
   $node->content['group3'] = array(
     '#prefix' => '<div class="jiscpmfields">',
@@ -79,7 +76,7 @@ function theme_jiscpmsr_view($node, $teaser = FALSE, $page = FALSE) {
   );
 
   $node->content['group3']['sr_product_process'] = array(
-	'#value' => theme('jiscpm_view_item', t('Product/Process'),$node->jiscpmsrs[0]['sr_product_process']),
+'#value' => theme('jiscpm_view_item', t('Product/Process'), $node->jiscpmsrs[0]['sr_product_process']),
   );
   $node->content['group2'] = array(
     '#prefix' => '<div class="jiscpmfields">',

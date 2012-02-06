@@ -18,24 +18,19 @@ function jiscpmbca_list() {
   WHERE n.status=1 AND n.type='jiscpmbca'";
   //$sql .= tablesort_sql($header);
   $result = pager_query($sql, 50);
-  while ( $records = db_fetch_object($result) )
-  {
+  while ( $records = db_fetch_object($result) ) {
     $project = node_load($records->project_nid);
-  	$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
-  	'<a href="' . $base_url . '/node/' . $project->nid . '">' . $project->title . '</a>');
+ $rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', '<a href="' . $base_url . '/node/' . $project->nid . '">' . $project->title . '</a>');
   }
   $pager = theme('pager', NULL, 50, 0);
-  if ( count($rows) && !empty($pager))
-  {
+  if ( count($rows) && !empty($pager)) {
     $rows[] = array(array('data' => $pager, 'colspan' => '2'));
   }
   
-  if ( count($rows) )
-  {
+  if ( count($rows) ) {
     $output .= theme('table', $header, $rows);
   }
-  else
-  {
+  else {
     drupal_set_message("There are no business case assessments", 'status');
   }
   $module_path = drupal_get_path('module', 'jiscpm');

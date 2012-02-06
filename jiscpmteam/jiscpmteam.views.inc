@@ -1,5 +1,7 @@
 <?php
-// $Id: $
+/**
+ * @file
+ */
 
 function jiscpmteam_views_data() {
   $data['jiscpmteam']['table']['group']  = 'jiscpm';

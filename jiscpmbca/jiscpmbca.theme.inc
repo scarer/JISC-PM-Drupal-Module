@@ -42,68 +42,59 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['links']['timetrackings'] = theme('jiscpm_link', 'jiscpmbca', 'jiscpmtimetracking', $node->nid, 5);
   $actions .= '<p><table><th>Title</th><th>Description</th><th>Delivery Date</th>';
   //generate output for jiscpm bca actions
-  for ($a = 0; $a < count ($node->actions); $a ++)
-  {
-  	$actions .= '<tr><td>' . $node->actions[$a]['action_title'] . '</td><td>' . check_markup($node->actions[$a]['action_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . date('d M Y', $node->actions[$a]['action_deliverydate']) . '</td></tr>';
+  for ($a = 0; $a < count ($node->actions); $a ++) {
+$actions .= '<tr><td>' . $node->actions[$a]['action_title'] . '</td><td>' . check_markup($node->actions[$a]['action_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . date('d M Y', $node->actions[$a]['action_deliverydate']) . '</td></tr>';
   }
-  $actions.= '</table></p>';
+  $actions .= '</table></p>';
   $staffcosts .= '<p><table><th>Title</th><th>Quantity</th><th>Hours</th><th>Rate</th>';
   //generate output for jiscpm bca staff costs
-  for ($s = 0; $s < count ($node->staff_costs); $s ++)
-  {
-  	$user = user_load($node->staff_costs[$s]['staff_cost_title']);
-  	$staffcosts .= '<tr><td><a href="?q=user/' . $user->uid . '">' . $user->name . '</a></td><td>' . $node->staff_costs[$s]['staff_cost_quantity'] . '</td><td>' . $node->staff_costs[$s]['staff_cost_hours'] . '</td><td>' . $node->staff_costs[$s]['staff_cost_rate'] .'</td></tr>';
+  for ($s = 0; $s < count ($node->staff_costs); $s ++) {
+    $user = user_load($node->staff_costs[$s]['staff_cost_title']);
+$staffcosts .= '<tr><td><a href="?q=user/' . $user->uid . '">' . $user->name . '</a></td><td>' . $node->staff_costs[$s]['staff_cost_quantity'] . '</td><td>' . $node->staff_costs[$s]['staff_cost_hours'] . '</td><td>' . $node->staff_costs[$s]['staff_cost_rate'] .'</td></tr>';
   }
-  $staffcosts.= '</table></p>';
+  $staffcosts .= '</table></p>';
   //generate output for jiscpm bca training costs
   $trainingcosts .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
-  for ($t = 0; $t < count ($node->training_costs); $t ++)
-  {
-  	$trainingcosts .= '<tr><td>' . $node->training_costs[$t]['training_cost_title'] . '</td><td>' . check_markup($node->training_costs[$t]['training_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->training_costs[$t]['training_cost_total'] . '</td></tr>';
+  for ($t = 0; $t < count ($node->training_costs); $t ++) {
+$trainingcosts .= '<tr><td>' . $node->training_costs[$t]['training_cost_title'] . '</td><td>' . check_markup($node->training_costs[$t]['training_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->training_costs[$t]['training_cost_total'] . '</td></tr>';
   }
-  $trainingcosts.= '</table></p>';
+  $trainingcosts .= '</table></p>';
   //generate output for jiscpm bca equipment costs
   $equipmentcosts .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
-  for ($e = 0; $e < count ($node->equipment_costs); $e ++)
-  {
-  	$equipmentcosts .= '<tr><td>' . $node->equipment_costs[$e]['equipment_cost_title'] . '</td><td>' . check_markup($node->equipment_costs[$e]['equipment_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->equipment_costs[$e]['equipment_cost_total'] . '</td></tr>';
+  for ($e = 0; $e < count ($node->equipment_costs); $e ++) {
+$equipmentcosts .= '<tr><td>' . $node->equipment_costs[$e]['equipment_cost_title'] . '</td><td>' . check_markup($node->equipment_costs[$e]['equipment_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->equipment_costs[$e]['equipment_cost_total'] . '</td></tr>';
   }
-  $equipmentcosts.= '</table></p>';
+  $equipmentcosts .= '</table></p>';
   //generate output for jiscpm bca other costs
   $othercosts .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
-  for ($o = 0; $o < count ($node->other_costs); $o ++)
-  {
-  	$othercosts .= '<tr><td>' . $node->other_costs[$o]['other_cost_title'] . '</td><td>' . check_markup($node->other_costs[$o]['other_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->other_costs[$o]['other_cost_total'] . '</td></tr>';
+  for ($o = 0; $o < count ($node->other_costs); $o ++) {
+$othercosts .= '<tr><td>' . $node->other_costs[$o]['other_cost_title'] . '</td><td>' . check_markup($node->other_costs[$o]['other_cost_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->other_costs[$o]['other_cost_total'] . '</td></tr>';
   }
-  $othercosts.= '</table></p>';
+  $othercosts .= '</table></p>';
   //generate output for jiscpm bca running costs training
   $runningcoststraining .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
-  for ($rct = 0; $rct < count ($node->running_cost_trainings); $rct ++)
-  {
-  	$runningcoststraining .= '<tr><td>' . $node->running_cost_trainings[$rct]['running_cost_training_title'] . '</td><td>' . check_markup($node->running_cost_trainings[$rct]['running_cost_training_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_trainings[$rct]['running_cost_training_total'] . '</td></tr>';
+  for ($rct = 0; $rct < count ($node->running_cost_trainings); $rct ++) {
+$runningcoststraining .= '<tr><td>' . $node->running_cost_trainings[$rct]['running_cost_training_title'] . '</td><td>' . check_markup($node->running_cost_trainings[$rct]['running_cost_training_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_trainings[$rct]['running_cost_training_total'] . '</td></tr>';
   }
-  $runningcoststraining.= '</table></p>';
+  $runningcoststraining .= '</table></p>';
   //generate output for jiscpm bca running costs licensing
   $runningcostslicensing .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
-  for ($rcl = 0; $rcl < count ($node->running_cost_licensings); $rcl ++)
-  {
-  	$runningcostslicensing .= '<tr><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_title'] . '</td><td>' . check_markup($node->running_cost_licensings[$rcl]['running_cost_licensing_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_total'] . '</td></tr>';
+  for ($rcl = 0; $rcl < count ($node->running_cost_licensings); $rcl ++) {
+$runningcostslicensing .= '<tr><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_title'] . '</td><td>' . check_markup($node->running_cost_licensings[$rcl]['running_cost_licensing_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_licensings[$rcl]['running_cost_licensing_total'] . '</td></tr>';
   }
-  $runningcostslicensing.= '</table></p>';
+  $runningcostslicensing .= '</table></p>';
   //generate output for running costs maintenance
   $runningcostsmaintenance .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
-  for ($rcm = 0; $rcm < count ($node->running_cost_maintenances); $rcm ++)
-  {
-  	$runningcostsmaintenance .= '<tr><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_title'] . '</td><td>' . check_markup($node->running_cost_maintenances[$rcm]['running_cost_maintenance_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_total'] . '</td></tr>';
+  for ($rcm = 0; $rcm < count ($node->running_cost_maintenances); $rcm ++) {
+$runningcostsmaintenance .= '<tr><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_title'] . '</td><td>' . check_markup($node->running_cost_maintenances[$rcm]['running_cost_maintenance_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_maintenances[$rcm]['running_cost_maintenance_total'] . '</td></tr>';
   }
-  $runningcostsmaintenance.= '</table></p>';
+  $runningcostsmaintenance .= '</table></p>';
   //generate output for jiscpm bca running costs other
   $runningcostsother .= '<p><table><th>Title</th><th>Description</th><th>Total</th>';
-  for ($rco = 0; $rco < count ($node->running_cost_others); $rco ++)
-  {
-  	$runningcostsother .= '<tr><td>' . $node->running_cost_others[$rco]['running_cost_other_title'] . '</td><td>' . check_markup($node->running_cost_others[$rco]['running_cost_other_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_others[$rco]['running_cost_other_total'] . '</td></tr>';
+  for ($rco = 0; $rco < count ($node->running_cost_others); $rco ++) {
+$runningcostsother .= '<tr><td>' . $node->running_cost_others[$rco]['running_cost_other_title'] . '</td><td>' . check_markup($node->running_cost_others[$rco]['running_cost_other_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . $node->running_cost_others[$rco]['running_cost_other_total'] . '</td></tr>';
   }
-  $runningcostsother.= '</table></p>';
+  $runningcostsother .= '</table></p>';
   
   $node->content['group1'] = array(
     '#prefix' => '<div class="jiscpmfields">',

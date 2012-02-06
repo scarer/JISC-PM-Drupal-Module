@@ -18,13 +18,13 @@ function jiscpmissue_uninstall() {
 function jiscpmissue_schema() {
   $schema['jiscpmissue'] = array(
     'fields'                => array(
-      'nid'                 => array('description' =>t('The nid of the issue'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' =>t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'    => array('description' =>t('The nid for the project the post project review belongs to'), 'type' => 'int'),
-      'issue_progress' => array('description' =>t('The progress on the issue'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'issue_resolved' => array('description' =>t('Is the issue resolved'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'issue_resolution' => array('description' =>t('The issue resolution'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'issue_owner_uid'  => array('description' =>t('The uid of the issue owner'), 'type' => 'varchar', 'length' => 100),
+      'nid'                 => array('description' => t('The nid of the issue'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('description' => t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('description' => t('The nid for the project the post project review belongs to'), 'type' => 'int'),
+      'issue_progress' => array('description' => t('The progress on the issue'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'issue_resolved' => array('description' => t('Is the issue resolved'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'issue_resolution' => array('description' => t('The issue resolution'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'issue_owner_uid'  => array('description' => t('The uid of the issue owner'), 'type' => 'varchar', 'length' => 100),
     ),
     'primary key' => array('nid', 'vid'),
   );

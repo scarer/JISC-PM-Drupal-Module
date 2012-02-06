@@ -1,5 +1,4 @@
 <?php
-// $Id: $
 
 /**
  * @file
@@ -46,12 +45,11 @@ function theme_jiscpmteam_view($node, $teaser = FALSE, $page = FALSE) {
 
   //generate output for jiscpm team running costs other
   $members_o .= '<p><table><th>Member</th><th>Description</th>';
-  for ($m = 0; $m < count ($node->members); $m ++)
-  {
+  for ($m = 0; $m < count ($node->members); $m ++) {
     $user = user_load($node->members[$m]['member_uid']);  
-  	$members_o .= '<tr><td><a href="?q=user/' . $user->uid . '">' . $user->name . '</a></td><td>' . check_markup($node->members[$m]['member_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
+$members_o .= '<tr><td><a href="?q=user/' . $user->uid . '">' . $user->name . '</a></td><td>' . check_markup($node->members[$m]['member_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
-  $members_o.= '</table></p>';
+  $members_o .= '</table></p>';
   
   $node->content['group1'] = array(
     '#prefix' => '<div class="jiscpmfields">',

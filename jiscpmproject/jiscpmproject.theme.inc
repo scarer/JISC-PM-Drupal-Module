@@ -50,7 +50,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   );
   
   //get node results from database
-  $results = db_query('SELECT project_manager_uid, client_uid, projectcategory, projectstatus, projectpriority, datebegin, dateend, organisational_scope, logical_scope, out_of_scope FROM {jiscpmproject} WHERE nid = %d', $node->nid);
+  $results = db_query(db_rewrite_sql('SELECT project_manager_uid, client_uid, projectcategory, projectstatus, projectpriority, datebegin, dateend, organisational_scope, logical_scope, out_of_scope FROM {jiscpmproject} WHERE nid = %d', $node->nid));
   while ($rows = db_fetch_object($results)) {
     $project_manager = user_load($rows->project_manager_uid);
     $pm_name = $project_manager->name;
@@ -66,7 +66,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
     $out_scope = $rows->out_of_scope;
   }
   //get risks from database
-  $risks_results = db_query('SELECT n.title, jr.vid, jr.risk_owner_uid FROM {node} n JOIN {jiscpmrisk} jr ON n.nid = jr.nid WHERE jr.project_nid = %d', $node->nid);
+  $risks_results = db_query(db_rewrite_sql('SELECT n.title, jr.vid, jr.risk_owner_uid FROM {node} n JOIN {jiscpmrisk} jr ON n.nid = jr.nid WHERE jr.project_nid = %d', $node->nid));
   while ($risks_rows = db_fetch_object($risks_results)) {
     $risktitle = $risks_rows->title;
     $risknid = $risks_rows->vid;
@@ -75,7 +75,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $risks = '<p><table><th>Risk</th><th>Owner</th>' . $output_risks . '</table></p>';
   //get issues from database
-  $issues_results = db_query('SELECT n.title, i.vid, i.issue_owner_uid FROM {node} n JOIN {jiscpmissue} i ON n.nid = i.nid WHERE i.project_nid = %d', $node->nid);
+  $issues_results = db_query(db_rewrite_sql('SELECT n.title, i.vid, i.issue_owner_uid FROM {node} n JOIN {jiscpmissue} i ON n.nid = i.nid WHERE i.project_nid = %d', $node->nid));
   while ($issues_rows = db_fetch_object($issues_results)) {
     $issuetitle = $issues_rows->title;
     $issuenid = $issues_rows->vid;
@@ -84,7 +84,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $issues = '<p><table><th>Issue</th><th>Owner</th>' . $output_issues . '</table></p>';
   //get business case assessments from database
-  $bca_results = db_query('SELECT n.title, jb.vid FROM {node} n JOIN {jiscpmbca} jb ON n.nid = jb.nid WHERE jb.project_nid = %d', $node->nid);
+  $bca_results = db_query(db_rewrite_sql('SELECT n.title, jb.vid FROM {node} n JOIN {jiscpmbca} jb ON n.nid = jb.nid WHERE jb.project_nid = %d', $node->nid));
   while ($bca_rows = db_fetch_object($bca_results)) {
     $bcatitle = $bca_rows->title;
     $bcanid = $bca_rows->vid;
@@ -92,7 +92,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $bca = '<p><table><th>BCA</th>' . $output_bcas . '</table></p>';
   //get post project reviews from database
-  $ppr_results = db_query('SELECT n.title, ppr.vid FROM {node} n JOIN {jiscpmppr} ppr ON n.nid = ppr.nid WHERE ppr.project_nid = %d', $node->nid);
+  $ppr_results = db_query(db_rewrite_sql('SELECT n.title, ppr.vid FROM {node} n JOIN {jiscpmppr} ppr ON n.nid = ppr.nid WHERE ppr.project_nid = %d', $node->nid));
   while ($ppr_rows = db_fetch_object($ppr_results)) {
     $pprtitle = $ppr_rows->title;
     $pprnid = $ppr_rows->vid;
@@ -100,7 +100,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $ppr = '<p><table><th>PPR</th>' . $output_pprs . '</table></p>';
   //get status reports from database
-  $sr_results = db_query('SELECT n.title, sr.vid, sr.sr_start, sr.sr_end FROM {node} n JOIN {jiscpmsr} sr ON n.nid = sr.nid WHERE sr.project_nid = %d ORDER BY sr.sr_start ASC', $node->nid);
+  $sr_results = db_query(db_rewrite_sql('SELECT n.title, sr.vid, sr.sr_start, sr.sr_end FROM {node} n JOIN {jiscpmsr} sr ON n.nid = sr.nid WHERE sr.project_nid = %d ORDER BY sr.sr_start ASC', $node->nid));
   while ($sr_rows = db_fetch_object($sr_results)) {
     $srtitle = $sr_rows->title;
     $srnid = $sr_rows->vid;
@@ -108,7 +108,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $sr = '<p><table><th>Status Report</th><th>Timescale</th>' . $output_srs . '</table></p>';
   //get requests for change from database
-  $rfc_results = db_query('SELECT n.title, rfc.vid FROM {node} n JOIN {jiscpmrfc} rfc ON n.nid = rfc.nid WHERE rfc.project_nid = %d', $node->nid);
+  $rfc_results = db_query(db_rewrite_sql('SELECT n.title, rfc.vid FROM {node} n JOIN {jiscpmrfc} rfc ON n.nid = rfc.nid WHERE rfc.project_nid = %d', $node->nid));
   while ($rfc_rows = db_fetch_object($rfc_results)) {
     $rfctitle = $rfc_rows->title;
     $rfcnid = $rfc_rows->vid;
@@ -117,52 +117,51 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   $rfcs = '<p><table><th>RFC</th>' . $output_rfcs . '</table></p>';
   
   //get project relationships data
-  for($r = 0; $r < count($node->relationships); $r ++) {
+  for ($r = 0; $r < count($node->relationships); $r ++) {
     $rel_project = node_load($node->relationships[$r]['relationship_nid']);
-  	$output_r .= '<tr><td><a href="' . $base_url . '/node/' . $rel_project->nid . '">' . $rel_project->title . '</a></td><td>' . $node->relationships[$r]['relationship_description'] . '</td></tr>';
+$output_r .= '<tr><td><a href="' . $base_url . '/node/' . $rel_project->nid . '">' . $rel_project->title . '</a></td><td>' . $node->relationships[$r]['relationship_description'] . '</td></tr>';
   }
   $relationships = '<p><table><th>Related project</th><th>Relationship Description</th>' . $output_r . '</table></p>';
   //get project phases data
   for ($p = 0; $p < count($node->phases); $p ++) {
-  	$output_p .= '<tr><td valign="top"><strong>' . $node->phases[$p]['phase_title'] . '</strong></td><td valign="top">' . 
-  	check_markup($node->phases[$p]['phase_scope'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td valign="top">' . date('d-m-Y', $node->phases[$p]['phase_datebegin']) . ' - ' 
-  	. date('d-m-Y', $node->phases[$p]['phase_dateend']) .'</td></tr>';
+$output_p .= '<tr><td valign="top"><strong>' . $node->phases[$p]['phase_title'] . '</strong></td><td valign="top">' . 
+check_markup($node->phases[$p]['phase_scope'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td valign="top">' . date('d-m-Y', $node->phases[$p]['phase_datebegin']) . ' - ' . date('d-m-Y', $node->phases[$p]['phase_dateend']) .'</td></tr>';
   }
   $phases = '<p><table><th>Phase</th><th>Phase Description</th><th>Timescale</th>' . $output_p . '</table></p>';
   //get project stakeholders data
-  for ($s = 0; $s < count($node->stakeholders); $s ++){
+  for ($s = 0; $s < count($node->stakeholders); $s ++) {
     $stake_user = user_load($node->stakeholders[$s]['stakeholder_uid']);
-  	$output_s .= '<tr><td><a href="?q=user/' . $stake_user->uid . '">' . $stake_user->name . '</a></td><td>' . check_markup($node->stakeholders[$s]['stakeholder_stake_in_project'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
+$output_s .= '<tr><td><a href="?q=user/' . $stake_user->uid . '">' . $stake_user->name . '</a></td><td>' . check_markup($node->stakeholders[$s]['stakeholder_stake_in_project'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   } 
   $stakeholders = '<p><table><th>Stakeholder</th><th>Stake in project</th>' . $output_s . '</table></p>';
   //get project critical success factors data
   for ($f = 0; $f < count($node->factors); $f ++) {
-  	$output_f .= '<tr><td>' . $node->factors[$f]['factor_title'] . '</a></td><td>' . check_markup($node->factors[$f]['factor_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
+$output_f .= '<tr><td>' . $node->factors[$f]['factor_title'] . '</a></td><td>' . check_markup($node->factors[$f]['factor_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $factors = '<p><table><th>Critical Success Factor</th><th>Description</th>' . $output_f . '</table></p>';
   //get project assumptions data
   for ($a = 0; $a < count($node->assumptions); $a ++) {
-  	$output_a .= '<tr><td>' . $node->assumptions[$a]['assumption_title'] . '</a></td><td>' . check_markup($node->assumptions[$a]['assumption_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
+$output_a .= '<tr><td>' . $node->assumptions[$a]['assumption_title'] . '</a></td><td>' . check_markup($node->assumptions[$a]['assumption_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $assumptions = '<p><table><th>Assumption</th><th>Description</th>' . $output_a . '</table></p>';
   //get project constraints data
   for ($c = 0; $c < count($node->constraints); $c ++) {
-  	$output_c .= '<tr><td>' . $node->constraints[$c]['constraint_title'] . '</a></td><td>' . check_markup($node->constraints[$c]['constraint_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
+$output_c .= '<tr><td>' . $node->constraints[$c]['constraint_title'] . '</a></td><td>' . check_markup($node->constraints[$c]['constraint_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $constraints = '<p><table><th>Constraint</th><th>Description</th>' . $output_c . '</table></p>';
   //get project goals and objectives data
   for ($g = 0; $g < count ($node->goals); $g ++) {
-  	$output_g .= '<tr><td>' . $node->goals[$g]['goal_title'] . '</a></td><td>' . check_markup($node->goals[$g]['goal_objectives'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
+$output_g .= '<tr><td>' . $node->goals[$g]['goal_title'] . '</a></td><td>' . check_markup($node->goals[$g]['goal_objectives'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $goals = '<p><table><th>Goal</th><th>Objectives</th>' . $output_g . '</table></p>';
   //get project milestone data
   for ($m = 0; $m < count($node->milestones); $m ++) {
-  	$output_m .= '<tr><td>' . $node->milestones[$m]['milestone_title'] . '</a></td><td>' . date('D d M Y', $node->milestones[$m]['milestone_deliverydate']) . '</td></tr>';
+$output_m .= '<tr><td>' . $node->milestones[$m]['milestone_title'] . '</a></td><td>' . date('D d M Y', $node->milestones[$m]['milestone_deliverydate']) . '</td></tr>';
   }
   //get project team data
   for ($t = 0; $t < count($node->teams); $t ++) {
-  	$output_t .= '<tr><td><a href="' . $base_url . '/node/' . $node->teams[$t]['team_nid'] . '">' . 
-  	$node->teams[$t]['team_title'] . '</a></td><td>' . check_markup($node->teams[$t]['team_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
+$output_t .= '<tr><td><a href="' . $base_url . '/node/' . $node->teams[$t]['team_nid'] . '">' . 
+$node->teams[$t]['team_title'] . '</a></td><td>' . check_markup($node->teams[$t]['team_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
   }
   $teams = '<p><table><th>Team</th><th>Description</th>' . $output_t . '</table></p>';
   $milestones = '<p><table><th>Milestone</th><th>Delivery Date</th>' . $output_m . '</table></p>';

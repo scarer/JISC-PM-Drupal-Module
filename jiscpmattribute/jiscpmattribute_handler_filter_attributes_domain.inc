@@ -1,6 +1,6 @@
 <?php
-
 /**
+ * @file
  * Filter by vocabulary id
  */
 

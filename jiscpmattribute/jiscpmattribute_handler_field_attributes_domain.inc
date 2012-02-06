@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * Show attribute values rather than keys in jiscpm Views fields.
  */
 

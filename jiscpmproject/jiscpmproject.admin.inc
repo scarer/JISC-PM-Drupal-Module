@@ -25,24 +25,20 @@ function jiscpmproject_list() {
   FROM {node} n JOIN {jiscpmproject} j ON n.nid = j.nid WHERE n.status=1 AND n.type='jiscpmproject'";
   //$sql .= tablesort_sql($header);
   $result = pager_query($sql, 50);
-  while ( $records = db_fetch_object($result) )
-  {
-  	$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
-  	$records->projectstatus, $records->projectpriority, date('d-m-Y', $records->datebegin), 
-  	date('d-m-Y', $records->dateend));
+  while ( $records = db_fetch_object($result) ) {
+$rows[] = array('<a href="' . $base_url . '/node/' . $records->nid . '">' . $records->title . '</a>', 
+$records->projectstatus, $records->projectpriority, date('d-m-Y', $records->datebegin), 
+date('d-m-Y', $records->dateend));
   }
   $pager = theme('pager', NULL, 50, 0);
-  if ( count($rows) && !empty($pager))
-  {
+  if ( count($rows) && !empty($pager)) {
     $rows[] = array(array('data' => $pager, 'colspan' => '5'));
   }
   
-  if ( count($rows) )
-  {
+  if ( count($rows) ) {
     $output .= theme('table', $header, $rows);
   }
-  else
-  {
+  else {
     drupal_set_message("There are no projects", status);
   }
   $module_path = drupal_get_path('module', 'jiscpm');
