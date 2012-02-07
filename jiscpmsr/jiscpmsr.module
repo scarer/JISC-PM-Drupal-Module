@@ -222,11 +222,20 @@ $form['group2']['project_nid'] = array(
 '#required' => TRUE,
 );
 
+$currentdate = date("Y-m-d");
+// Title.
+$title_default = "";
+if ($node->title != "" || $node->title != NULL) {
+$title_default = $node->title;
+}
+else {
+$title_default = '<INSERT PROJECT NAME>' . $currentdate . '-SR';
+}
 $form['title'] = array(
 '#type' => 'textfield',
 '#title' => check_plain($type->title_label),
 '#required' => TRUE,
-'#default_value' => $node->title,
+'#default_value' => $title_default,
 '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
 );
 
@@ -357,8 +366,7 @@ $form['group9']['timescale'] = array(
 '#collapsible' => TRUE,
 '#collapsed' => FALSE,
 );
-//if ($node->sr_start != '' || $node->sr_start != NULL || $node->sr_start != 0)
-//{
+//if ($node->sr_start != '' || $node->sr_start != NULL || $node->sr_start != 0) {
 if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group9']['timescale']['sr_start'] = array(
 '#type' => 'date_popup',
@@ -379,8 +387,7 @@ $form['group9']['timescale']['sr_start'] = array(
 );
 }*/
 // }
-//if ($node->sr_end != '' || $node->sr_end != NULL || $node->sr_end != 0)
-//{
+//if ($node->sr_end != '' || $node->sr_end != NULL || $node->sr_end != 0) {
 if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group9']['timescale']['sr_end'] = array(
 '#type' => 'date_popup',

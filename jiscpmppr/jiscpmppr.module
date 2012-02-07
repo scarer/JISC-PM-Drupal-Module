@@ -223,11 +223,11 @@ return array(
 
 function jiscpmppr_form(&$node) {
 $breadcrumb = array();
-$breadcrumb[] = l(t('JISCPM'), 'jiscpm');
-$breadcrumb[] = l(t('pprs'), 'jiscpm/pprs');
+$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+$breadcrumb[] = l(t('PPRs'), 'jiscpm/dashboard/pprs');
 drupal_set_breadcrumb($breadcrumb);
 
-$s_pro = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid"));
+$s_pro = db_rewrite_sql(db_query("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid"));
 
 $type = node_get_types('type', $node);
 
@@ -240,8 +240,8 @@ $form['group2'] = array(
 );
 
 /* print out project options */
-$s_pro = db_rewrite_sql($s_pro);
-$r = db_query($s_pro);
+//$s_pro = db_rewrite_sql($s_pro);
+$r = $s_pro;
 $projects = array();
 while ($project = db_fetch_object($r)) {
 $projects[$project->nid] = $project->title;
@@ -264,12 +264,18 @@ $form['group1'] = array(
 '#theme' => 'jiscpm_form_group',
 '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -21,
 );
-
+$title_default = "";
+if ($node->title != "" || $node->title != NULL) {
+$title_default = $node->title;
+}
+else {
+$title_default = "<INSERT PROJECT NAME> PPR";
+}
 $form['group1']['title'] = array(
 '#type' => 'textfield',
 '#title' => check_plain($type->title_label),
 '#required' => TRUE,
-'#default_value' => check_plain($node->title),
+'#default_value' => $title_default,
 '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
 );
 
@@ -277,10 +283,10 @@ if ($type->has_body) {
 $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
 }
 
-$form['title_old'] = array(
+/*$form['title_old'] = array(
 '#type' => 'hidden',
 '#default_value' => check_plain($node->title_old),
-);
+);*/
 
 //summary of project objectives
 $form['group3'] = array(
@@ -294,11 +300,14 @@ $form['group3']['summary_objectives'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group3']['summary_objectives']['summary_of_objectives'] = array(
+$form['group3']['summary_objectives']['ppr_summary_objectives'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_summary_objectives'],
 '#process' => array('jiscpm_dependent_select_process'),
+'#weight' => 0,
 );
+
+$form['group3']['summary_objectives']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group3', 'summary_objectives', 'format'));
 //benefits achieved
 $form['group4'] = array(
 '#type' => 'markup',
@@ -311,10 +320,10 @@ $form['group4']['benefits_achieved'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group4']['benefits_achieved']['project_benefits'] = array(
+$form['group4']['benefits_achieved']['ppr_benefits_achieved'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_benefits_achieved'],
-'#process' => array('jiscpm_dependent_select_process'),
+//'#process' => array('jiscpm_dependent_select_process'),
 '#weight' => 0,
 );
 $form['group4']['benefits_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group4', 'benefits_achieved', 'format'));
@@ -330,7 +339,7 @@ $form['group5']['benefits_not_achieved'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group5']['benefits_not_achieved']['bna'] = array(
+$form['group5']['benefits_not_achieved']['ppr_benefits_not_achieved'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_benefits_not_achieved'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -349,7 +358,7 @@ $form['group6']['negative_benefits_factors'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group6']['negative_benefits_factors']['nbf'] = array(
+$form['group6']['negative_benefits_factors']['ppr_negative_benefits_factors'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_negative_benefits_factors'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -368,7 +377,7 @@ $form['group7']['underestimated_tasks'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group7']['underestimated_tasks']['uet'] = array(
+$form['group7']['underestimated_tasks']['ppr_underestimated_tasks'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_underestimated_tasks'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -387,7 +396,7 @@ $form['group8']['overestimated_tasks'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group8']['overestimated_tasks']['oet'] = array(
+$form['group8']['overestimated_tasks']['ppr_overestimated_tasks'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_overestimated_tasks'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -406,7 +415,7 @@ $form['group9']['negative_time_factors'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group9']['negative_time_factors']['ntf'] = array(
+$form['group9']['negative_time_factors']['ppr_negative_time_factors'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_negative_time_factors'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -425,7 +434,7 @@ $form['group10']['underestimated_costs'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group10']['underestimated_costs']['uec'] = array(
+$form['group10']['underestimated_costs']['ppr_underestimated_costs'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_underestimated_costs'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -444,7 +453,7 @@ $form['group11']['overestimated_costs'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group11']['overestimated_costs']['oepc'] = array(
+$form['group11']['overestimated_costs']['ppr_overestimated_costs'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_overestimated_costs'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -463,7 +472,7 @@ $form['group12']['negative_cost_factors'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group12']['negative_cost_factors']['ncf'] = array(
+$form['group12']['negative_cost_factors']['ppr_negative_cost_factors'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_negative_cost_factors'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -482,7 +491,7 @@ $form['group13']['negative_quality_factors'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group13']['negative_quality_factors']['nqf'] = array(
+$form['group13']['negative_quality_factors']['ppr_negative_quality_factors'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_negative_quality_factors'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -501,7 +510,7 @@ $form['group14']['delivered_outputs'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group14']['delivered_outputs']['do'] = array(
+$form['group14']['delivered_outputs']['ppr_delivered_outputs'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_delivered_outputs'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -520,7 +529,7 @@ $form['group15']['unexpected_outcomes'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group15']['unexpected_outcomes']['uo'] = array(
+$form['group15']['unexpected_outcomes']['ppr_unexpected_outcomes'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_unexpected_outcomes'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -539,7 +548,7 @@ $form['group16']['outputs_not_fit'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group16']['outputs_not_fit']['onf'] = array(
+$form['group16']['outputs_not_fit']['ppr_outputs_not_fit'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_outputs_not_fit'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -558,7 +567,7 @@ $form['group17']['lessons_learned'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group17']['lessons_learned']['ll'] = array(
+$form['group17']['lessons_learned']['ppr_lessons_learned'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_lessons_learned'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -577,7 +586,7 @@ $form['group18']['recommendations_for_project'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group18']['recommendations_for_project']['rfp'] = array(
+$form['group18']['recommendations_for_project']['ppr_recommendations_for_project'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_recommendations_for_project'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -596,7 +605,7 @@ $form['group19']['recommendations_for_future_projects'] = array(
 '#collapsed' => TRUE,
 '#collapsible' => TRUE,
 );
-$form['group19']['recommendations_for_future_projects']['rffp'] = array(
+$form['group19']['recommendations_for_future_projects']['ppr_recommendations_for_future_projects'] = array(
 '#type' => 'textarea',
 '#default_value' => $node->pprs[0]['ppr_recommendations_for_future_projects'],
 '#process' => array('jiscpm_dependent_select_process'),
@@ -608,16 +617,16 @@ return $form;
 }
 
 function jiscpmppr_insert($node) {
-
 db_query("INSERT INTO {jiscpmppr}
-(nid, vid, project_nid, ppr_summary_objectives, ppr_benefits_achieved, ppr_benefits_not_achieved, ppr_negative_benefits_factors, ppr_underestimated_tasks, ppr_overestimated_tasks, ppr_negative_time_factors, 
-ppr_underestimated_costs, ppr_overestimated_costs, ppr_negative_cost_factors, ppr_negative_quality_factors, ppr_delivered_outputs, ppr_unexpected_outcomes, ppr_outputs_not_fit, ppr_lessons_learned, ppr_recommendations_for_project,
+(vid, nid, project_nid, ppr_summary_objectives, ppr_benefits_achieved, ppr_benefits_not_achieved, ppr_negative_benefits_factors, ppr_underestimated_tasks, ppr_overestimated_tasks, ppr_negative_time_factors, 
+ppr_underestimated_costs, ppr_overestimated_costs, ppr_negative_cost_factors, ppr_negative_quality_factors, ppr_delivered_outputs, ppr_outputs_not_fit, ppr_unexpected_outcomes, ppr_lessons_learned, ppr_recommendations_for_project,
 ppr_recommendations_for_future_projects)
 VALUES
-(%d, %d, %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
-$node->nid, $node->nid, $node->project_nid, $node->summary_objectives, $node->benefits_achieved, $node->benefits_not_achieved, $node->negative_benefits_factors, $node->underestimated_tasks,
-$node->overestimated_tasks, $node->negative_time_factors, $node->underestimated_costs, $node->overestimated_costs,  $node->negative_cost_factors, $node->negative_quality_factors, $node->delivered_outputs, $node->unexpected_outcomes, $node->outputs_not_fit,
-$node->lessons_learned, $node->recommendations_for_project, $node->recommendations_for_future_projects);
+(%d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', 
+'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+$node->vid, $node->nid, $node->project_nid, $node->ppr_summary_objectives, $node->ppr_benefits_achieved, $node->ppr_benefits_not_achieved, $node->ppr_negative_benefits_factors, $node->ppr_underestimated_tasks,
+$node->ppr_overestimated_tasks, $node->ppr_negative_time_factors, $node->ppr_underestimated_costs, $node->ppr_overestimated_costs,  $node->ppr_negative_cost_factors, $node->ppr_negative_quality_factors, $node->ppr_delivered_outputs, $node->ppr_outputs_not_fit, $node->ppr_unexpected_outcomes, $node->ppr_lessons_learned, $node->ppr_recommendations_for_project, $node->ppr_recommendations_for_future_projects);
+
 }
 
 function jiscpmppr_update($node) {
@@ -627,21 +636,9 @@ function jiscpmppr_update($node) {
 if ($node->revision) {
 jiscpmppr_insert($node);
 }
-else {
-
-db_query("UPDATE {jiscpmppr} SET
-project_nid=%d, ppr_summary_objectives='%s', ppr_benefits_achieved='%s', ppr_benefits_not_achieved='%s', ppr_negative_benefits_factors='%s', ppr_underestimated_tasks='%s', ppr_overestimated_tasks='%s',
-ppr_negative_time_factors='%s', ppr_underestimated_costs='%s', ppr_overestimated_costs='%s', ppr_negative_cost_factors='%s', ppr_negative_quality_factors='%s', ppr_delivered_outputs='%s', 
-ppr_unexpected_outcomes='%s', ppr_outputs_not_fit='%s', ppr_lessons_learned='%s', ppr_recommendations_for_project='%s', ppr_recommendations_for_future_projects='%s' WHERE nid = %d",
-$node->project_nid, $node->summary_objectives, $node->benefits_achieved, $node->benefits_not_achieved, $node->negative_benefits_factors, $node->underestimated_tasks, $node->overestimated_tasks,
-$node->negative_time_factors, $node->underestimated_costs, $node->overestimated_costs, $node->negative_cost_factors, $node->negative_quality_factors, $node->delivered_outputs, $node->unexpected_outcomes, $node->outputs_not_fit,
-$node->lessons_learned, $node->recommendations_for_project, $node->recommendations_for_future_projects, $node->nid
-);
-
-/*if ($node->title != $node->title_old) {
-module_invoke_all('jiscpmppr_change', $node->nid, $node->title);
-}
-*/
+else {   
+db_query("DELETE FROM {jiscpmppr} WHERE nid = %d AND vid = %d", $node->nid, $node->vid);
+jiscpmppr_insert($node);
 }
 }
 
@@ -663,9 +660,7 @@ db_query('DELETE FROM {jiscpmppr} WHERE nid = %d', $node->nid);
 }
 
 function jiscpmppr_load($node) {
-$result_ppr = db_query('SELECT project_nid, ppr_summary_objectives, ppr_benefits_achieved, ppr_benefits_not_achieved, ppr_negative_benefits_factors, ppr_underestimated_tasks, ppr_overestimated_tasks, ppr_negative_time_factors,
-ppr_underestimated_costs, ppr_overestimated_costs, ppr_negative_cost_factors, ppr_negative_quality_factors, ppr_delivered_outputs, ppr_unexpected_outcomes, ppr_outputs_not_fit, ppr_lessons_learned, ppr_recommendations_for_project,
-ppr_recommendations_for_future_projects FROM {jiscpmppr} WHERE nid = %d', $node->nid);
+$result_ppr = db_query('SELECT * FROM {jiscpmppr} WHERE nid = %d', $node->nid);
 $node->pprs = array();
 while ($row_ppr = db_fetch_object($result_ppr)) {
 $ppr = array(
@@ -691,12 +686,13 @@ $ppr = array(
 
 $node->pprs[0] = $ppr;
 }
+//print_r($node->pprs[0]);
 return $node;
 }
 
 function jiscpmppr_view($node, $teaser = FALSE, $page = FALSE) {
 $breadcrumb = array();
-$breadcrumb[] = l(t('jiscpm/dashboard'), 'jiscpm');
+$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
 $breadcrumb[] = l(t('Post Project Reviews'), 'jiscpm/dashboard/pprs');
 drupal_set_breadcrumb($breadcrumb);
 

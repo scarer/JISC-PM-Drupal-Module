@@ -40,25 +40,28 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
     '#suffix' => '</div>',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group10') : -12,
   );
-  
   //get node results from database
-  $results = db_query(db_rewrite_sql('SELECT project_manager_uid, client_uid, projectcategory, projectstatus, projectpriority, datebegin, dateend, organisational_scope, logical_scope, out_of_scope FROM {jiscpmproject} WHERE nid = %d', $node->nid));
-  while ($rows = db_fetch_object($results)) {
-    $project_manager = user_load($rows->project_manager_uid);
-    $pm_name = $project_manager->name;
-    $client = user_load($rows->client_uid);
-    $client_name = $client->name;
-    $category = $rows->projectcategory;
-    $status = $rows->projectstatus;
-    $priority = $rows->projectpriority;
-    $begin = date('D m Y' , $rows->datebegin);
-    $end = date('D m Y' , $rows->dateend);
-    $org_scope = $rows->organisational_scope;
-    $log_scope = $rows->logical_scope;
-    $out_scope = $rows->out_of_scope;
+  $resultspro = db_query('SELECT jp.project_manager_uid, jp.client_uid, jp.projectcategory, jp.projectstatus, jp.projectpriority, jp.datebegin, jp.dateend, jp.organisational_scope, jp.logical_scope, jp.out_of_scope FROM {jiscpmproject} jp WHERE jp.nid = %d', $node->nid);
+  while ($rowspro = db_fetch_object($resultspro)) {
+if ($rowspro->project_manager_uid != -1) {
+$project_manager = user_load($rowspro->project_manager_uid);
+$pm_name = $project_manager->name;
+}
+if ($rowspro->client_uid != -1) {
+$client = user_load($rowspro->client_uid);
+$client_name = $client->name;
+}
+    $category = $rowspro->projectcategory;
+    $status = $rowspro->projectstatus;
+    $priority = $rowspro->projectpriority;
+    $begin = date('D m Y' , $rowspro->datebegin);
+    $end = date('D m Y' , $rowspro->dateend);
+    $org_scope = $rowspro->organisational_scope;
+    $log_scope = $rowspro->logical_scope;
+    $out_scope = $rowspro->out_of_scope;
   }
   //get risks from database
-  $risks_results = db_query(db_rewrite_sql('SELECT n.title, jr.vid, jr.risk_owner_uid FROM {node} n JOIN {jiscpmrisk} jr ON n.nid = jr.nid WHERE jr.project_nid = %d', $node->nid));
+  $risks_results = db_rewrite_sql(db_query('SELECT n.title, jr.vid, jr.risk_owner_uid FROM {node} n JOIN {jiscpmrisk} jr ON n.nid = jr.nid WHERE jr.project_nid = %d', $node->nid));
   while ($risks_rows = db_fetch_object($risks_results)) {
     $risktitle = $risks_rows->title;
     $risknid = $risks_rows->vid;
@@ -67,16 +70,16 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $risks = '<p><table><th>Risk</th><th>Owner</th>' . $output_risks . '</table></p>';
   //get issues from database
-  $issues_results = db_query(db_rewrite_sql('SELECT n.title, i.vid, i.issue_owner_uid FROM {node} n JOIN {jiscpmissue} i ON n.nid = i.nid WHERE i.project_nid = %d', $node->nid));
+  $issues_results = db_rewrite_sql(db_query('SELECT n.title, i.nid, i.issue_owner_uid FROM {jiscpmissue} i JOIN {node} n ON i.nid = n.nid WHERE i.project_nid = %d', $node->nid));
   while ($issues_rows = db_fetch_object($issues_results)) {
     $issuetitle = $issues_rows->title;
-    $issuenid = $issues_rows->vid;
+    $issuenid = $issues_rows->nid;
     $issueowner = user_load($issues_rows->issue_owner_uid);
     $output_issues .= '<tr><td><a href="' . $base_url . '/node/' . $issuenid . '">' . $issuetitle . '</a></td><td><a href="user/' . $issueowner->uid . '">' . $issueowner->name . '</a></td>';
   }
   $issues = '<p><table><th>Issue</th><th>Owner</th>' . $output_issues . '</table></p>';
   //get business case assessments from database
-  $bca_results = db_query(db_rewrite_sql('SELECT n.title, jb.vid FROM {node} n JOIN {jiscpmbca} jb ON n.nid = jb.nid WHERE jb.project_nid = %d', $node->nid));
+  $bca_results = db_rewrite_sql(db_query('SELECT n.title, jb.vid FROM {node} n JOIN {jiscpmbca} jb ON n.nid = jb.nid WHERE jb.project_nid = %d', $node->nid));
   while ($bca_rows = db_fetch_object($bca_results)) {
     $bcatitle = $bca_rows->title;
     $bcanid = $bca_rows->vid;
@@ -84,7 +87,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $bca = '<p><table><th>BCA</th>' . $output_bcas . '</table></p>';
   //get post project reviews from database
-  $ppr_results = db_query(db_rewrite_sql('SELECT n.title, ppr.vid FROM {node} n JOIN {jiscpmppr} ppr ON n.nid = ppr.nid WHERE ppr.project_nid = %d', $node->nid));
+  $ppr_results = db_rewrite_sql(db_query('SELECT n.title, ppr.vid FROM {node} n JOIN {jiscpmppr} ppr ON n.nid = ppr.nid WHERE ppr.project_nid = %d', $node->nid));
   while ($ppr_rows = db_fetch_object($ppr_results)) {
     $pprtitle = $ppr_rows->title;
     $pprnid = $ppr_rows->vid;
@@ -92,7 +95,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $ppr = '<p><table><th>PPR</th>' . $output_pprs . '</table></p>';
   //get status reports from database
-  $sr_results = db_query(db_rewrite_sql('SELECT n.title, sr.vid, sr.sr_start, sr.sr_end FROM {node} n JOIN {jiscpmsr} sr ON n.nid = sr.nid WHERE sr.project_nid = %d ORDER BY sr.sr_start ASC', $node->nid));
+  $sr_results = db_rewrite_sql(db_query('SELECT n.title, sr.vid, sr.sr_start, sr.sr_end FROM {node} n JOIN {jiscpmsr} sr ON n.nid = sr.nid WHERE sr.project_nid = %d ORDER BY sr.sr_start ASC', $node->nid));
   while ($sr_rows = db_fetch_object($sr_results)) {
     $srtitle = $sr_rows->title;
     $srnid = $sr_rows->vid;
@@ -100,7 +103,7 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
   }
   $sr = '<p><table><th>Status Report</th><th>Timescale</th>' . $output_srs . '</table></p>';
   //get requests for change from database
-  $rfc_results = db_query(db_rewrite_sql('SELECT n.title, rfc.vid FROM {node} n JOIN {jiscpmrfc} rfc ON n.nid = rfc.nid WHERE rfc.project_nid = %d', $node->nid));
+  $rfc_results = db_rewrite_sql(db_query('SELECT n.title, rfc.vid FROM {node} n JOIN {jiscpmrfc} rfc ON n.nid = rfc.nid WHERE rfc.project_nid = %d', $node->nid));
   while ($rfc_rows = db_fetch_object($rfc_results)) {
     $rfctitle = $rfc_rows->title;
     $rfcnid = $rfc_rows->vid;
@@ -255,7 +258,6 @@ $node->teams[$t]['team_title'] . '</a></td><td>' . check_markup($node->teams[$t]
      '#collapsed' => TRUE,
      '#weight' => -9,
   );
-  
   $node->content['scope']['projectscope']['organisational_scope'] = array(
     '#prefix' => '<div class="projectscope"><b>Organisational Scope</b><br>',
     '#suffix' => '</div>',

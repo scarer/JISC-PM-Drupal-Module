@@ -10,7 +10,6 @@ function theme_jiscpmppr_list($header, $pprs) {
   foreach ($pprs as $key => $ppr) {
     $rows[] = array(
       jiscpm_icon('pprcategory_'. $ppr->pprcategory, $ppr->pprcategory),
-      l($ppr->organization_title, 'node/'. $ppr->organization_nid),
       l($ppr->title, 'node/'. $ppr->nid) . theme('mark', node_mark($ppr->nid, $ppr->changed)),
       jiscpm_icon('status_'. $ppr->pprstatus, $ppr->pprstatus),
       jiscpm_icon('priority_'. $ppr->pprpriority, $ppr->pprpriority),

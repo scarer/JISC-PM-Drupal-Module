@@ -39,7 +39,7 @@ function jiscpmppr_schema() {
       'ppr_recommendations_for_project'  => array('description' => t('The recommendations for the project in the post project review'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
       'ppr_recommendations_for_future_projects'  => array('description' => t('The recommendations for future similar projects in the post project review'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
-    'primary key' => array('nid', 'vid', 'project_nid'),
+    'primary key' => array('nid', 'vid'),
   );
 
   return $schema;

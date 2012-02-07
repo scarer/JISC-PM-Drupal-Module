@@ -10,7 +10,6 @@ function theme_jiscpmbca_list($header, $bcas) {
   foreach ($bcas as $key => $bca) {
     $rows[] = array(
       jiscpm_icon('bcacategory_'. $bca->bcacategory, $bca->bcacategory),
-      l($bca->organization_title, 'node/'. $bca->organization_nid),
       l($bca->title, 'node/'. $bca->nid) . theme('mark', node_mark($bca->nid, $bca->changed)),
       jiscpm_icon('status_'. $bca->bcastatus, $bca->bcastatus),
       jiscpm_icon('priority_'. $bca->bcapriority, $bca->bcapriority),
@@ -249,12 +248,11 @@ $runningcostsother .= '<tr><td>' . $node->running_cost_others[$rco]['running_cos
     '#prefix' => '<div class="jiscpmbca-internal-support"><h2>Internal Support</h2>',
     '#suffix' => '</div>',
   );
-  $node->content['group7']['bcaorganisationalareas']['external_suppport'] = array(
-    '#value' => check_markup($node->jiscpmbcas[0]['external_suppport'], FILTER_FORMAT_DEFAULT, FALSE),
+  $node->content['group7']['bcaorganisationalareas']['bca_external_suppport'] = array(
+    '#value' => check_markup($node->jiscpmbcas[0]['bca_external_support'], FILTER_FORMAT_DEFAULT, FALSE),
     '#prefix' => '<div class="jiscpmbca-external-support"><h2>External Support</h2>',
     '#suffix' => '</div>',
   );
-  
   $node->content['group8'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',

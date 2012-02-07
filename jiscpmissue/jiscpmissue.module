@@ -176,7 +176,7 @@ $breadcrumb[] = l(t('issues'), 'jiscpm/issues');
 drupal_set_breadcrumb($breadcrumb);
 
 $s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
-$s_pro = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid"));
+$s_pro = db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid");
 
 $type = node_get_types('type', $node);
 
@@ -205,7 +205,7 @@ $form['group1']['issue_owner_uid'] = array(
 '#process' => array('jiscpm_dependent_select_process'),
 );
 /* print out project options */
-$s_pro = db_rewrite_sql($s_pro);
+//$s_pro = db_rewrite_sql($s_pro);
 $r = db_query($s_pro);
 $projects = array();
 while ($project = db_fetch_object($r)) {
