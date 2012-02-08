@@ -62,7 +62,6 @@ function theme_jiscpmtask_list($header, $tasks) {
         'jiscpm_status_'. preg_replace('/[^a-zA-Z]/', '', $task->taskstatus) . ' ' .
         'jiscpm_priority_'. preg_replace('/[^a-zA-Z]/', '', $task->taskpriority),
       'data' => array(
-        l($task->organization_title, 'node/'. $task->organization_nid),
         l($task->project_title, 'node/'. $task->project_nid),
         l($task->title, 'node/'. $task->nid) . theme('mark', node_mark($task->nid, $task->changed)),
         jiscpm_icon('category_'. $task->taskcategory, $task->taskcategory),

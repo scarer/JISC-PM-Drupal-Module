@@ -5,41 +5,13 @@
 
 function theme_jiscpmbca_list($header, $bcas) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') .'/jiscpm.css', 'module');
-
-  $rows = array();
-  foreach ($bcas as $key => $bca) {
-    $rows[] = array(
-      jiscpm_icon('bcacategory_'. $bca->bcacategory, $bca->bcacategory),
-      l($bca->title, 'node/'. $bca->nid) . theme('mark', node_mark($bca->nid, $bca->changed)),
-      jiscpm_icon('status_'. $bca->bcastatus, $bca->bcastatus),
-      jiscpm_icon('priority_'. $bca->bcapriority, $bca->bcapriority),
-      array(
-        'data' => jiscpm_icon_edit_node($bca, $_GET) .'&nbsp;'. jiscpm_icon_delete_node($bca, $_GET),
-        'class' => 'jiscpm_list_operations',
-      ),
-    );
-  }
-  $o  = theme('table', $header, $rows);
-  return $o;
 }
 
 function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm-node.css', 'module');
   
   $node = node_prepare($node, $teaser);
-  
-  $node->content['links'] = array(
-    '#prefix' => '<div class="jiscpmlinks"><dl>',
-    '#suffix' => '</dl></div>',
-    '#weight' => -25,
-  );
-  
-  $node->content['links']['expenses'] = theme('jiscpm_link', 'jiscpmbca', 'jiscpmexpense', $node->nid, 1);
-  $node->content['links']['notes'] = theme('jiscpm_link', 'jiscpmbca', 'jiscpmnote', $node->nid, 2);
-  $node->content['links']['tasks'] = theme('jiscpm_link', 'jiscpmbca', 'jiscpmtask', $node->nid, 3);
-  $node->content['links']['tickets'] = theme('jiscpm_link', 'jiscpmbca', 'jiscpmticket', $node->nid, 4);  
-  $node->content['links']['timetrackings'] = theme('jiscpm_link', 'jiscpmbca', 'jiscpmtimetracking', $node->nid, 5);
-  $actions .= '<p><table><th>Title</th><th>Description</th><th>Delivery Date</th>';
+
   //generate output for jiscpm bca actions
   for ($a = 0; $a < count ($node->actions); $a ++) {
 $actions .= '<tr><td>' . $node->actions[$a]['action_title'] . '</td><td>' . check_markup($node->actions[$a]['action_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td><td>' . date('d M Y', $node->actions[$a]['action_deliverydate']) . '</td></tr>';

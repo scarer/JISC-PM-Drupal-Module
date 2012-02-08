@@ -390,7 +390,7 @@ $form['group3'] = array(
 '#theme' => 'jiscpm_form_group',
 '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group3') : -16,
 );
-
+if ($node->datebegin != '' || $node->datebegin != NULL || $node->datebegin != 0) {
 if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group3']['datebegin'] = array(
 '#type' => 'date_popup',
@@ -399,14 +399,18 @@ $form['group3']['datebegin'] = array(
 '#default_value' => date('Y-m-d', $node->datebegin),
 );
 }
+}
 else {
+if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group3']['datebegin'] = array(
-'#type' => 'date',
+'#type' => 'date_popup',
 '#title' => t('Date begin'),
-'#default_value' => date('Y-m-d', $node->datebegin),
+'#date_format' =>  'Y-m-d',
+'#default_value' => date('Y-m-d'),
 );
 }
-
+}
+if ($node->dateend != '' || $node->dateend != NULL || $node->dateend != 0) {
 if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group3']['dateend'] = array(
 '#type' => 'date_popup',
@@ -415,12 +419,16 @@ $form['group3']['dateend'] = array(
 '#default_value' => date('Y-m-d', $node->dateend),
 );
 }
+}
 else {
+if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group3']['dateend'] = array(
-'#type' => 'date',
+'#type' => 'date_popup',
 '#title' => t('Date end'),
-'#default_value' => date('Y-m-d', $node->dateend),
+'#date_format' =>  'Y-m-d',
+'#default_value' => date('Y-m-d'),
 );
+}
 }
 
 $durationunit_list = jiscpmattribute_attributes_bydomain('Duration unit');

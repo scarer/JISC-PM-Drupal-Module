@@ -181,7 +181,7 @@ $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
 $breadcrumb[] = l(t('Teams'), 'jiscpm/dashboard/teams');
 drupal_set_breadcrumb($breadcrumb);
 
-return theme('jiscpmrisk_view', $node, $teaser, $page);
+return theme('jiscpmteam_view', $node, $teaser, $page);
 // @TODO: render and theme member listing.
 return theme('jiscpmteam_view', $node, $teaser, $page);
 }

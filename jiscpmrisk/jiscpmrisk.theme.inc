@@ -10,7 +10,6 @@ function theme_jiscpmrisk_list($header, $risks) {
   foreach ($risks as $key => $risk) {
     $rows[] = array(
       jiscpm_icon('riskcategory_'. $risk->riskcategory, $risk->riskcategory),
-      l($risk->organization_title, 'node/'. $risk->organization_nid),
       l($risk->title, 'node/'. $risk->nid) . theme('mark', node_mark($risk->nid, $risk->changed)),
       jiscpm_icon('status_'. $risk->riskstatus, $risk->riskstatus),
       jiscpm_icon('priority_'. $risk->riskpriority, $risk->riskpriority),
@@ -28,18 +27,6 @@ function theme_jiscpmrisk_view($node, $teaser = FALSE, $page = FALSE) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm-node.css', 'module');
   
   $node = node_prepare($node, $teaser);
-  
-  $node->content['links'] = array(
-    '#prefix' => '<div class="jiscpmlinks"><dl>',
-    '#suffix' => '</dl></div>',
-    '#weight' => -25,
-  );
-  
-  $node->content['links']['expenses'] = theme('jiscpm_link', 'jiscpmrisk', 'jiscpmexpense', $node->nid, 1);
-  $node->content['links']['notes'] = theme('jiscpm_link', 'jiscpmrisk', 'jiscpmnote', $node->nid, 2);
-  $node->content['links']['tasks'] = theme('jiscpm_link', 'jiscpmrisk', 'jiscpmtask', $node->nid, 3);
-  $node->content['links']['tickets'] = theme('jiscpm_link', 'jiscpmrisk', 'jiscpmticket', $node->nid, 4);  
-  $node->content['links']['timetrackings'] = theme('jiscpm_link', 'jiscpmrisk', 'jiscpmtimetracking', $node->nid, 5);
   
   $node->content['group1'] = array( 
     '#prefix' => '<div class="jiscpmfields">',

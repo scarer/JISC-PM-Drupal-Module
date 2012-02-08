@@ -5,41 +5,12 @@
 
 function theme_jiscpmrfc_list($header, $risks) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') .'/jiscpm.css', 'module');
-
-  $rows = array();
-  foreach ($risks as $key => $risk) {
-    $rows[] = array(
-      jiscpm_icon('riskcategory_'. $risk->riskcategory, $risk->riskcategory),
-      l($risk->organization_title, 'node/'. $risk->organization_nid),
-      l($risk->title, 'node/'. $risk->nid) . theme('mark', node_mark($risk->nid, $risk->changed)),
-      jiscpm_icon('status_'. $risk->riskstatus, $risk->riskstatus),
-      jiscpm_icon('priority_'. $risk->riskpriority, $risk->riskpriority),
-      array(
-        'data' => jiscpm_icon_edit_node($risk, $_GET) .'&nbsp;'. jiscpm_icon_delete_node($risk, $_GET),
-        'class' => 'jiscpm_list_operations',
-      ),
-    );
-  }
-  $o  = theme('table', $header, $rows);
-  return $o;
 }
 
 function theme_jiscpmrfc_view($node, $teaser = FALSE, $page = FALSE) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm-node.css', 'module');
   
   $node = node_prepare($node, $teaser);
-  
-  $node->content['links'] = array(
-    '#prefix' => '<div class="jiscpmlinks"><dl>',
-    '#suffix' => '</dl></div>',
-    '#weight' => -25,
-  );
-  
-  $node->content['links']['expenses'] = theme('jiscpm_link', 'jiscpmrfc', 'jiscpmexpense', $node->nid, 1);
-  $node->content['links']['notes'] = theme('jiscpm_link', 'jiscpmrfc', 'jiscpmnote', $node->nid, 2);
-  $node->content['links']['tasks'] = theme('jiscpm_link', 'jiscpmrfc', 'jiscpmtask', $node->nid, 3);
-  $node->content['links']['tickets'] = theme('jiscpm_link', 'jiscpmrfc', 'jiscpmticket', $node->nid, 4);  
-  $node->content['links']['timetrackings'] = theme('jiscpm_link', 'jiscpmrfc', 'jiscpmtimetracking', $node->nid, 5);
   
   $node->content['group0'] = array(
     '#prefix' => '<div class="jiscpmfields">',

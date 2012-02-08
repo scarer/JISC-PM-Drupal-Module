@@ -193,8 +193,8 @@ db_query($s, $owner_name, $owner_uid, $owner_name);
 
 function jiscpmsr_form(&$node, $form_state) {
 $breadcrumb = array();
-$breadcrumb[] = l(t('JISCPM'), 'jiscpm');
-$breadcrumb[] = l(t('srs'), 'jiscpm/srs');
+$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+$breadcrumb[] = l(t('Status Reports'), 'jiscpm/dashboard/srs');
 drupal_set_breadcrumb($breadcrumb);
 $s_pro = db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid");
 $type = node_get_types('type', $node);
@@ -366,7 +366,7 @@ $form['group9']['timescale'] = array(
 '#collapsible' => TRUE,
 '#collapsed' => FALSE,
 );
-//if ($node->sr_start != '' || $node->sr_start != NULL || $node->sr_start != 0) {
+if ($node->sr_start != '' || $node->sr_start != NULL || $node->sr_start != 0) {
 if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group9']['timescale']['sr_start'] = array(
 '#type' => 'date_popup',
@@ -375,19 +375,18 @@ $form['group9']['timescale']['sr_start'] = array(
 '#default_value' => date('Y-m-d', $node->jiscpmsrs[0]['sr_start']),
 );
 }
-//}
-//else
-//{
-/*if (module_exists('date_api') && module_exists('date_popup')) {
+} 
+else {
+if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group9']['timescale']['sr_start'] = array(
 '#type' => 'date_popup',
 '#title' => t('Reporting Period Start'),
 '#date_format' =>	 'Y-m-d',
 '#default_value' => date('Y-m-d'),
 );
-}*/
-// }
-//if ($node->sr_end != '' || $node->sr_end != NULL || $node->sr_end != 0) {
+}
+}
+if ($node->sr_end != '' || $node->sr_end != NULL || $node->sr_end != 0) {
 if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group9']['timescale']['sr_end'] = array(
 '#type' => 'date_popup',
@@ -396,18 +395,17 @@ $form['group9']['timescale']['sr_end'] = array(
 '#default_value' => date('Y-m-d', $node->jiscpmsrs[0]['sr_end']),
 );
 }
-//}
-//else
-//{
-/*if (module_exists('date_api') && module_exists('date_popup')) {
+}
+else {
+if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group9']['timescale']['sr_end'] = array(
 '#type' => 'date_popup',
 '#title' => t('Reporting Period End'),
 '#date_format' =>	 'Y-m-d',
 '#default_value' => date('Y-m-d'),
 );
-}*/
-//}
+}
+}
 $form['group10'] = array(
 '#type' => 'markup',
 '#theme' => 'jiscpm_form_group',

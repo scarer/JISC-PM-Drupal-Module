@@ -5,41 +5,12 @@
 
 function theme_jiscpmsr_list($header, $srs) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') .'/jiscpm.css', 'module');
-
-  $rows = array();
-  foreach ($srs as $key => $sr) {
-    $rows[] = array(
-      jiscpm_icon('srcategory_'. $sr->srcategory, $sr->srcategory),
-      l($sr->organization_title, 'node/'. $sr->organization_nid),
-      l($sr->title, 'node/'. $sr->nid) . theme('mark', node_mark($sr->nid, $sr->changed)),
-      jiscpm_icon('status_'. $sr->srstatus, $sr->srstatus),
-      jiscpm_icon('priority_'. $sr->srpriority, $sr->srpriority),
-      array(
-        'data' => jiscpm_icon_edit_node($sr, $_GET) .'&nbsp;'. jiscpm_icon_delete_node($sr, $_GET),
-        'class' => 'jiscpm_list_operations',
-      ),
-    );
-  }
-  $o  = theme('table', $header, $rows);
-  return $o;
 }
 
 function theme_jiscpmsr_view($node, $teaser = FALSE, $page = FALSE) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm-node.css', 'module');
   
   $node = node_prepare($node, $teaser);
-  
-  $node->content['links'] = array(
-    '#prefix' => '<div class="jiscpmlinks"><dl>',
-    '#suffix' => '</dl></div>',
-    '#weight' => -25,
-  );
-  
-  $node->content['links']['expenses'] = theme('jiscpm_link', 'jiscpmsr', 'jiscpmexpense', $node->nid, 1);
-  $node->content['links']['notes'] = theme('jiscpm_link', 'jiscpmsr', 'jiscpmnote', $node->nid, 2);
-  $node->content['links']['tasks'] = theme('jiscpm_link', 'jiscpmsr', 'jiscpmtask', $node->nid, 3);
-  $node->content['links']['tickets'] = theme('jiscpm_link', 'jiscpmsr', 'jiscpmticket', $node->nid, 4);  
-  $node->content['links']['timetrackings'] = theme('jiscpm_link', 'jiscpmsr', 'jiscpmtimetracking', $node->nid, 5);
   
   $node->content['group1'] = array( 
     '#prefix' => '<div class="jiscpmfields">',
@@ -170,13 +141,6 @@ $node->content['projectmanager'] = array(
   $node->content['group14']['sr_related_project_information'] = array(
     '#value' => theme('jiscpm_view_item', t('Related Project Information'), check_markup($node->jiscpmsrs[0]['sr_related_project_information'], FILTER_FORMAT_DEFAULT, FALSE)),
   );
-  /*$node->content['body_field'] = array(
-    '#prefix' => '<div class="jiscpmbody">',
-    '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Description'), $node->content['body']['#value']),
-    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'body_field') : -18,
-  );
-  unset($node->content['body']);*/
   
   return $node;
 }

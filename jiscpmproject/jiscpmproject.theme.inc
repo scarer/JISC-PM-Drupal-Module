@@ -154,10 +154,14 @@ $output_g .= '<tr><td>' . $node->goals[$g]['goal_title'] . '</a></td><td>' . che
 $output_m .= '<tr><td>' . $node->milestones[$m]['milestone_title'] . '</a></td><td>' . date('D d M Y', $node->milestones[$m]['milestone_deliverydate']) . '</td></tr>';
   }
   //get project team data
-  for ($t = 0; $t < count($node->teams); $t ++) {
-$output_t .= '<tr><td><a href="' . $base_url . '/node/' . $node->teams[$t]['team_nid'] . '">' . 
-$node->teams[$t]['team_title'] . '</a></td><td>' . check_markup($node->teams[$t]['team_description'], FILTER_FORMAT_DEFAULT, FALSE) . '</td></tr>';
+  $team_results = db_rewrite_sql(db_query('SELECT n.title, n.nid, t.team_description FROM {node} n JOIN {jiscpmteam} t ON n.nid = t.nid WHERE t.project_nid = %d', $node->nid));
+  while ($t_rows = db_fetch_object($team_results)) {
+    $ttitle = $t_rows->title;
+    $tnid = $t_rows->nid;
+$tdescription = $t_rows->team_description;
+    $output_t .= '<tr><td><a href="' . $base_url . '/node/' . $tnid . '">' . $ttitle . '</a></td><td>' . $tdescription . '</td></tr>';
   }
+  $sr = '<p><table><th>Status Report</th><th>Timescale</th>' . $output_srs . '</table></p>';
   $teams = '<p><table><th>Team</th><th>Description</th>' . $output_t . '</table></p>';
   $milestones = '<p><table><th>Milestone</th><th>Delivery Date</th>' . $output_m . '</table></p>';
   $node->content['projectcategory'] = array(
