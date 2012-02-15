@@ -144,7 +144,7 @@ $form['jiscpmtask_jsgantt_location'] = array(
 '#default_value' => variable_get('jiscpmtask_jsgantt_location', t('sites/all/libraries/jsgantt')),
 '#description' => t('The directory that contains the jsgantt library ( sites/all/libraries/jsgantt is recommended )'),
 '#size' => 50,
-'#after_build' => array('jsgantt_check_directory'),
+'#after_build' => array('jiscpmtask_jsgantt_check_directory'),
 );
 
 
@@ -199,7 +199,7 @@ $form['jiscpmtask_jsgantt_color_overdue'] = array(
 return system_settings_form($form);
 }
 
-function jsgantt_check_directory($form_element) {
+function jiscpmtask_jsgantt_check_directory($form_element) {
 $file = $form_element['#value'] . "/jsgantt.js";
 if (!file_exists($file)) {
 form_set_error($form_element['#name'], t('The file %file does not exist.', array('%file' => $file)));
