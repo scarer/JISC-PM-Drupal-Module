@@ -1,5 +1,3 @@
-// $Id: README.txt,v 1.1.2.2 2009/07/02 09:08:53 magnity Exp $
-
 jsGantt Library:
 
 02 July 2009.
