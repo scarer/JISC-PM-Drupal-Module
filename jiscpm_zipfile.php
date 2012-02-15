@@ -162,5 +162,3 @@ class zipfile
             "\x00\x00";                             // .zip file comment length 
     }  
 } 
-
-?>
