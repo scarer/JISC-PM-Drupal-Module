@@ -170,10 +170,6 @@ drupal_set_breadcrumb($breadcrumb);
 $s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
 $s_pro = db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid");
 
-
-/*$type = node_get_types('type', $node);
-
-$form['#attributes']['class'] = 'jiscpmcomponent_node_form';*/
 $form['group0'] = array(
 '#type' => 'markup',
 '#theme' => 'jiscpm_form_group',
@@ -194,7 +190,6 @@ $form['group1'] = array(
 );
 
 /* print out owner options */
-/*$s_own = db_rewrite_sql($s_own);*/
 $r = db_query($s_own);
 $owners = array();
 while ($owner = db_fetch_object($r)) {
@@ -209,7 +204,6 @@ $form['group1']['risk_owner_uid'] = array(
 '#process' => array('jiscpm_dependent_select_process'),
 );
 /* print out project options */
-/*$s_pro = db_rewrite_sql($s_pro);*/
 $r = db_query($s_pro);
 $projects = array();
 while ($project = db_fetch_object($r)) {

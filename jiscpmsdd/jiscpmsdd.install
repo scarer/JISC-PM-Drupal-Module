@@ -1,0 +1,82 @@
+<?php
+/**
+* @file
+*/
+
+function jiscpmsdd_install() {
+drupal_install_schema('jiscpmsdd');
+drupal_install_schema('jiscpmsdd_user_classes');
+drupal_install_schema('jiscpmsdd_functional');
+drupal_install_schema('jiscpmsdd_non_functional');
+drupal_install_schema('jiscpmsdd_definitions');
+}
+
+function jiscpmsdd_disable() {
+drupal_set_message(t('Nodes of type "jiscpmsdd" have not been deleted on disabling jiscpm sdd. Please note that they will now have reduced functionality, and will not be protected by jiscpm sdd access controls.'), 'warning');
+}
+
+function jiscpmsdd_uninstall() {
+drupal_uninstall_schema('jiscpmsdd');
+drupal_uninstall_schema('jiscpmsdd_user_classes');
+drupal_uninstall_schema('jiscpmsdd_functional');
+drupal_uninstall_schema('jiscpmsdd_non_functional');
+drupal_uninstall_schema('jiscpmsdd_definitions');
+}
+
+function jiscpmsdd_schema() {
+$schema['jiscpmsdd'] = array(
+'fields'                => array(
+'nid'                 => array('description' => t('The nid of a status report'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+'vid'                 => array('description' => t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+'project_nid'    => array('description' => t('The nid for the project a status report belongs to'), 'type' => 'int'),
+'system_overview'  => array('description' => t('An overview of the system'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'system_architecture'  => array('description' => t('A description of the system architecture'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'data_design'  => array('description' => t('A description of the data design'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'component_design'  => array('description' => t('A description of the component design'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'user_interfaces'  => array('description' => t('A description of the user interfaces'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'hardware_interfaces'  => array('description' => t('A description of the hardware interfaces'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'software_interfaces'  => array('description' => t('A description of the software interfaces'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'user_documentation'  => array('description' => t('A description of the user documentation'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+),
+'primary key' => array('nid', 'vid'),
+);
+$schema['jiscpmsdd_user_classes'] = array(
+'fields'                => array(
+'user_class_id'                 => array('description' => t('The id for a user class and description for a system design document. Primary key.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+'sdd_nid'    => array('description' => t('The nid for the system design document node that this entry belongs to'), 'type' => 'int'),
+'user_class_name'  => array('description' => t('The user class'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'user_class_characteristics'  => array('description' => t('The characteristics for the user class'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+),
+'primary key' => array('user_class_id'),
+);
+$schema['jiscpmsdd_functional'] = array(
+'fields'                => array(
+'functional_id'                 => array('description' => t('The id for a functional requirement for a system design document. Primary key.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+'sdd_nid'    => array('description' => t('The nid for the system design document node that this entry belongs to'), 'type' => 'int'),
+'functional_req'  => array('description' => t('The functional requirement'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'functional_req_desc'  => array('description' => t('A description of the functional requirement'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'functional_req_imp'  => array('description' => t('The importance of the functional requirement'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+),
+'primary key' => array('functional_id'),
+);
+$schema['jiscpmsdd_non_functional'] = array(
+'fields'                => array(
+'non_functional_id'                 => array('description' => t('The id for a non functional requirement for a system design document. Primary key.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+'sdd_nid'    => array('description' => t('The nid for the system design document node that this entry belongs to'), 'type' => 'int'),
+'non_functional_req'  => array('description' => t('The functional requirement'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'non_functional_req_desc'  => array('description' => t('A description of the non functional requirement'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'non_functional_req_imp'  => array('description' => t('The importance of the non functional requirement'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+),
+'primary key' => array('non_functional_id'),
+);
+$schema['jiscpmsdd_definitions'] = array(
+'fields'                => array(
+'definition_id'                 => array('description' => t('The id for a definition for a system design document. Primary key.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+'sdd_nid'    => array('description' => t('The nid for the system design document node that this entry belongs to'), 'type' => 'int'),
+'definition_term'  => array('description' => t('The term/acronym'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+'definition_of_term'  => array('description' => t('The definition of the term'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+),
+'primary key' => array('definition_id'),
+);
+return $schema;
+}

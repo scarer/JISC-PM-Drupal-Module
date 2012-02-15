@@ -142,7 +142,7 @@ function jiscpmrfc_theme() {
 return array(
 'jiscpmrfc_list' => array(
 'file'      => 'jiscpmrfc.theme.inc',
-'arguments' => array('header', 'risks'),
+'arguments' => array('header', 'rfcs'),
 ),
 'jiscpmrfc_view' => array(
 'file'      => 'jiscpmrfc.theme.inc',
@@ -323,8 +323,8 @@ return $node;
 
 function jiscpmrfc_view($node, $teaser = FALSE, $page = FALSE) {
 $breadcrumb = array();
-$breadcrumb[] = l(t('jiscpm'), 'jiscpm/dashboard');
-$breadcrumb[] = l(t('risks'), 'jiscpm/dashboard/rfcs');
+$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+$breadcrumb[] = l(t('RFCs'), 'jiscpm/dashboard/rfcs');
 drupal_set_breadcrumb($breadcrumb);
 
 return theme('jiscpmrfc_view', $node, $teaser, $page);

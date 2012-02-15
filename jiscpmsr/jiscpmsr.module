@@ -381,7 +381,7 @@ if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group9']['timescale']['sr_start'] = array(
 '#type' => 'date_popup',
 '#title' => t('Reporting Period Start'),
-'#date_format' =>	 'Y-m-d',
+'#date_format' => 'Y-m-d',
 '#default_value' => date('Y-m-d'),
 );
 }
@@ -401,7 +401,7 @@ if (module_exists('date_api') && module_exists('date_popup')) {
 $form['group9']['timescale']['sr_end'] = array(
 '#type' => 'date_popup',
 '#title' => t('Reporting Period End'),
-'#date_format' =>	 'Y-m-d',
+'#date_format' => 'Y-m-d',
 '#default_value' => date('Y-m-d'),
 );
 }

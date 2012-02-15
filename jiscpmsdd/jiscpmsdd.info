@@ -1,0 +1,8 @@
+name = JISC PM System Design Document
+description = "Allows the creation of System Design Documents based on JISC PM Projects"
+dependencies[] = jiscpm 
+dependencies[] = jiscpmattribute
+dependencies[] = jiscpmproject
+package = JISC Project Management
+core = 6.x
+
