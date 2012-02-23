@@ -36,7 +36,7 @@ if ( count($rows) ) {
 $output .= theme('table', $header, $rows);
 }
 else {
-drupal_set_message("There are no post project reviews", 'status');
+drupal_set_message(t("There are no post project reviews"), 'status');
 }
 $module_path = drupal_get_path('module', 'jiscpm');
 $full_path = $module_path .'/jiscpm.css';

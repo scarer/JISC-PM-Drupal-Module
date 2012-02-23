@@ -36,7 +36,7 @@ if ( count($rows) ) {
 $output = theme('table', $header, $rows);
 }
 else {
-drupal_set_message("There are no system design documents", 'status');
+drupal_set_message(t("There are no system design documents"), 'status');
 }
 $module_path = drupal_get_path('module', 'jiscpm');
 $full_path = $module_path .'/jiscpm.css';

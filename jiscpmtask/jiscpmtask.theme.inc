@@ -28,7 +28,7 @@ function theme_jiscpmtask_tasks($form) {
       drupal_render($form['tasks'][$key]['task_status_'. $key]),
       drupal_render($form['tasks'][$key]['task_priority_'. $key]),
       array(
-        'data' => sprintf('%.2f', drupal_render($form['tasks'][$key]['task_duration_'. $key])) .' '. substr($durationunit, 0, 1), 
+        'data' => sprintf('%.2f', drupal_render($form['tasks'][$key]['task_duration_'. $key])) .' '. drupal_substr($durationunit, 0, 1), 
         'style' => 'text-align: right'),
       drupal_render($form['tasks'][$key]['task_parent-nid_'. $key]) . drupal_render($form['tasks'][$key]['task_nid_'. $key]),
       drupal_render($form['tasks'][$key]['task_weight_'. $key]),
@@ -163,13 +163,13 @@ function theme_jiscpmtask_view($node, $teaser = FALSE, $page = FALSE) {
   $node->content['group6']['datebegin'] = array(
     '#prefix' => '<div class="datebegin">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Date begin '), date('d-m-Y', $node->datebegin)),
+    '#value' => theme('jiscpm_view_item', t('Date begin'), date('d-m-Y', $node->datebegin)),
     '#weight' => 2,
   );
     $node->content['group6']['dateend'] = array(
     '#prefix' => '<div class="dateend">',
     '#suffix' => '</div>',
-    '#value' => theme('jiscpm_view_item', t('Date end '), date('d-m-Y', $node->dateend)),
+    '#value' => theme('jiscpm_view_item', t('Date end'), date('d-m-Y', $node->dateend)),
     '#weight' => 3,
   );
   

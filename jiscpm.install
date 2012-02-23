@@ -10,7 +10,7 @@
  */
 function jiscpm_install() {
   variable_set('jiscpm_report_header', '');
-  variable_set('jiscpm_icons_path', drupal_get_path('module', 'jiscpm') .'/icons');
+  variable_set('jiscpm_icons_path', drupal_get_path('module', 'jiscpm') . '/icons');
   variable_set('jiscpm_organization_nid', 0);
   variable_set('jiscpm_yearsrangebegin', 2001);
   variable_set('jiscpm_yearsrangeend', 2012);
@@ -35,7 +35,7 @@ distinguish the major stakeholders and their respective attributes. </p>
 <p>To ensure change requests being raised do not impact upon the project manager’s and development team’s ability to carry out scheduled work, no more than two change requests may 
 be raised in any week.</p>
 ');
-variable_set('jiscpm_information_management', '<p>All documentation relevant to the project will eventually be stored on the TEDI project management portal. The TEDI project management portal 
+  variable_set('jiscpm_information_management', '<p>All documentation relevant to the project will eventually be stored on the TEDI project management portal. The TEDI project management portal 
 will be available to all TEDI team members. Prior to the availability of the TEDI project management portal, documentation will be stored on shared drives, emailed and made available 
 to the necessary individuals.</p><p>The TEDI project management portal will alert users when new content has been submitted via email. It will also feature customised views of content 
 and support document workflows. While the project is active, the documentation will be in an active to semi-active state. When the project is closed the documentation will be less 
@@ -43,18 +43,16 @@ frequently visited. Consequently, 6 months after the completion of the project, 
 online it will remain online and reviewed again after 6 months. If the documentation is not in active use any more but is still valuable to TEDI, it will be archived and stored. It the 
 documentation does not serve any purpose still being hosted or kept for any reason it will be deleted.</p>
 ');
-variable_set('jiscpm_reporting_project_team', '<table><th>Interested party</th><th>Info Required</th><th>Info Provider</th><th>Frequency of Communication</th>
-<th>Method of Communication</th><tr><td>Meeting participants</td><td>Meeting Minutes</td><td>Meeting organiser</td><td>After all meetings</td><td>Email</td></tr></table>'
-);
-variable_set('jiscpm_management_reporting', '<p>All project management products, deliverables and communication documents will be posted to the TEDI shared intranet in a nominated folder for the project.</p>
+  variable_set('jiscpm_reporting_project_team', '<table><th>Interested party</th><th>Info Required</th><th>Info Provider</th><th>Frequency of Communication</th>
+<th>Method of Communication</th><tr><td>Meeting participants</td><td>Meeting Minutes</td><td>Meeting organiser</td><td>After all meetings</td><td>Email</td></tr></table>');
+  variable_set('jiscpm_management_reporting', '<p>All project management products, deliverables and communication documents will be posted to the TEDI shared intranet in a nominated folder for the project.</p>
 <table><th>Interested party</th><th>Info Required</th><th>Info Provider</th><th>Frequency of Communication</th><th>Method of Communication</th>
 <tr><td>All stakeholders</td><td>Current project activities</td><td>Project manager</td><td>At the end of each phase</td><td>Status report</td></tr>
 <tr><td>All stakeholders</td><td>Changes or updates to project plan/schedule</td><td>Project manager</td><td>As required. Maximum frequency 1 once a week.</td><td>Post updates to TEDI intranet & notify by email</td></tr>
 <tr><td>Project board</td><td>Highlight report</td><td>Project board</td><td>At the end of each phase</td><td>Meeting</td></tr>
 <tr><td>Project Board</td><td>Project review: accomplishments & status, issues, risks, assumptions, changes, planned activities for coming week, planned movements for team members.</td><td>Project manager</td><td>Weekly</td><td>Email</td></tr>
-</table>'
-);
-variable_set('jiscpm_quality_assurance', '<ul><li>The Project Board will evaluate the quality of the 
+</table>');
+  variable_set('jiscpm_quality_assurance', '<ul><li>The Project Board will evaluate the quality of the 
 documentation when it’s submitted at each stage.</li><li>The stakeholder analysts will review the 
 quality of the outcomes in alignment with the stakeholders’ interests during the planning stage.</li> 
 <li>The web developers and testers will assess the quality of the hosting solution during the 
@@ -62,7 +60,7 @@ evaluation phase. <li>The Project Board will evaluate the quality of the outcome
 the closure of the project. </li><li>The Project Manager will be responsible for guiding the user 
 acceptance through the submission of the user acceptance guides in the implementation phase. </li>
 </ul>');
-variable_set('jiscpm_approach', 'The TEDI Website Rebuild in Drupal will be completed in phases. As 
+  variable_set('jiscpm_approach', 'The TEDI Website Rebuild in Drupal will be completed in phases. As 
 well, there are significant milestones, which will determine the outcomes of other deliverables. To 
 this end, the project is flexible and will adopt the ‘Sliding Planning Window’ approach as outlines 
 in the JISC Project Management infoKit. For more information on this planning approach please visit 
@@ -75,7 +73,6 @@ http://www.jiscinfonet.ac.uk/infokits/project-management/sliding-planning-window
  * @function
  * Uninstall function for the jiscpm module
  */
-
 function jiscpm_uninstall() {
   variable_del('jiscpm_report_header');
   variable_del('jiscpm_icons_path');

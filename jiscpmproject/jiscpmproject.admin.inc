@@ -39,7 +39,7 @@ date('d-m-Y', $records->dateend));
     $output .= theme('table', $header, $rows);
   }
   else {
-    drupal_set_message("There are no projects", status);
+    drupal_set_message(t("There are no projects"), 'status');
   }
   $module_path = drupal_get_path('module', 'jiscpm');
   $full_path = $module_path .'/jiscpm.css';

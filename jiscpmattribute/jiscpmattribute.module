@@ -2,7 +2,11 @@
 /**
  * @file
  */
-
+ 
+/**
+ * @function
+ * Implementation of hook_help
+ */
 function jiscpmattribute_help($path, $arg) {
   $output = '';
 
@@ -14,10 +18,12 @@ function jiscpmattribute_help($path, $arg) {
 
   return $output;
 }
-
-
+/**
+ * @function
+ * Implementation of hook_menu.
+ */
 function jiscpmattribute_menu() {
-  
+
   $items['jiscpm/dashboard/attributes'] = array(
     'title' => 'Attributes',
     'description' => 'jiscpm Attributes',
@@ -25,7 +31,7 @@ function jiscpmattribute_menu() {
     'access arguments' => array('jiscpm: access administration pages'),
     'file' => 'jiscpmattribute.admin.inc',
     'type' => MENU_NORMAL_ITEM);
-  
+
   $items['jiscpm/attributes/add'] = array(
     'title' => 'Add a new attribute',
     'description' => 'jiscpm Attributes',
@@ -34,7 +40,7 @@ function jiscpmattribute_menu() {
     'access arguments' => array('jiscpm: access administration pages'),
     'file' => 'jiscpmattribute.admin.inc',
     'type' => MENU_CALLBACK);
-  
+
   $items['jiscpm/attributes/edit/%'] = array(
     'title' => 'Edit an attribute',
     'description' => 'jiscpm Attributes',
@@ -43,7 +49,7 @@ function jiscpmattribute_menu() {
     'access arguments' => array('jiscpm: access administration pages'),
     'file' => 'jiscpmattribute.admin.inc',
     'type' => MENU_CALLBACK);
-  
+
   $items['jiscpm/attributes/delete/%'] = array(
     'title' => 'Delete an attribute',
     'description' => 'jiscpm Attributes',
@@ -52,7 +58,7 @@ function jiscpmattribute_menu() {
     'access arguments' => array('jiscpm: access administration pages'),
     'file' => 'jiscpmattribute.admin.inc',
     'type' => MENU_CALLBACK);
-  
+
   $items['jiscpm/attributes/domain/autocomplete'] = array(
     'title' => 'List of attributes',
     'description' => 'jiscpm Attributes',
@@ -61,22 +67,24 @@ function jiscpmattribute_menu() {
     'access arguments' => array('jiscpm: access administration pages'),
     'file' => 'jiscpmattribute.admin.inc',
     'type' => MENU_CALLBACK);
-  
+
   return $items;
 }
-
-
+/**
+ * @function
+ */
 function jiscpmattribute_theme() {
   return array(
     'jiscpmattribute_list' => array(
-      'file'      => 'jiscpmattribute.theme.inc',
+      'file' => 'jiscpmattribute.theme.inc',
       'arguments' => array('form'),
     ),
   );
 }
-
-
-function jiscpmattribute_access($op, $item=NULL, $account=NULL) {
+/**
+ * @function
+ */
+function jiscpmattribute_access($op, $item = NULL, $account = NULL) {
   if (empty($account)) {
     global $user;
     $account = $user;
@@ -96,8 +104,9 @@ function jiscpmattribute_access($op, $item=NULL, $account=NULL) {
   
   return FALSE;
 }
-
-
+/**
+ * @function
+ */
 function jiscpmattribute_attributes_bydomain($domain) {
   static $attributes_cache = array();
   $attributes = array();
@@ -108,9 +117,11 @@ function jiscpmattribute_attributes_bydomain($domain) {
   $r = db_query($s, $domain);
   $attributes['values'] = array();
   while ($attribute = db_fetch_object($r)) {
-    // The variable is deliberately passed through t() for translatability
+    // The variable is deliberately passed through t() for translatability.
     $attributes['values'][$attribute->akey] = t($attribute->avalue);
-    if ($attribute->isdefault) $attributes['default'] = $attribute->akey;
+    if ($attribute->isdefault) {
+      $attributes['default'] = $attribute->akey;
+    }
   }
   if (is_array($attributes['values']) && !array_key_exists('default', $attributes)) {
     $v = array_flip($attributes['values']);
@@ -120,14 +131,15 @@ function jiscpmattribute_attributes_bydomain($domain) {
   $attributes_cache[$domain] = $attributes;
   return $attributes;
 }
-
-
+/**
+ * @function
+ */
 function jiscpmattribute_value($domain, $key) {
   $attributes_array = jiscpmattribute_attributes_bydomain($domain);
   $attributes = $attributes_array['values'];
   if (array_key_exists($key, $attributes)) {
     return $attributes[$key];
   }
-  
+
   return $key;
 }

@@ -1,11 +1,6 @@
-
-/* Creates two columns, each 50% of page width */
-
 #jiscpmdashboard {
-width: 100%
+  width: 100%;
 }
-
 div.jiscpmdashboard {
-float: left;
-/*width: 50%;*/
+  float: left;
 }

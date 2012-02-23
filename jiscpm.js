@@ -35,21 +35,21 @@ function jiscpm_popup(sender, name, title, width, height, content_id, position) 
     break;
     case 'lt':
       left = left - width;
-      top = top - height;   
+      top = top - height;
     break;
     case 't':
-      left = left - Math.floor(width / 2); 
-      top = top - height; 
+      left = left - Math.floor(width / 2);
+      top = top - height;
     break;
     case 'rt':
-      top = top - height; 
+      top = top - height;
     break;
     case 'r':
     break;
     case 'rb':
     break;
     case 'b':
-      left = left - Math.floor(width / 2); 
+      left = left - Math.floor(width / 2);
     break;
     case 'lb':
       left = left-width;

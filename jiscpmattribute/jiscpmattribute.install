@@ -19,7 +19,7 @@ function jiscpmattribute_install() {
     'inserted' => 'inserted',
     'in progress' => 'in progress',
     'on hold' => 'on hold',
-    'completed' => 'completed'
+    'completed' => 'completed',
   );
 
   $attributes['Project status search'] = array(
@@ -28,7 +28,7 @@ function jiscpmattribute_install() {
     'inserted' => '-- inserted',
     'in progress' => '-- in progress',
     'on hold' => '-- on hold',
-    'completed' => 'completed'
+    'completed' => 'completed',
   );
 
   $attributes['Project category'] = array(
@@ -54,14 +54,14 @@ function jiscpmattribute_install() {
     '1-low' => 'low',
     '2-normal' => 'normal',
     '3-high' => 'high',
-    '4-urgent' => 'urgent'
+    '4-urgent' => 'urgent',
   );
 
   $attributes['Task status'] = array(
     'inserted' => 'inserted',
     'in progress' => 'in progress',
     'on hold' => 'on hold',
-    'completed' => 'completed'
+    'completed' => 'completed',
   );
 
   $attributes['Task status search'] = array(
@@ -70,21 +70,21 @@ function jiscpmattribute_install() {
     'inserted' => '-- inserted',
     'in progress' => '-- in progress',
     'on hold' => '-- on hold',
-    'completed' => 'completed'
+    'completed' => 'completed',
   );
 
   $attributes['Task category'] = array(
     'bug' => 'bug',
     'feature request' => 'feature request',
     'support' => 'support',
-    'task' => 'task'
+    'task' => 'task',
   );
 
   $attributes['Task priority'] = array(
     '1-low' => 'low',
     '2-normal' => 'normal',
     '3-high' => 'high',
-    '4-urgent' => 'urgent'
+    '4-urgent' => 'urgent',
   );
 
   $attributes['Task priority search'] = array(
@@ -100,7 +100,7 @@ function jiscpmattribute_install() {
     'bug' => 'bug',
     'feature request' => 'feature request',
     'support' => 'support',
-    'task' => 'task'
+    'task' => 'task',
   );
 
 

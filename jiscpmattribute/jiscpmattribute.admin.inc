@@ -3,10 +3,13 @@
  * @file
  */
 
+/**
+ * @function
+ * This function lists the attributes.
+ */
 function jiscpmattribute_list() {
   $i = new stdClass();
   $i->type = 'jiscpmattribute';
-
   $header = array(
     array(
       'data' => t('Domain'),
@@ -36,73 +39,61 @@ function jiscpmattribute_list() {
       'class' => 'jiscpm_list_operations',
     ),
   );
-
   $s = "SELECT * FROM {jiscpmattribute}";
   $where = array();
   $args = array();
   $filterfields = array();
-
   if ($_SESSION['jiscpmattribute_list_filter']['domain']) {
     $where[] = "domain='%s'";
     $args[] = $_SESSION['jiscpmattribute_list_filter']['domain'];
     $filterfields[] = t('Domain');
   }
-
   if ($_SESSION['jiscpmattribute_list_filter']['akey']) {
     $where[] = "LOWER(akey) LIKE LOWER('%s')";
     $args[] = $_SESSION['jiscpmattribute_list_filter']['akey'];
     $filterfields[] = t('Key');
   }
-
   if ($_SESSION['jiscpmattribute_list_filter']['avalue']) {
     $where[] = "LOWER(avalue) LIKE LOWER('%s')";
     $args[] = $_SESSION['jiscpmattribute_list_filter']['avalue'];
     $filterfields[] = t('Value');
   }
-
   if (isset($_SESSION['jiscpmattribute_list_filter']['isactive']) && ($_SESSION['jiscpmattribute_list_filter']['isactive'] != '-')) {
     $where[] = "isactive = %d";
     $args[] = $_SESSION['jiscpmattribute_list_filter']['isactive'];
     $filterfields[] = t('Active');
   }
-  
   if (isset($_SESSION['jiscpmattribute_list_filter']['isdefault']) && ($_SESSION['jiscpmattribute_list_filter']['isdefault'] != '-')) {
     $where[] = "isdefault = %d";
     $args[] = $_SESSION['jiscpmattribute_list_filter']['isdefault'];
     $filterfields[] = t('Default');
   }
-  
   $itemsperpage = $_SESSION['jiscpmattribute_list_filter']['itemsperpage'];
   if (!$itemsperpage) {
     $itemsperpage = variable_get('jiscpm_default_items_per_page', 10);
   }
-
   $tablesort = tablesort_sql($header);
-
   if (count($filterfields) == 0) {
     $filterdesc = t('Not filtered');
   }
   else {
     $filterdesc = t('Filtered by !fields', array('!fields' => implode(", ", array_unique($filterfields))));
   }
-  $filterdesc .= ' | '. t('!items items per page', array('!items' => $itemsperpage));
-  
+  $filterdesc .= ' | ' . t('!items items per page', array('!items' => $itemsperpage));
   $o = drupal_get_form('jiscpmattribute_list_filter', $filterdesc);
-  
   $s = db_rewrite_sql($s, 'jiscpmattribute', 'aid');
-  //$s = jiscpm_rewrite_sql($s, $where) . $tablesort;
   $r = pager_query($s, $itemsperpage, 0, NULL, $args);
-
   $attributes = array();
   while ($attribute = db_fetch_object($r)) {
     $attributes[] = $attribute;
   }
-
   $o .= drupal_get_form('jiscpmattribute_list_form', $header, $attributes);
   $o .= theme('pager', NULL, $itemsperpage, 0);
   return $o;
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_list_form($form_id, $header, $attributes) {
   $form = array();
 
@@ -116,53 +107,59 @@ function jiscpmattribute_list_form($form_id, $header, $attributes) {
     $i = new stdClass();
     $i->type = 'jiscpmattribute';
 
-    $form['attributes']['attributes'][$attribute->aid]['attribute_domain_'. $attribute->aid] = array(
+    $form['attributes']['attributes'][$attribute->aid]['attribute_domain_' . $attribute->aid] = array(
       '#value' => check_plain($attribute->domain),
     );
 
-    $form['attributes']['attributes'][$attribute->aid]['attribute_akey_'. $attribute->aid] = array(
+    $form['attributes']['attributes'][$attribute->aid]['attribute_akey_' . $attribute->aid] = array(
       '#value' => check_plain($attribute->akey),
     );
 
-    $form['attributes']['attributes'][$attribute->aid]['attribute_avalue_'. $attribute->aid] = array(
+    $form['attributes']['attributes'][$attribute->aid]['attribute_avalue_' . $attribute->aid] = array(
       '#value' => check_plain($attribute->avalue),
     );
 
-    $form['attributes']['attributes'][$attribute->aid]['attribute_isactive_'. $attribute->aid] = array(
+    $form['attributes']['attributes'][$attribute->aid]['attribute_isactive_' . $attribute->aid] = array(
       '#type' => 'checkbox',
       '#default_value' => check_plain($attribute->isactive),
     );
 
-    $form['attributes']['attributes'][$attribute->aid]['attribute_default_'. $attribute->aid] = array(
+    $form['attributes']['attributes'][$attribute->aid]['attribute_default_' . $attribute->aid] = array(
       '#default_value' => check_plain($attribute->isdefault),
     );
 
-    $form['attributes']['attributes'][$attribute->aid]['attribute_weight_'. $attribute->aid] = array(
+    $form['attributes']['attributes'][$attribute->aid]['attribute_weight_' . $attribute->aid] = array(
       '#type' => 'weight',
       '#default_value' => check_plain($attribute->weight),
     );
 
-    $form['attributes']['attributes'][$attribute->aid]['attribute_operations_'. $attribute->aid] = array(
-      '#value' => jiscpm_icon_edit('jiscpm/attributes/edit/'. $attribute->aid, $i, $_GET) .'&nbsp;'.  jiscpm_icon_delete('jiscpm/attributes/delete/'. $attribute->aid, $i, $_GET),
+    $form['attributes']['attributes'][$attribute->aid]['attribute_operations_' . $attribute->aid] = array(
+      '#value' => jiscpm_icon_edit('jiscpm/attributes/edit/' . $attribute->aid, $i, $_GET) . '&nbsp;' . jiscpm_icon_delete('jiscpm/attributes/delete/' . $attribute->aid, $i, $_GET),
     );
   }
 
   $form['submit'] = array(
     '#type' => 'submit',
     '#submit' => array('jiscpmattribute_list_submit'),
-    '#value' => t('Save'),
+    '#value' => check_plain(t('Save')),
   );
   return $form;
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_list_submit($form, &$form_state) {
   $attributes = array();
   $default_for_domain = array();
   foreach ($_POST as $key => $value) {
     $ar = explode('_', $key);
     if ($ar[0] == 'attribute') {
-      if ($ar[1] == 'weight') $attributes[$ar[2]]['weight'] = $value;
-      if ($ar[1] == 'isactive') $attributes[$ar[2]]['isactive'] = $value;
+      if ($ar[1] == 'weight') {
+        $attributes[$ar[2]]['weight'] = $value;
+      }
+      if ($ar[1] == 'isactive') {
+        $attributes[$ar[2]]['isactive'] = $value;
+      }
       if ($ar[1 ]== 'default') {
         $domain = str_replace('|', ' ', $ar[2]);
         $default_for_domain[$domain] = $value;
@@ -170,21 +167,23 @@ function jiscpmattribute_list_submit($form, &$form_state) {
     }
   }
 
-  $s = "UPDATE {jiscpmattribute} SET isactive=%d, weight=%d WHERE aid=%d";  
+  $s = "UPDATE {jiscpmattribute} SET isactive=%d, weight=%d WHERE aid=%d";
   foreach ($attributes as $aid => $values) {
     db_query($s, $values['isactive'], $values['weight'], $aid);
   }
 
   foreach ($default_for_domain as $domain => $aid) {
-    $s = "UPDATE {jiscpmattribute} SET isdefault=0 WHERE domain='%s'";  
+    $s = "UPDATE {jiscpmattribute} SET isdefault=0 WHERE domain='%s'";
     db_query($s, $domain);
     $s = "UPDATE {jiscpmattribute} SET isdefault=1 WHERE aid=%d";
-    db_query($s, $aid);  
+    db_query($s, $aid);
   }
 
   drupal_set_message(t('Attributes saved'));
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_list_filter(&$form_state, $filterdesc = 'Filter') {
   $domain = $_SESSION['jiscpmattribute_list_filter']['domain'];
   $akey = $_SESSION['jiscpmattribute_list_filter']['akey'];
@@ -279,7 +278,9 @@ function jiscpmattribute_list_filter(&$form_state, $filterdesc = 'Filter') {
 
   return $form;
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_list_filter_filter($form, &$form_state) {
   $_SESSION['jiscpmattribute_list_filter']['domain'] = $form_state['values']['domain'];
   $_SESSION['jiscpmattribute_list_filter']['akey'] = $form_state['values']['akey'];
@@ -288,24 +289,30 @@ function jiscpmattribute_list_filter_filter($form, &$form_state) {
   $_SESSION['jiscpmattribute_list_filter']['isdefault'] = $form_state['values']['isdefault'];
   $_SESSION['jiscpmattribute_list_filter']['itemsperpage'] = $form_state['values']['itemsperpage'];
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_list_filter_reset($form, &$form_state) {
   unset($_SESSION['jiscpmattribute_list_filter']);
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_add() {
   $attribute = new stdClass();
   return jiscpmattribute_form($attribute);
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_add_submit($form, &$form_state) {
   if ($form_state['values']['isdefault']) {
     db_query("UPDATE {jiscpmattribute} SET isdefault=0 WHERE domain='%s'", $form_state['values']['domain']);
   }
 
-  db_query("INSERT INTO {jiscpmattribute} (domain, akey, avalue, parent_domain, weight, isactive, isdefault) 
-  VALUES ('%s', '%s', '%s', '%s', %d, %d, %d)", 
-  $form_state['values']['domain'], $form_state['values']['akey'], $form_state['values']['avalue'], $form_state['values']['parent_domain'], 
+  db_query("INSERT INTO {jiscpmattribute} (domain, akey, avalue, parent_domain, weight, isactive, isdefault)
+  VALUES ('%s', '%s', '%s', '%s', %d, %d, %d)",
+  $form_state['values']['domain'], $form_state['values']['akey'], $form_state['values']['avalue'], $form_state['values']['parent_domain'],
   $form_state['values']['weight'], $form_state['values']['isactive'], $form_state['values']['isdefault']);
 
   if ($_REQUEST['destination']) {
@@ -316,7 +323,9 @@ function jiscpmattribute_add_submit($form, &$form_state) {
   }
   drupal_goto($destination);
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_edit($form_state, $aid) {
   $attribute = array();
   if ($aid) {
@@ -325,15 +334,17 @@ function jiscpmattribute_edit($form_state, $aid) {
   }
   return jiscpmattribute_form($attribute);
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_edit_submit($form, &$form_state) {
   if ($form_state['values']['isdefault']) {
     db_query("UPDATE {jiscpmattribute} SET isdefault=0 WHERE domain='%s'", $form_state['values']['domain']);
   }
 
-  db_query("UPDATE {jiscpmattribute} SET domain='%s', akey='%s', avalue='%s', 
-  parent_domain='%s', weight=%d, isactive=%d, isdefault=%d WHERE aid=%d", 
-  $form_state['values']['domain'], $form_state['values']['akey'], $form_state['values']['avalue'], 
+  db_query("UPDATE {jiscpmattribute} SET domain='%s', akey='%s', avalue='%s',
+  parent_domain='%s', weight=%d, isactive=%d, isdefault=%d WHERE aid=%d",
+  $form_state['values']['domain'], $form_state['values']['akey'], $form_state['values']['avalue'],
   $form_state['values']['parent_domain'], $form_state['values']['weight'], $form_state['values']['isactive'], $form_state['values']['isdefault'], $form_state['values']['aid']);
 
   if ($_REQUEST['destination']) {
@@ -344,13 +355,19 @@ function jiscpmattribute_edit_submit($form, &$form_state) {
   }
   drupal_goto($destination);
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_form_delete($form, &$form_state) {
-  $destination = drupal_get_destination(); 
-  if (array_key_exists('destination', $_REQUEST)) unset($_REQUEST['destination']);
-  drupal_goto('jiscpm/attributes/delete/'. $form_state['values']['aid'], $destination);
+  $destination = drupal_get_destination();
+  if (array_key_exists('destination', $_REQUEST)) {
+    unset($_REQUEST['destination']);
+  }
+  drupal_goto('jiscpm/attributes/delete/' . $form_state['values']['aid'], $destination);
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_delete($form_state, $aid) {
   $destination = drupal_get_destination();
   if (array_key_exists('destination', $_REQUEST)) {
@@ -362,19 +379,21 @@ function jiscpmattribute_delete($form_state, $aid) {
   $form['aid'] = array('#type' => 'value', '#value' => $aid);
   $r = db_query("SELECT * FROM {jiscpmattribute} WHERE aid=%d", $aid);
   $a = db_fetch_object($r);
-  $title = $a->domain .' : '. $a->avalue;
+  $title = $a->domain . ' : ' . $a->avalue;
 
   return confirm_form($form,
   t('Are you sure you want to delete the attribute %title?', array('%title' => $title)),
-  array('path' => 'jiscpm/attributes/edit/'. $aid, 'query' => $destination),
+  array('path' => 'jiscpm/attributes/edit/' . $aid, 'query' => $destination),
   t('This action cannot be undone.'),
   t('Delete'), t('Cancel'));
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_delete_submit($form, &$form_state) {
   if ($form_state['values']['aid']) {
     db_query('DELETE FROM {jiscpmattribute} WHERE aid=%d', $form_state['values']['aid']);
-    drupal_set_message('jiscpm attribute deleted');
+    drupal_set_message(t('jiscpm attribute deleted'));
     if ($form_state['values']['destination']) {
       $destination = $form_state['values']['destination'];
     }
@@ -384,14 +403,16 @@ function jiscpmattribute_delete_submit($form, &$form_state) {
     drupal_goto($destination);
   }
 }
-
+/**
+ * @function
+ */
 function jiscpmattribute_form($attribute = NULL) {
   $breadcrumb = array();
   $breadcrumb[] = l(t('jiscpm'), 'jiscpm');
   $breadcrumb[] = l(t('Attributes'), 'jiscpm/attributes');
   drupal_set_breadcrumb($breadcrumb);
 
-  if (arg(2)=='add') {
+  if (arg(2) == 'add') {
     if (array_key_exists('domain', $_GET) && !$attribute->domain) {
       $attribute->domain = $_GET['domain'];
     }
@@ -482,7 +503,7 @@ function jiscpmattribute_form($attribute = NULL) {
 
   $form['save'] = array(
     '#type' => 'submit',
-    '#value' => t('Save')
+    '#value' => t('Save'),
   );
 
   if ($attribute->aid) {
@@ -492,10 +513,12 @@ function jiscpmattribute_form($attribute = NULL) {
       '#submit' => array('jiscpmattribute_form_delete'),
     );
   }
-  
+
   return $form;
 }
-
+/**
+ * @function
+ */
 function _jiscpmattibute_domain_options() {
   static $options;
   if (!$options) {
@@ -507,7 +530,9 @@ function _jiscpmattibute_domain_options() {
   }
   return $options;
 }
-
+/**
+ * @function
+ */
 function _jiscpmattribute_domain_autocomplete($string = '') {
   static $default_domains;
   if (!$default_domains) {
@@ -545,7 +570,7 @@ function _jiscpmattribute_domain_autocomplete($string = '') {
   }
 
   foreach ($default_domains as $domain) {
-    if (strpos(strtoupper($domain), strtoupper($string)) === FALSE) {
+    if (strpos(drupal_strtoupper($domain), drupal_strtoupper($string)) === FALSE) {
     }
     else {
       $matches[$domain] = $domain;
@@ -556,4 +581,3 @@ function _jiscpmattribute_domain_autocomplete($string = '') {
 
   drupal_json($matches);
 }
-

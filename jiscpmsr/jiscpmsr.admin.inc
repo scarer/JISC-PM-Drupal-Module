@@ -37,7 +37,7 @@ $records->sr_focus_area, $records->sr_product_process, date('d-m-Y', $records->s
     $output = theme('table', $header, $rows);
   }
   else {
-    drupal_set_message("There are no status reports", 'status');
+    drupal_set_message(t("There are no status reports"), 'status');
   }
   $module_path = drupal_get_path('module', 'jiscpm');
   $full_path = $module_path .'/jiscpm.css';
