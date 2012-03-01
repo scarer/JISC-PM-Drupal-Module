@@ -69,12 +69,12 @@ function jiscpmbca_schema() {
   // Schema for jiscpmbca actions.
   $schema['jiscpmbca_action'] = array(
     'fields' => array(
-      'action_id' => array('description' => 'The id of an action for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-    'bca_nid' => array('description' => 'The nid for the business case assessment the action belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-    'action_title' => array('description' => 'The action title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-    'action_description' => array('description' => 'The action description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-    'action_deliverydate' => array('description' => 'The action delivery date', 'type' => 'int', 'default' => 0),
-  ),
+      'action_id' => array('description' => 'The id of an action for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid' => array('description' => 'The nid for the business case assessment the action belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'action_title' => array('description' => 'The action title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'action_description' => array('description' => 'The action description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'action_deliverydate' => array('description' => 'The action delivery date', 'type' => 'int', 'default' => 0),
+    ),
     'primary key' => array('action_id'),
   );
   // Schema for jiscpmbca staff costs.
