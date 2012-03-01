@@ -403,9 +403,9 @@ function jiscpmbca_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
     case 'prepare':
       if (!$node->nid) {
-        $status_list = jiscpmattribute_attributes_bydomain('Project status');
+        $status_list = jiscpmattributeattributesbydomain('Project status');
         $node->projectstatus = $status_list['default'];
-        $priority_list = jiscpmattribute_attributes_bydomain('Project priority');
+        $priority_list = jiscpmattributeattributesbydomain('Project priority');
         $node->projectpriority = $priority_list['default'];
       }
       break;

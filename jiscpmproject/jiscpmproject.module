@@ -379,9 +379,9 @@ function jiscpmproject_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
     case 'prepare':
       if (!$node->nid) {
-        $status_list = jiscpmattribute_attributes_bydomain('Project status');
+        $status_list = jiscpmattributeattributesbydomain('Project status');
         $node->projectstatus = $status_list['default'];
-        $priority_list = jiscpmattribute_attributes_bydomain('Project priority');
+        $priority_list = jiscpmattributeattributesbydomain('Project priority');
         $node->projectpriority = $priority_list['default'];
       }
       break;
@@ -1235,7 +1235,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group10') : -11,
   );
   // Project category.
-  $category_list = jiscpmattribute_attributes_bydomain('Project category');
+  $category_list = jiscpmattributeattributesbydomain('Project category');
   $form['group10']['projectcategory'] = array(
     '#type' => 'select',
     '#title' => t('Category'),
@@ -1248,7 +1248,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group11') : -10,
   );
   // Project status.
-  $status_list = jiscpmattribute_attributes_bydomain('Project status');
+  $status_list = jiscpmattributeattributesbydomain('Project status');
   $form['projectstatus'] = array(
     '#type' => 'select',
     '#title' => t('Status'),
@@ -1261,7 +1261,7 @@ function jiscpmproject_form(&$node, $form_state) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group12') : -9,
   );
   // Project priority.
-  $priority_list = jiscpmattribute_attributes_bydomain('Project priority');
+  $priority_list = jiscpmattributeattributesbydomain('Project priority');
   $form['projectpriority'] = array(
     '#type' => 'select',
     '#title' => t('Priority'),
