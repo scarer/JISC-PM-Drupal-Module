@@ -140,7 +140,8 @@ function jiscpmproject_content_extra_fields($type_name) {
  * Implements hook_insert().
  */
 function jiscpmproject_insert($node) {
-  jiscpmproject_beforesave($node);
+	$node->datebegin = strtotime($node->datebegin);
+  $node->dateend = strtotime($node->dateend);
   if ($node->relationships != NULL || $node->relationships != 0 || $node->relationships != '') {
     foreach ($node->relationships as $relationship) {
       db_query("INSERT INTO {jiscpmproject_relationship} (project_nid, relationship_nid, relationship_description) VALUES('%d', '%d', '%s')", $node->nid, $relationship['relationship_nid'], $relationship['relationship_description']);
@@ -205,11 +206,11 @@ function jiscpmproject_insert($node) {
           db_query("INSERT INTO {jiscpmproject_milestone} (project_nid, milestone_title, milestone_deliverydate) VALUES(%d, '%s', %s)", $node->nid, $milestone['milestone_title'], $milestone['milestone_deliverydate']);
       }
     }
-    // Insert the jiscpmproject node.
-    db_query("INSERT INTO {jiscpmproject} (nid, vid, project_manager_uid, client_uid, projectstatus, projectcategory, projectpriority, datebegin, dateend, organisational_scope, logical_scope, out_of_scope) 
-    VALUES(%d, %d, %s, %s, '%s', '%s', '%s', %s, %s, '%s', '%s', '%s')",
-    $node->nid, $node->vid, $node->project_manager_uid, $node->client_uid, $node->projectstatus, $node->projectcategory, $node->projectpriority, $node->datebegin, $node->dateend, $node->organisational_scope, $node->logical_scope, $node->out_of_scope);
-  }
+	}
+  // Insert the jiscpmproject node.
+  db_query("INSERT INTO {jiscpmproject} (nid, vid, project_manager_uid, client_uid, projectstatus, projectcategory, projectpriority, datebegin, dateend, organisational_scope, logical_scope, out_of_scope) 
+  VALUES(%d, %d, %d, %d, '%s', '%s', '%s', %d, %d, '%s', '%s', '%s')",
+  $node->nid, $node->vid, $node->project_manager_uid, $node->client_uid, $node->projectstatus, $node->projectcategory, $node->projectpriority, $node->datebegin, $node->dateend, $node->organisational_scope, $node->logical_scope, $node->out_of_scope);
 }
 /**
  * @function
@@ -247,14 +248,6 @@ function jiscpmproject_delete(&$node) {
   db_query('DELETE FROM {jiscpmproject_goal} WHERE project_nid = %d', $node->nid);
   db_query('DELETE FROM {jiscpmproject_assumption} WHERE project_nid = %d', $node->nid);
   db_query('DELETE FROM {jiscpmproject_milestone} WHERE project_nid = %d', $node->nid);
-}
-/**
- * @function
- * Function that's called before the node is saved.
- */
-function jiscpmproject_beforesave(&$node) {
-  $node->datebegin = strtotime($node->datebegin);
-  $node->dateend = strtotime($node->dateend);
 }
 /**
  * @function
@@ -469,7 +462,7 @@ function jiscpmproject_form(&$node, $form_state) {
   $form['group2']['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
   // Adds functionality for adding project relationships.
   $projects = array();
-  $results = db_query(db_rewrite_sql("SELECT n.title, n.nid FROM {node} n WHERE n.type = 'jiscpmproject'"));
+  $results = db_query("SELECT n.title, n.nid FROM {node} n WHERE n.type = 'jiscpmproject'");
   while ($row = db_fetch_object($results)) {
     $projects[$row->nid] = check_plain($row->title);
   }
