@@ -140,73 +140,73 @@ function jiscpmproject_content_extra_fields($type_name) {
  * Implements hook_insert().
  */
 function jiscpmproject_insert($node) {
-	$node->datebegin = strtotime($node->datebegin);
+  $node->datebegin = strtotime($node->datebegin);
   $node->dateend = strtotime($node->dateend);
   if ($node->relationships != NULL || $node->relationships != 0 || $node->relationships != '') {
     foreach ($node->relationships as $relationship) {
       db_query("INSERT INTO {jiscpmproject_relationship} (project_nid, relationship_nid, relationship_description) VALUES('%d', '%d', '%s')", $node->nid, $relationship['relationship_nid'], $relationship['relationship_description']);
     }
-    if ($node->phases != NULL || $node->phases != 0 || $node->phases != '') {
-      foreach ($node->phases as $phase) {
-        $checkstring1 = explode(' ', $phase['phase_datebegin']);
-        if ($checkstring1[1] == NULL || $checkstring1[1] == '') {
-        }
-        else {
-          $phase['phase_datebegin'] = strtotime($phase['phase_datebegin']);
-        }
-        $checkstring2 = explode(' ', $phase['phase_dateend']);
-        if ($checkstring1[1] == NULL || $checkstring1[1] == '') {
-        }
-        else {
-          $phase['phase_dateend'] = strtotime($phase['phase_dateend']);
-        }
-        db_query("INSERT INTO {jiscpmproject_phase} (project_nid, phase_title, phase_scope, phase_datebegin, phase_dateend) VALUES(%d, '%s', '%s',%s, %s)", $node->nid, $phase['phase_title'], $phase['phase_scope'], $phase['phase_datebegin'], $phase['phase_dateend']);
+  }
+  if ($node->phases != NULL || $node->phases != 0 || $node->phases != '') {
+    foreach ($node->phases as $phase) {
+      $checkstring1 = explode(' ', $phase['phase_datebegin']);
+      if ($checkstring1[1] == NULL || $checkstring1[1] == '') {
       }
-    }
-    if ($node->stakeholders != NULL || $node->stakeholders != 0 || $node->stakeholders != '') {
-      foreach ($node->stakeholders as $stakeholder) {
-        db_query("INSERT INTO {jiscpmproject_stakeholder} (stakeholder_uid, project_nid, stakeholder_stake_in_project, stakeholder_management_strategy, stakeholder_potential_impact,
-        stakeholder_expectations, stakeholder_attitudes_risks)
-        VALUES(%s, %d, '%s', '%s', '%s', '%s', '%s')", $stakeholder['stakeholder_uid'], $node->nid, $stakeholder['stakeholder_stake_in_project'], $stakeholder['stakeholder_management_strategy'],
-        $stakeholder['stakeholder_potential_impact'], $stakeholder['stakeholder_expectations'], $stakeholder['stakeholder_attitudes_risks']);
+      else {
+        $phase['phase_datebegin'] = strtotime($phase['phase_datebegin']);
       }
-    }
-    // Insert values for critical success factors.
-    if ($node->factors != NULL || $node->factors != 0 || $node->factors != '') {
-      foreach ($node->factors as $factor) {
-        db_query("INSERT INTO {jiscpmproject_factor} (project_nid, factor_title, factor_description) VALUES(%d, '%s', '%s')", $node->nid, $factor['factor_title'], $factor['factor_description']);
+      $checkstring2 = explode(' ', $phase['phase_dateend']);
+      if ($checkstring1[1] == NULL || $checkstring1[1] == '') {
       }
-    }
-    // Insert values for project assumptions.
-    if ($node->assumptions != NULL || $node->assumptions != 0 || $node->assumptions != '') {
-      foreach ($node->assumptions as $assumption) {
-        db_query("INSERT INTO {jiscpmproject_assumption} (project_nid, assumption_title, assumption_description) VALUES(%d, '%s', '%s')", $node->nid, $assumption['assumption_title'], $assumption['assumption_description']);
+      else {
+        $phase['phase_dateend'] = strtotime($phase['phase_dateend']);
       }
+      db_query("INSERT INTO {jiscpmproject_phase} (project_nid, phase_title, phase_scope, phase_datebegin, phase_dateend) VALUES(%d, '%s', '%s',%s, %s)", $node->nid, $phase['phase_title'], $phase['phase_scope'], $phase['phase_datebegin'], $phase['phase_dateend']);
     }
-    // Insert values for project constraints.
-    if ($node->constraints != NULL || $node->constraints != 0 || $node->constraints != '') {
-      foreach ($node->constraints as $constraint) {
-        db_query("INSERT INTO {jiscpmproject_constraint} (project_nid, constraint_title, constraint_description) VALUES(%d, '%s', '%s')", $node->nid, $constraint['constraint_title'], $constraint['constraint_description']);
+  }
+  if ($node->stakeholders != NULL || $node->stakeholders != 0 || $node->stakeholders != '') {
+    foreach ($node->stakeholders as $stakeholder) {
+      db_query("INSERT INTO {jiscpmproject_stakeholder} (stakeholder_uid, project_nid, stakeholder_stake_in_project, stakeholder_management_strategy, stakeholder_potential_impact,
+      stakeholder_expectations, stakeholder_attitudes_risks)
+      VALUES(%s, %d, '%s', '%s', '%s', '%s', '%s')", $stakeholder['stakeholder_uid'], $node->nid, $stakeholder['stakeholder_stake_in_project'], $stakeholder['stakeholder_management_strategy'],
+      $stakeholder['stakeholder_potential_impact'], $stakeholder['stakeholder_expectations'], $stakeholder['stakeholder_attitudes_risks']);
+    }
+  }
+  // Insert values for critical success factors.
+  if ($node->factors != NULL || $node->factors != 0 || $node->factors != '') {
+    foreach ($node->factors as $factor) {
+      db_query("INSERT INTO {jiscpmproject_factor} (project_nid, factor_title, factor_description) VALUES(%d, '%s', '%s')", $node->nid, $factor['factor_title'], $factor['factor_description']);
+    }
+  }
+  // Insert values for project assumptions.
+  if ($node->assumptions != NULL || $node->assumptions != 0 || $node->assumptions != '') {
+    foreach ($node->assumptions as $assumption) {
+      db_query("INSERT INTO {jiscpmproject_assumption} (project_nid, assumption_title, assumption_description) VALUES(%d, '%s', '%s')", $node->nid, $assumption['assumption_title'], $assumption['assumption_description']);
+    }
+  }
+  // Insert values for project constraints.
+  if ($node->constraints != NULL || $node->constraints != 0 || $node->constraints != '') {
+    foreach ($node->constraints as $constraint) {
+      db_query("INSERT INTO {jiscpmproject_constraint} (project_nid, constraint_title, constraint_description) VALUES(%d, '%s', '%s')", $node->nid, $constraint['constraint_title'], $constraint['constraint_description']);
+    }
+  }
+  // Insert values for project goals.
+  if ($node->goals != NULL || $node->goals != 0 || $node->goals != '') {
+    foreach ($node->goals as $goal) {
+      db_query("INSERT INTO {jiscpmproject_goal} (project_nid, goal_title, goal_objectives) VALUES(%d, '%s', '%s')", $node->nid, $goal['goal_title'], $goal['goal_objectives']);
+    }
+  }
+  if ($node->milestones != NULL || $node->milestones != 0 || $node->milestones != '') {
+    foreach ($node->milestones as $milestone) {
+      $checkstring = explode(' ', $milestone['milestone_deliverydate']);
+      if ($checkstring[1] == NULL || $checkstring[1] == '') {
       }
-    }
-    // Insert values for project goals.
-    if ($node->goals != NULL || $node->goals != 0 || $node->goals != '') {
-      foreach ($node->goals as $goal) {
-        db_query("INSERT INTO {jiscpmproject_goal} (project_nid, goal_title, goal_objectives) VALUES(%d, '%s', '%s')", $node->nid, $goal['goal_title'], $goal['goal_objectives']);
+      else {
+        $milestone['milestone_deliverydate'] = strtotime($milestone['milestone_deliverydate']);
       }
+        db_query("INSERT INTO {jiscpmproject_milestone} (project_nid, milestone_title, milestone_deliverydate) VALUES(%d, '%s', %s)", $node->nid, $milestone['milestone_title'], $milestone['milestone_deliverydate']);
     }
-    if ($node->milestones != NULL || $node->milestones != 0 || $node->milestones != '') {
-      foreach ($node->milestones as $milestone) {
-        $checkstring = explode(' ', $milestone['milestone_deliverydate']);
-        if ($checkstring[1] == NULL || $checkstring[1] == '') {
-        }
-        else {
-          $milestone['milestone_deliverydate'] = strtotime($milestone['milestone_deliverydate']);
-        }
-          db_query("INSERT INTO {jiscpmproject_milestone} (project_nid, milestone_title, milestone_deliverydate) VALUES(%d, '%s', %s)", $node->nid, $milestone['milestone_title'], $milestone['milestone_deliverydate']);
-      }
-    }
-	}
+  }
   // Insert the jiscpmproject node.
   db_query("INSERT INTO {jiscpmproject} (nid, vid, project_manager_uid, client_uid, projectstatus, projectcategory, projectpriority, datebegin, dateend, organisational_scope, logical_scope, out_of_scope) 
   VALUES(%d, %d, %d, %d, '%s', '%s', '%s', %d, %d, '%s', '%s', '%s')",
@@ -437,7 +437,7 @@ function jiscpmproject_form(&$node, $form_state) {
   // Get all users from the database for referencing.
   $r = db_query("SELECT u.uid, u.name FROM {users} u ORDER BY u.name");
   $people = array();
-  $people [-1] = '--SELECT A PERSON--';
+  $people[-1] = '--SELECT A PERSON--';
   while ($person = db_fetch_object($r)) {
     $people[$person->uid] = check_plain($person->name);
   }
@@ -462,7 +462,7 @@ function jiscpmproject_form(&$node, $form_state) {
   $form['group2']['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
   // Adds functionality for adding project relationships.
   $projects = array();
-  $results = db_query("SELECT n.title, n.nid FROM {node} n WHERE n.type = 'jiscpmproject'");
+  $results = db_rewrite_sql(db_query("SELECT n.title, n.nid FROM {node} n WHERE n.type = 'jiscpmproject'"));
   while ($row = db_fetch_object($results)) {
     $projects[$row->nid] = check_plain($row->title);
   }
