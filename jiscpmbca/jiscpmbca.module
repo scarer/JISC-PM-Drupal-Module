@@ -102,16 +102,16 @@ function jiscpmbca_access($op, $node, $account = NULL) {
   if ($op != 'create') {
     $node = (object) $node;
   }
-  if ($op = = 'create') {
+  if ($op == 'create') {
     if (user_access('create jiscpmbca')) {
       return TRUE;
     }
   }
-  elseif ($op = = 'update' || $op = = 'delete') {
+  elseif ($op == 'update' || $op == 'delete') {
     if (user_access('edit jiscpmbca')) {
       return TRUE;
     }
-    elseif (user_access('edit own jiscpmbca') && $account->uid = = $node->uid) {
+    elseif (user_access('edit own jiscpmbca') && $account->uid == $node->uid) {
       return TRUE;
     }
   }
@@ -120,7 +120,7 @@ function jiscpmbca_access($op, $node, $account = NULL) {
  * @function
  */
 function jiscpmbca_content_extra_fields($type_name) {
-  if ($type_name = = 'jiscpmbca') {
+  if ($type_name == 'jiscpmbca') {
     return array(
       'group1' => array('label' => 'Title', 'weight' => -20),
       'group2' => array('label' => 'Actions', 'weight' => -19),
@@ -152,7 +152,7 @@ function jiscpmbca_insert($node) {
   if ($node->actions != NULL || $node->actions != 0 || $node->actions != '') {
     foreach ($node->actions as $action) {
       $checkstring = explode(' ', $action['action_deliverydate']);
-      if ($checkstring[1] = = NULL || $checkstring[1] = = '') {
+      if ($checkstring[1] == NULL || $checkstring[1] == '') {
       }
       else {
         $action['action_deliverydate'] = strtotime($action['action_deliverydate']);
@@ -1659,7 +1659,7 @@ function jiscpmbca_action_js($delta = 0) {
   // So we need to tell it first.
   $javascript = drupal_add_js(NULL, NULL);
   if (isset($javascript['setting'])) {
-    $output . = '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+    $output .= '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
   }
   // Final rendering callback.
   drupal_json(array('status' => TRUE, 'data' => $output));
@@ -1682,7 +1682,7 @@ function jiscpmbca_staff_cost_js($delta = 0) {
   // So we need to tell it first.
   $javascript = drupal_add_js(NULL, NULL);
   if (isset($javascript['setting'])) {
-    $output . = '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+    $output .= '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
   }
   // Final rendering callback.
   drupal_json(array('status' => TRUE, 'data' => $output));
@@ -1704,7 +1704,7 @@ function jiscpmbca_training_cost_js($delta = 0) {
   // So we need to tell it first.
   $javascript = drupal_add_js(NULL, NULL);
   if (isset($javascript['setting'])) {
-    $output . = '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+    $output .= '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
   }
   // Final rendering callback.
   drupal_json(array('status' => TRUE, 'data' => $output));
@@ -1727,7 +1727,7 @@ function jiscpmbca_equipment_cost_js($delta = 0) {
   // So we need to tell it first.
   $javascript = drupal_add_js(NULL, NULL);
   if (isset($javascript['setting'])) {
-    $output . = '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+    $output .= '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
   }
   // Final rendering callback.
   drupal_json(array('status' => TRUE, 'data' => $output));
@@ -1750,7 +1750,7 @@ function jiscpmbca_other_cost_js($delta = 0) {
   // So we need to tell it first.
   $javascript = drupal_add_js(NULL, NULL);
   if (isset($javascript['setting'])) {
-    $output . = '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+    $output .= '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
   }
   // Final rendering callback.
   drupal_json(array('status' => TRUE, 'data' => $output));
@@ -1796,7 +1796,7 @@ function jiscpmbca_running_cost_licensing_js($delta = 0) {
   // So we need to tell it first.
   $javascript = drupal_add_js(NULL, NULL);
   if (isset($javascript['setting'])) {
-    $output . = '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+    $output .= '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
   }
   // Final rendering callback.
   drupal_json(array('status' => TRUE, 'data' => $output));
@@ -1819,7 +1819,7 @@ function jiscpmbca_running_cost_maintenance_js($delta = 0) {
   // So we need to tell it first.
   $javascript = drupal_add_js(NULL, NULL);
   if (isset($javascript['setting'])) {
-    $output . = '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+    $output .= '<script type = "text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
   }
   // Final rendering callback.
   drupal_json(array('status' => TRUE, 'data' => $output));
@@ -1959,7 +1959,7 @@ function theme_jiscpmbca_action_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
@@ -2001,7 +2001,7 @@ function theme_jiscpmbca_staff_cost_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
@@ -2040,7 +2040,7 @@ function theme_jiscpmbca_training_cost_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
@@ -2079,7 +2079,7 @@ function theme_jiscpmbca_equipment_cost_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
@@ -2118,7 +2118,7 @@ function theme_jiscpmbca_other_cost_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
@@ -2157,7 +2157,7 @@ function theme_jiscpmbca_running_cost_training_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
@@ -2197,7 +2197,7 @@ function theme_jiscpmbca_running_cost_licensing_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
@@ -2237,7 +2237,7 @@ function theme_jiscpmbca_running_cost_maintenance_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
@@ -2277,7 +2277,7 @@ function theme_jiscpmbca_running_cost_other_table($form) {
     $rows[] = $row;
   }
   $output = theme('table', $headers, $rows);
-  $output . = drupal_render($form);
+  $output .= drupal_render($form);
   return $output;
 }
 /**
