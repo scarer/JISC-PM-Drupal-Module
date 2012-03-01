@@ -366,21 +366,21 @@ function jiscpmtask_form(&$node) {
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group2') : -17,
   );
-  $taskcategory_list = jiscpmattribute_attributes_bydomain('Task category');
+  $taskcategory_list = jiscpmattributeattributesbydomain('Task category');
   $form['group2']['taskcategory'] = array(
     '#type' => 'select',
     '#title' => t('Category'),
     '#default_value' => $node->taskcategory,
     '#options' => $taskcategory_list['values'],
   );
-  $taskstatus_list = jiscpmattribute_attributes_bydomain('Task status');
+  $taskstatus_list = jiscpmattributeattributesbydomain('Task status');
   $form['group2']['taskstatus'] = array(
     '#type' => 'select',
     '#title' => t('Status'),
     '#default_value' => $node->taskstatus,
     '#options' => $taskstatus_list['values'],
   );
-  $taskpriority_list = jiscpmattribute_attributes_bydomain('Task priority');
+  $taskpriority_list = jiscpmattributeattributesbydomain('Task priority');
   $form['group2']['taskpriority'] = array(
     '#type' => 'select',
     '#title' => t('Priority'),
@@ -432,7 +432,7 @@ function jiscpmtask_form(&$node) {
       );
     }
   }
-  $durationunit_list = jiscpmattribute_attributes_bydomain('Duration unit');
+  $durationunit_list = jiscpmattributeattributesbydomain('Duration unit');
   $form['group3']['durationunit'] = array(
     '#type' => 'select',
     '#title' => t('Duration unit'),
@@ -450,7 +450,7 @@ function jiscpmtask_form(&$node) {
     '#theme' => 'jiscpm_form_group',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group4') : -16,
   );
-  $pricemode_list = jiscpmattribute_attributes_bydomain('Price mode');
+  $pricemode_list = jiscpmattributeattributesbydomain('Price mode');
   $form['group4']['pricemode'] = array(
     '#type' => 'select',
     '#title' => t('Price mode'),
@@ -463,7 +463,7 @@ function jiscpmtask_form(&$node) {
     '#size' => 15,
     '#default_value' => $node->price,
   );
-  $currency_list = jiscpmattribute_attributes_bydomain('Currency');
+  $currency_list = jiscpmattributeattributesbydomain('Currency');
   $form['group4']['currency'] = array(
     '#type' => 'select',
     '#title' => t('Price currency'),
@@ -545,17 +545,17 @@ function jiscpmtask_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
     case 'prepare':
       if (!$node->nid) {
-        $taskcategory_list = jiscpmattribute_attributes_bydomain('Task category');
+        $taskcategory_list = jiscpmattributeattributesbydomain('Task category');
         $node->taskcategory = $taskcategory_list['default'];
-        $taskstatus_list = jiscpmattribute_attributes_bydomain('Task status');
+        $taskstatus_list = jiscpmattributeattributesbydomain('Task status');
         $node->taskstatus = $taskstatus_list['default'];
-        $taskpriority_list = jiscpmattribute_attributes_bydomain('Task priority');
+        $taskpriority_list = jiscpmattributeattributesbydomain('Task priority');
         $node->taskpriority = $taskpriority_list['default'];
-        $durationunit_list = jiscpmattribute_attributes_bydomain('Duration unit');
+        $durationunit_list = jiscpmattributeattributesbydomain('Duration unit');
         $node->durationunit = $durationunit_list['default'];
-        $pricemode_list = jiscpmattribute_attributes_bydomain('Price mode');
+        $pricemode_list = jiscpmattributeattributesbydomain('Price mode');
         $node->pricemode = $pricemode_list['default'];
-        $currency_list = jiscpmattribute_attributes_bydomain('Currency');
+        $currency_list = jiscpmattributeattributesbydomain('Currency');
         $node->currency = $currency_list['default'];
       }
       break;
