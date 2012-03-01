@@ -3,6 +3,10 @@
  * @file
  */
 
+/**
+ * @function
+ * Views data.
+ */
 function jiscpmtask_views_data() {
   $data['jiscpmtask']['table']['group']  = 'jiscpm';
   $data['jiscpmtask']['table']['join'] = array(
@@ -11,7 +15,6 @@ function jiscpmtask_views_data() {
       'field' => 'vid',
     ),
   );
-  
   $data['jiscpmtask']['stepno'] = array(
     'title' => t('Task Step Number'),
     'help' => 'jiscpm Task Step Number',
@@ -28,7 +31,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
   $data['jiscpmtask']['organization_nid'] = array(
     'title' => t('Task Organization Node ID'),
     'help' => 'jiscpm Task Organization Node ID',
@@ -45,7 +47,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_numeric',
     ),
   );
-  
   $data['jiscpmtask']['organization_title'] = array(
     'title' => t('Task Organization Title'),
     'help' => 'jiscpm Task Organization Title',
@@ -62,7 +63,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
   $data['jiscpmtask']['project_nid'] = array(
     'title' => t('Task Project Node ID'),
     'help' => 'jiscpm Task Project Node ID',
@@ -79,7 +79,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_numeric',
     ),
   );
-
   $data['jiscpmtask']['project_title'] = array(
     'title' => t('Task Project Title'),
     'help' => 'jiscpm Task Project Title',
@@ -96,7 +95,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-
   $data['jiscpmtask']['parent_nid'] = array(
     'title' => t('Task Parent Task Node ID'),
     'help' => 'jiscpm Task Patent Task Node ID',
@@ -113,7 +111,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_numeric',
     ),
   );
-
   $data['jiscpmtask']['weight'] = array(
     'title' => t('Task Weight'),
     'help' => 'jiscpm Task Weight',
@@ -130,7 +127,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_numeric',
     ),
   );
-
   $data['jiscpmtask']['taskstatus'] = array(
     'title' => t('Task Status'),
     'help' => 'jiscpm Task Status',
@@ -147,7 +143,6 @@ function jiscpmtask_views_data() {
       'domain' => 'Task Status',
     ),
   );
-
   $data['jiscpmtask']['taskcategory'] = array(
     'title' => t('Task Category'),
     'help' => 'jiscpm Task Category',
@@ -164,7 +159,6 @@ function jiscpmtask_views_data() {
       'domain' => 'Task Category',
     ),
   );
-
   $data['jiscpmtask']['taskpriority'] = array(
     'title' => t('Task Priority'),
     'help' => 'jiscpm Task Priority',
@@ -181,7 +175,6 @@ function jiscpmtask_views_data() {
       'domain' => 'Task Priority',
     ),
   );
-
   $data['jiscpmtask']['pricemode'] = array(
     'title' => t('Task Price Mode'),
     'help' => 'jiscpm Task Price Mode',
@@ -198,7 +191,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-
   $data['jiscpmtask']['price'] = array(
     'title' => t('Task Price'),
     'help' => 'jiscpm Task Price',
@@ -215,7 +207,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_numeric',
     ),
   );
-
   $data['jiscpmtask']['currency'] = array(
     'title' => t('Task Currency'),
     'help' => 'jiscpm Task Currency',
@@ -232,7 +223,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-
   $data['jiscpmtask']['datebegin'] = array(
     'title' => t('Task Date Begin'),
     'help' => 'jiscpm Task Date Begin',
@@ -247,7 +237,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_filter_date',
     ),
   );
-
   $data['jiscpmtask']['dateend'] = array(
     'title' => t('Task Date End'),
     'help' => 'jiscpm Task Date End',
@@ -262,7 +251,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_filter_date',
     ),
   );
-
   $data['jiscpmtask']['durationunit'] = array(
     'title' => t('Task Duration Unit'),
     'help' => 'jiscpm Task Duration Unit',
@@ -279,7 +267,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-
   $data['jiscpmtask']['duration'] = array(
     'title' => t('Task Duration'),
     'help' => 'jiscpm Task Duration',
@@ -296,7 +283,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_numeric',
     ),
   );
-  
   $data['jiscpmtask']['assigned_nid'] = array(
     'title' => t('Task Assigned Node ID'),
     'help' => 'jiscpm Task Assigned Node ID',
@@ -313,7 +299,6 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_numeric',
     ),
   );
-  
   $data['jiscpmtask']['assigned_title'] = array(
     'title' => t('Task Assigned Title'),
     'help' => 'jiscpm Task Assigned Title',
@@ -330,10 +315,12 @@ function jiscpmtask_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
   return $data;
 }
-
+/**
+ * @function
+ * Implements hook_views_handlers().
+ */
 function jiscpmtask_views_handlers() {
   return array(
     'info' => array(
@@ -345,40 +332,34 @@ function jiscpmtask_views_handlers() {
       ),
       'jiscpmattribute_handler_filter_attributes_domain' => array(
         'parent' => 'views_handler_filter_in_operator',
-    ),
+      ),
     ),
   );
 }
 
 /**
- * Implementation of hook_date_api_fields().
+ * @function
+ * Implementation of hook_date_api_fields()
  * on behalf of core fields.
- * 
- * All modules that create custom fields that use the 
- * 'views_handler_field_date' handler can provide
- * additional information here about the type of
- * date they create so the date can be used by
- * the Date API views date argument and date filter.
  */
 function jiscpmtask_date_api_fields($field) {
   $values = array(
-    'sql_type' => DATE_UNIX, 
+    'sql_type' => DATE_UNIX,
     'tz_handling' => 'site',
-    'timezone_field' => '', 
-    'offset_field' => '', 
+    'timezone_field' => '',
+    'offset_field' => '',
     'related_fields' => array(),
     'granularity' => array('year', 'month', 'day', 'hour', 'minute', 'second'),
   );
-
   switch ($field) {
     case 'jiscpmtask.datebegin':
     case 'jiscpmtask.dateend':
       return $values;
   }
-
 }
 
 /**
+ * @function
  * Implement hook_date_api_tables().
  */
 function jiscpmtask_date_api_tables() {

@@ -15,4 +15,3 @@ function jiscpmsdd_organization_sdds(_organization_select, _sdd_select_id, _with
     }
   });
 };
-

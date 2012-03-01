@@ -1,7 +1,4 @@
 name = JISC PM Module
-description = The JISC Project Management Module provides a project management portal modelled around the JISC Project Management framework.
-core = 6.x
-; Add a stylesheet for all media
-stylesheets[all][] = jiscpm.css
-
+description = The JISC Project Management Module.
 package = JISC Project Management
+core = 6.x

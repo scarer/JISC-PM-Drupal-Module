@@ -3,36 +3,48 @@
  * @file
  */
 
+/**
+ * @function
+ * Implements hook_install().
+ */
 function jiscpmrisk_install() {
   drupal_install_schema('jiscpmrisk');
 }
-
+/**
+ * @function
+ * Implements hook_disable().
+ */
 function jiscpmrisk_disable() {
   drupal_set_message(t('Nodes of type "risk" have not been deleted on disabling jiscpm risk. Please note that they will now have reduced functionality, and will not be protected by jiscpm risk access controls.'), 'warning');
 }
-
+/**
+ * @function
+ * Implements hook_uninstall().
+ */
 function jiscpmrisk_uninstall() {
   drupal_uninstall_schema('jiscpmrisk');
 }
-
+/**
+ * @function
+ * Implements hook_schema().
+ */
 function jiscpmrisk_schema() {
   $schema['jiscpmrisk'] = array(
     'fields'                => array(
-      'nid'                 => array('description' => t('The nid of a risk'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'    => array('description' => t('The nid for the project the risk belongs to'), 'type' => 'int'),
-      'risk_probability'  => array('description' => t('The probability of the risk occurring'), 'type' => 'varchar', 'length' => 100),
-      'risk_impact'  => array('description' => t('The impact of the risk'), 'type' => 'varchar', 'length' => 100),
-      'risk_start'  => array('description' => t('The start date of the risk occurring'), 'type' => 'int', 'default' => 0),
-      'risk_end'  => array('description' => t('The end date of the risk occurring'), 'type' => 'int', 'default' => 0),
-      'risk_residual'  => array('description' => t('The residual of the risk once all measures to prevent its occurance have been taken'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'risk_early_warning_signs'  => array('description' => t('The early warning signs of the risk'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'risk_owner_uid'  => array('description' => t('The uid of the risk owner'), 'type' => 'varchar', 'length' => 100),
-      'risk_category'  => array('description' => t('The category of the risk'), 'type' => 'varchar', 'length' => 100),
-      'risk_management_approach'  => array('description' => t('The risk management approach'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'nid'                 => array('description' => 'The nid of a risk', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('description' => 'The nid for the project the risk belongs to', 'type' => 'int'),
+      'risk_probability'  => array('description' => 'The probability of the risk occurring', 'type' => 'varchar', 'length' => 100),
+      'risk_impact'  => array('description' => 'The impact of the risk', 'type' => 'varchar', 'length' => 100),
+      'risk_start'  => array('description' => 'The start date of the risk occurring', 'type' => 'int', 'default' => 0),
+      'risk_end'  => array('description' => 'The end date of the risk occurring', 'type' => 'int', 'default' => 0),
+      'risk_residual'  => array('description' => 'The residual of the risk once all measures to prevent its occurance have been taken', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'risk_early_warning_signs'  => array('description' => 'The early warning signs of the risk', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'risk_owner_uid'  => array('description' => 'The uid of the risk owner', 'type' => 'varchar', 'length' => 100),
+      'risk_category'  => array('description' => 'The category of the risk', 'type' => 'varchar', 'length' => 100),
+      'risk_management_approach'  => array('description' => 'The risk management approach', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array('nid', 'vid'),
   );
-
   return $schema;
 }

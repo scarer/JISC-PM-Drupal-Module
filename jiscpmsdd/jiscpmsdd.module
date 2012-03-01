@@ -1,1469 +1,1470 @@
 <?php
 /**
-* @file
-*/
+ * @file
+ */
 
-/** 
-* @function
-* Implementation of hook_help
-*/
+/**
+ * @function
+ * Implements hook_help().
+ */
 function jiscpmsdd_help($path, $arg) {
-$o = '';
-
-switch ($path) {
-case "admin/help#jiscpmsdd":
-$o = '<p>'.  t("Provides System Design Document support for jiscpm") .'</p>';
-break;
+  $o = '';
+  switch ($path) {
+    case "admin/help#jiscpmsdd":
+      $o = '<p>' . t("Provides System Design Document support for jiscpm") . '</p>';
+      break;
+  }
+  return $o;
 }
-
-return $o;
-}
-
 /**
-* @function
-* Implementation of hook_perm
-*/
+ * @function
+ * Implements hook_perm().
+ */
 function jiscpmsdd_perm() {
-return array(
-'jiscpm sdd: access',
-'jiscpm sdd: add',
-'jiscpm sdd: edit all',
-'jiscpm sdd: edit own',
-'jiscpm sdd: delete all',
-'jiscpm sdd: delete own',
-);
+  return array(
+    'jiscpm sdd: access',
+    'jiscpm sdd: add',
+    'jiscpm sdd: edit all',
+    'jiscpm sdd: edit own',
+    'jiscpm sdd: delete all',
+    'jiscpm sdd: delete own',
+  );
 }
-
 /**
-* @function
-* Implementation of hook_init
-*/
+ * @function
+ * Implements hook_init().
+ */
 function jiscpmsdd_init() {
-drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
+  drupal_add_js(drupal_get_path('module', 'jiscpm') . '/jiscpm.js', 'module', 'header', FALSE);
 }
-
-function jiscpmsdd_access($op, $node, $account=NULL) {
-if (empty($account)) {
-global $user;
-$account = $user;
+/**
+ * @function
+ * Implements hook_access().
+ */
+function jiscpmsdd_access($op, $node, $account = NULL) {
+  if (empty($account)) {
+    global $user;
+    $account = $user;
+  }
+  if (is_numeric($node)) {
+    $node = node_load($node);
+  }
+  if ($op == 'create') {
+    return user_access('jiscpm sdd: add');
+  }
+  if ($op == 'delete') {
+    if (user_access('jiscpm sdd: delete all')) {
+      return TRUE;
+    }
+    elseif (user_access('jiscpm sdd: delete own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    }
+  }
+  if ($op == 'update') {
+    if (user_access('jiscpm sdd: edit all')) {
+      return TRUE;
+    }
+    elseif (user_access('jiscpm sdd: edit own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    }
+  }
+  if ($op == 'view') {
+    if (user_access('jiscpm sdd: view all')) {
+      return TRUE;
+    }
+    elseif (user_access('jiscpm sdd: view own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
-
-if (is_numeric($node)) {
-$node = node_load($node);
-}
-
-if ($op == 'create') {
-return user_access('jiscpm sdd: add');
-}
-
-if ($op == 'delete') {
-if (user_access('jiscpm sdd: delete all'))  {
-return TRUE;
-} 
-else if (user_access('jiscpm sdd: delete own') && ($account->uid == $node->uid)) {
-return TRUE;
-} 
-}
-
-if ($op == 'update') {
-if (user_access('jiscpm sdd: edit all')) {
-return TRUE;
-} 
-else if (user_access('jiscpm sdd: edit own') && ($account->uid == $node->uid)) {
-return TRUE;
-} 
-}
-
-if ($op == 'view') {
-if (user_access('jiscpm sdd: view all')) {
-return TRUE;
-} 
-else if (user_access('jiscpm sdd: view own') && ($account->uid == $node->uid)) {
-return TRUE;
-} 
-}
-return FALSE;
-}
-
+/**
+ * @function
+ * Implements hook_access().
+ */
 function jiscpmsdd_access_sql($sql, $where = array()) {
-if (user_access('jiscpm sdd: view all')) {
-$where[] = "'jiscpm_access'='jiscpm_access'";
-return jiscpm_rewrite_sql($sql, $where);
+  if (user_access('jiscpm sdd: view all')) {
+    $where[] = "'jiscpm_access'='jiscpm_access'";
+    return jiscpm_rewrite_sql($sql, $where);
+  }
+  global $user;
+  $cond = '';
+  if (user_access('jiscpm sdd: view own')) {
+    $cond .= 'n.uid=' . $user->uid;
+  }
+  if (empty($cond)) {
+    $cond = '0=1';
+  }
+  $where[] = $cond;
+  $where[] = "'jiscpm_access'='jiscpm_access'";
+  return jiscpm_rewrite_sql($sql, $where);
 }
-
-global $user;
-
-$cond = '';
-if (user_access('jiscpm sdd: view own')) {
-$cond .= 'n.uid='. $user->uid;
-}
-
-if (empty($cond)) $cond = '0=1';
-$where[] = $cond;
-
-$where[] = "'jiscpm_access'='jiscpm_access'";
-return jiscpm_rewrite_sql($sql, $where);
-}
-
-
+/**
+ * @function
+ * Implements hook_menu().
+ */
 function jiscpmsdd_menu() {
-$items = array();
-
-$items['jiscpm/dashboard/sdds'] = array(
-'title' => 'System Design Documents',
-'description' => 'jiscpm system design documents',
-'page callback' => 'jiscpmsdd_list',
-'access arguments' => array('jiscpm sdd: access'),
-'file' => 'jiscpmsdd.admin.inc',
-'type' => MENU_NORMAL_ITEM
-);
-$items['jiscpm/project_sdd_js/%'] = array(
-'title' => 'System Design Documents',
-'page callback' => '_jiscpmsdd_project_sdd_js',
-'page arguments' => array(2),
-'access arguments' => array('jiscpm sdd: access'),
-'file' => 'jiscpmsdd.admin.inc',
-'type' => MENU_CALLBACK,
-);
-/* user classes ajax functionality */
-$items['jiscpmsdd_userclass/js/%'] = array(
-'page callback' => 'jiscpmsdd_userclass_js',
-'page arguments' => array(2),
-'access arguments' => array('access content'),
-'type ' => MENU_CALLBACK,
-);
-/* functional requirements ajax functionality */
-$items['jiscpmsdd_functional/js/%'] = array(
-'page callback' => 'jiscpmsdd_functional_js',
-'page arguments' => array(2),
-'access arguments' => array('access content'),
-'type ' => MENU_CALLBACK,
-);
-/* non functional requirements ajax functionality */
-$items['jiscpmsdd_non_functional/js/%'] = array(
-'page callback' => 'jiscpmsdd_non_functional_js',
-'page arguments' => array(2),
-'access arguments' => array('access content'),
-'type ' => MENU_CALLBACK,
-);
-/* definitions ajax functionality */
-$items['jiscpmsdd_definition/js/%'] = array(
-'page callback' => 'jiscpmsdd_definition_js',
-'page arguments' => array(2),
-'access arguments' => array('access content'),
-'type ' => MENU_CALLBACK,
-);
-return $items;
+  $items = array();
+  $items['jiscpm/dashboard/sdds'] = array(
+    'title' => 'System Design Documents',
+    'description' => 'jiscpm system design documents',
+    'page callback' => 'jiscpmsdd_list',
+    'access arguments' => array('jiscpm sdd: access'),
+    'file' => 'jiscpmsdd.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['jiscpm/project_sdd_js/%'] = array(
+    'title' => 'System Design Documents',
+    'page callback' => '_jiscpmsdd_project_sdd_js',
+    'page arguments' => array(2),
+    'access arguments' => array('jiscpm sdd: access'),
+    'file' => 'jiscpmsdd.admin.inc',
+    'type' => MENU_CALLBACK,
+  );
+  // User classes ajax functionality.
+  $items['jiscpmsdd_userclass/js/%'] = array(
+    'page callback' => 'jiscpmsdd_userclass_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  // Functional requirements ajax functionality.
+  $items['jiscpmsdd_functional/js/%'] = array(
+    'page callback' => 'jiscpmsdd_functional_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  // Non functional requirements ajax functionality.
+  $items['jiscpmsdd_non_functional/js/%'] = array(
+    'page callback' => 'jiscpmsdd_non_functional_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  // Definitions ajax functionality.
+  $items['jiscpmsdd_definition/js/%'] = array(
+    'page callback' => 'jiscpmsdd_definition_js',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type ' => MENU_CALLBACK,
+  );
+  return $items;
 }
-
+/**
+ * @function
+ * Implements hook_theme().
+ */
 function jiscpmsdd_theme() {
-return array(
-'jiscpmsdd_list' => array(
-'file'      => 'jiscpmsdd.theme.inc',
-'arguments' => array('header', 'srs'),
-),
-'jiscpmsdd_view' => array(
-'file'      => 'jiscpmsdd.theme.inc',
-'arguments' => array('node', 'teaser', 'page'),
-),
-/* view of table for user classes */
-'jiscpmsdd_userclass_table' => array(
-'arguments' => array('form'),
-),
-/* view of table for functional requirements */
-'jiscpmsdd_functional_table' => array(
-'arguments' => array('form'),
-),
-/* view of table for non functional requirements */
-'jiscpmsdd_non_functional_table' => array(
-'arguments' => array('form'),
-),
-/* view of table for definitions */
-'jiscpmsdd_definition_table' => array(
-'arguments' => array('form'),
-),
-);
+  return array(
+    'jiscpmsdd_list' => array(
+      'file'      => 'jiscpmsdd.theme.inc',
+      'arguments' => array('header', 'srs'),
+    ),
+    'jiscpmsdd_view' => array(
+      'file'      => 'jiscpmsdd.theme.inc',
+      'arguments' => array('node', 'teaser', 'page'),
+    ),
+     // View of table for user classes.
+    'jiscpmsdd_userclass_table' => array(
+      'arguments' => array('form'),
+    ),
+    // View of table for functional requirements.
+    'jiscpmsdd_functional_table' => array(
+      'arguments' => array('form'),
+    ),
+    // View of table for non functional requirements.
+    'jiscpmsdd_non_functional_table' => array(
+      'arguments' => array('form'),
+    ),
+    // View of table for definitions.
+    'jiscpmsdd_definition_table' => array(
+      'arguments' => array('form'),
+    ),
+  );
 }
-
+/**
+ * @function
+ * Implements hook_node_info().
+ */
 function jiscpmsdd_node_info() {
-return array(
-'jiscpmsdd' => array(
-'name' => t('JISCPM System Design Document'),
-'module' => 'jiscpmsdd',
-'description' => t("A System Design Document for JISC PM."),
-'title_label' => t("Title"),
-'body_label' => t("Description"),
-)
-);
+  return array(
+    'jiscpmsdd' => array(
+      'name' => t('JISCPM System Design Document'),
+      'module' => 'jiscpmsdd',
+      'description' => t("A System Design Document for JISC PM."),
+      'title_label' => t("Title"),
+      'body_label' => t("Description"),
+    ),
+  );
 }
-
+/**
+ * @function
+ * Implements hook_form().
+ */
 function jiscpmsdd_form(&$node, $form_state) {
-
-$breadcrumb = array();
-$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
-$breadcrumb[] = l(t('System Design Documents'), 'jiscpm/dashboard/sdds');
-drupal_set_breadcrumb($breadcrumb);
-$s_pro = db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid");
-$type = node_get_types('type', $node);
-$form['#attributes']['class'] = 'jiscpmcomponent_node_form';
-
-$form['group1'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 0,
-);
-/* print out project options */
-$s_pro = db_rewrite_sql($s_pro);
-$r = db_query($s_pro);
-$projects = array();
-while ($project = db_fetch_object($r)) {
-$projects[$project->nid] = check_plain($project->title);
-if (!$node->project_nid) $node->project_nid = $project->nid;
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('System Design Documents'), 'jiscpm/dashboard/sdds');
+  drupal_set_breadcrumb($breadcrumb);
+  $s_pro = db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid");
+  $type = node_get_types('type', $node);
+  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';
+  $form['group1'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 0,
+  );
+  // Get project options.
+  $s_pro = db_rewrite_sql($s_pro);
+  $r = db_query($s_pro);
+  $projects = array();
+  while ($project = db_fetch_object($r)) {
+    $projects[$project->nid] = check_plain($project->title);
+    if (!$node->project_nid) {
+      $node->project_nid = $project->nid;
+    }
+  }
+  $form['group1']['project_nid'] = array(
+    '#type' => 'select',
+    '#title' => t('Project'),
+    '#options' => $projects,
+    '#default_value' => $node->jiscpmsdds[0]['project_nid'],
+    '#process' => array('jiscpm_dependent_select_process'),
+    '#required' => TRUE,
+  );
+  $currentdate = date("Y-m-d");
+  // Title.
+  $title_default = "";
+  if ($node->title != "" || $node->title != NULL) {
+    $title_default = $node->title;
+  }
+  else {
+    $title_default = '<INSERT PROJECT NAME> SDD';
+  }
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => check_plain($type->title_label),
+    '#required' => TRUE,
+    '#default_value' => $title_default,
+    '#weight' => 2,
+  );
+  $form['group2'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 3,
+  );
+  $form['group2']['system_overview_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('System Overview'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group2']['system_overview_fieldset']['system_overview'] = array(
+    '#type' => 'textarea',
+    '#title' => t('System Overview'),
+    '#default_value' => $node->jiscpmsdds[0]['system_overview'],
+    '#description' => t('An overview of the system. For example, "This website serves as a portal for academics etc...".'),
+  );
+  $form['group2']['system_overview_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group2', 'system_overview_fieldset', 'format'));
+  $form['group3'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 4,
+  );
+  $form['group3']['system_architecture_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('System Architecture'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group3']['system_architecture_fieldset']['system_architecture'] = array(
+    '#type' => 'textarea',
+    '#title' => t('System Architecture'),
+    '#default_value' => $node->jiscpmsdds[0]['system_architecture'],
+    '#weight' => 0,
+    '#description' => t('An overview of the system architecture e.g. one virtual machine running linux red hat etc...'),
+  );
+  $form['group3']['system_architecture_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group3', 'system_architecture_fieldset', 'format'));
+  $form['group4'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 5,
+  );
+  $form['group4']['data_design_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Data Design'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group4']['data_design_fieldset']['data_design'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Data Design'),
+    '#default_value' => check_markup($node->jiscpmsdds[0]['data_design'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#description' => t('An overview of the data design e.g. one database that stores etc...'),
+    '#weight' => 0,
+  );
+  $form['group4']['data_design_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group4', 'data_design_fieldset', 'format'));
+  $form['group5'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 6,
+  );
+  $form['group5']['component_design_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Data Design'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group5']['component_design_fieldset']['component_design'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Component Design'),
+    '#default_value' => check_markup($node->jiscpmsdds[0]['component_design'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#description' => t('In this section include pseudocode for functional elements.'),
+    '#weight' => 0,
+  );
+  $form['group5']['component_design_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group5', 'component_design_fieldset', 'format'));
+  $form['group6'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 7,
+  );
+  $form['group6']['user_interfaces_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User Interfaces'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group6']['user_interfaces_fieldset']['user_interfaces'] = array(
+    '#type' => 'textarea',
+    '#title' => t('User Interfaces'),
+    '#default_value' => check_markup($node->jiscpmsdds[0]['user_interfaces'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#description' => t('Describe user interfaces that will be designed/used including relevant screenshots/wireframes.'),
+    '#weight' => 0,
+  );
+  $form['group6']['user_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group6', 'user_interfaces_fieldset', 'format'));
+  $form['group7'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 8,
+  );
+  $form['group7']['hardware_interfaces_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Hardware Interfaces'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group7']['hardware_interfaces_fieldset']['hardware_interfaces'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Hardware Interfaces'),
+    '#default_value' => check_markup($node->jiscpmsdds[0]['hardware_interfaces'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#description' => t('Describe hardware interfaces that will be designed/used including relevant diagrams.'),
+    '#weight' => 0,
+  );
+  $form['group7']['hardware_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group7', 'hardware_interfaces_fieldset', 'format'));
+  $form['group8'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 9,
+  );
+  $form['group8']['software_interfaces_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Software Interfaces'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group8']['software_interfaces_fieldset']['software_interfaces'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Software Interfaces'),
+    '#default_value' => check_markup($node->jiscpmsdds[0]['software_interfaces'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#description' => t('Describe software interfaces that will be designed/used including relevant images.'),
+    '#weight' => 0,
+  );
+  $form['group8']['software_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group8', 'software_interfaces_fieldset', 'format'));
+  $form['group9'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => 10,
+  );
+  $form['group9']['user_documentation_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User Documentation'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group9']['user_documentation_fieldset']['user_documentation'] = array(
+    '#type' => 'textarea',
+    '#title' => t('User Documentation'),
+    '#default_value' => check_markup($node->jiscpmsdds[0]['user_documentation'], FILTER_FORMAT_DEFAULT, FALSE),
+    '#description' => t('Describe the user documentation that will be generated to support system operations.'),
+    '#weight' => 0,
+  );
+  $form['group9']['user_documentation_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group9', 'user_documentation_fieldset', 'format'));
+  // Add ajax form elements for adding user classes.
+  $form['userclass_wrapper'] = array(
+    '#tree' => FALSE,
+    '#weight' => 11,
+    '#prefix' => '<h2>User Classes and Characteristics</h2><div class="clear-block" id="jiscpmsdd-userclass-wrapper">',
+    '#suffix' => '</div>',
+  );
+  // Get number of userclasses.
+  $userclass_count = empty($node->userclasses) ? 0 : count($node->userclasses);
+  // If a new userclass added, add to list and update the userclass count.
+  if (isset($form_state['new_userclass'])) {
+    if (!isset($node->userclasses)) {
+      $node->userclasses = array();
+    }
+    $node->userclasses = array_merge($node->userclasses, array($form_state['new_userclass']));
+    $userclass_count++;
+  }
+  // If a userclass removed, remove from list and update the userclass count.
+  $remove_delta = -1;
+  if (!empty($form_state['remove_delta'])) {
+    $remove_delta = $form_state['remove_delta'] - 1;
+    unset($node->userclasses[$remove_delta]);
+    // Re-number the values.
+    $node->userclasses = array_values($node->userclasses);
+    $userclass_count--;
+  }
+  // Container to display existing userclasses.
+  $form['userclass_wrapper']['userclasses'] = array(
+    '#prefix' => '<div id="jiscpmsdd-userclasses">',
+    '#suffix' => '</div>',
+    '#theme' => 'jiscpmsdd_userclass_table',
+  );
+  // Add the existing userclasses to the form.
+  for ($delta = 0; $delta < $userclass_count; $delta++) {
+    $user_class_name = isset($node->userclasses[$delta]['user_class_name']) ? $node->userclasses[$delta]['user_class_name'] : '';
+    $user_class_characteristics = isset($node->userclasses[$delta]['user_class_characteristics']) ? $node->userclasses[$delta]['user_class_characteristics'] : '';
+    // Display existing userclasses using helper
+    // function jiscpmsdd_userclass_display_form().
+    $form['userclass_wrapper']['userclasses'][$delta] = jiscpmsdd_userclass_display_form($delta, $user_class_name, $user_class_characteristics);
+  }
+  // Add new userclasses.
+  $form['userclass_wrapper']['add_userclass'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add Another User Class'),
+    '#tree' => FALSE,
+    '#weight' => -16,
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
+  );
+  // Define the form fields for the new userclass
+  // title and user_class_characteristics's name.
+  $form['userclass_wrapper']['add_userclass']['new_userclass'] = array(
+    '#tree' => TRUE,
+    '#theme' => 'jiscpmsdd_add_userclass_form',
+  );
+  $form['userclass_wrapper']['add_userclass']['new_userclass']['new_user_class_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('A User Class'),
+    '#weight' => 0,
+  );
+  $form['userclass_wrapper']['add_userclass']['new_userclass']['new_user_class_characteristics'] = array(
+    '#type' => 'textarea',
+    '#title' => t('User class description'),
+    '#weight' => 1,
+  );
+  $form['userclass_wrapper']['add_userclass']['new_userclass']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'userclass_wrapper', 'add_userclass', 'new_userclass', 'format'));
+  // We name our button 'jiscpmsdd_userclass_more'
+  // to avoid conflicts with other modules using
+  // AHAH-enabled buttons with the id 'more'.
+  $form['userclass_wrapper']['add_userclass']['jiscpmsdd_userclass_more'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add userclass'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmsdd_userclass_add_more_submit'),
+    '#ahah' => array(
+      'path' => 'jiscpmsdd_userclass/js/0',
+      'wrapper' => 'jiscpmsdd-userclasses',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  // Add ajax form elements for adding functional requirements.
+  $form['functional_wrapper'] = array(
+    '#tree' => FALSE,
+    '#weight' => 12,
+    '#prefix' => '<h2>Functional Requirements</h2><div class="clear-block" id="jiscpmsdd-functional-wrapper">',
+    '#suffix' => '</div>',
+  );
+  // Get number of functional.
+  $functional_count = empty($node->functional) ? 0 : count($node->functional);
+  // If a new functional added, add to list and update the functional count.
+  if (isset($form_state['new_functional'])) {
+    if (!isset($node->functional)) {
+      $node->functional = array();
+    }
+    $node->functional = array_merge($node->functional, array($form_state['new_functional']));
+    $functional_count++;
+  }
+  // If a functional removed, remove from list and update the functional count.
+  $remove_delta = -1;
+  if (!empty($form_state['remove_delta'])) {
+    $remove_delta = $form_state['remove_delta'] - 1;
+    unset($node->functional[$remove_delta]);
+    // Re-number the values.
+    $node->functional = array_values($node->functional);
+    $functional_count--;
+  }
+  // Container to display existing functional.
+  $form['functional_wrapper']['functional'] = array(
+    '#prefix' => '<div id="jiscpmsdd-functional">',
+    '#suffix' => '</div>',
+    '#theme' => 'jiscpmsdd_functional_table',
+  );
+  // Add the existing functional to the form.
+  for ($delta = 0; $delta < $functional_count; $delta++) {
+    $functional_req_desc = isset($node->functional[$delta]['functional_req_desc']) ? $node->functional[$delta]['functional_req_desc'] : '';
+    $functional_req_imp = isset($node->functional[$delta]['functional_req_imp']) ? $node->functional[$delta]['functional_req_imp'] : '';
+    // Display existing functional using helper
+    // function jiscpmsdd_functional_display_form().
+    $form['functional_wrapper']['functional'][$delta] = jiscpmsdd_functional_display_form($delta, $functional_req_desc, $functional_req_imp);
+  }
+  // Add new functional.
+  $form['functional_wrapper']['add_functional'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add another functional requirement'),
+    '#tree' => FALSE,
+    '#weight' => -15,
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
+  );
+  // Define the form fields for the new
+  // functional title and functional_req_imp's name.
+  $form['functional_wrapper']['add_functional']['new_functional'] = array(
+    '#tree' => TRUE,
+    '#theme' => 'jiscpmsdd_add_functional_form',
+  );
+  $form['functional_wrapper']['add_functional']['new_functional']['new_functional_req_desc'] = array(
+    '#type' => 'textfield',
+    '#title' => t('A Functional Requirement'),
+    '#weight' => 0,
+  );
+  $form['functional_wrapper']['add_functional']['new_functional']['new_functional_req_imp'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Functional Requirement Implementation'),
+    '#weight' => 1,
+  );
+  $form['functional_wrapper']['add_functional']['new_functional']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'functional_wrapper', 'add_functional', 'new_functional', 'format'));
+  // We name our button 'jiscpmsdd_functional_more'
+  // to avoid conflicts with other modules using
+  // AHAH-enabled buttons with the id 'more'.
+  $form['functional_wrapper']['add_functional']['jiscpmsdd_functional_more'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add functional'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmsdd_functional_add_more_submit'),
+    '#ahah' => array(
+      'path' => 'jiscpmsdd_functional/js/0',
+      'wrapper' => 'jiscpmsdd-functional',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  // Add ajax form elements for adding non functional requirements.
+  $form['non_functional_wrapper'] = array(
+    '#tree' => FALSE,
+    '#weight' => 13,
+    '#prefix' => '<h2>Non Functional Requirements</h2><div class="clear-block" id="jiscpmsdd-non_functional-wrapper">',
+    '#suffix' => '</div>',
+  );
+  // Get number of non_functional.
+  $non_functional_count = empty($node->non_functional) ? 0 : count($node->non_functional);
+  // If a new non_functional added, add to
+  // list and update the non_functional count.
+  if (isset($form_state['new_non_functional'])) {
+    if (!isset($node->non_functional)) {
+      $node->non_functional = array();
+    }
+    $node->non_functional = array_merge($node->non_functional, array($form_state['new_non_functional']));
+    $non_functional_count++;
+  }
+  // If a non_functional removed, remove from
+  // list and update the non_functional count.
+  $remove_delta = -1;
+  if (!empty($form_state['remove_delta'])) {
+    $remove_delta = $form_state['remove_delta'] - 1;
+    unset($node->non_functional[$remove_delta]);
+    // Re-number the values.
+    $node->non_functional = array_values($node->non_functional);
+    $non_functional_count--;
+  }
+  // Container to display existing non_functional.
+  $form['non_functional_wrapper']['non_functional'] = array(
+    '#prefix' => '<div id="jiscpmsdd-non_functional">',
+    '#suffix' => '</div>',
+    '#theme' => 'jiscpmsdd_non_functional_table',
+  );
+  // Add the existing non_functional to the form.
+  for ($delta = 0; $delta < $non_functional_count; $delta++) {
+    $non_functional_req_desc = isset($node->non_functional[$delta]['non_functional_req_desc']) ? $node->non_functional[$delta]['non_functional_req_desc'] : '';
+    $non_functional_req_imp = isset($node->non_functional[$delta]['non_functional_req_imp']) ? $node->non_functional[$delta]['non_functional_req_imp'] : '';
+    // Display existing non_functional using helper
+    // function jiscpmsdd_non_functional_display_form().
+    $form['non_functional_wrapper']['non_functional'][$delta] = jiscpmsdd_non_functional_display_form($delta, $non_functional_req_desc, $non_functional_req_imp);
+  }
+  // Add new non_functional.
+  $form['non_functional_wrapper']['add_non_functional'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add another non functional requirement'),
+    '#tree' => FALSE,
+    '#weight' => -15,
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
+  );
+  // Define the form fields for the new non_functional
+  // title and non_functional_req_imp's name.
+  $form['non_functional_wrapper']['add_non_functional']['new_non_functional'] = array(
+    '#tree' => TRUE,
+    '#theme' => 'jiscpmsdd_add_non_functional_form',
+  );
+  $form['non_functional_wrapper']['add_non_functional']['new_non_functional']['new_non_functional_req_desc'] = array(
+    '#type' => 'textfield',
+    '#title' => t('A Non Functional Requirement'),
+    '#weight' => 0,
+  );
+  $form['non_functional_wrapper']['add_non_functional']['new_non_functional']['new_non_functional_req_imp'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Non Functional Requirement Implementation'),
+    '#weight' => 1,
+  );
+  $form['non_functional_wrapper']['add_non_functional']['new_non_functional']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'non_functional_wrapper', 'add_non_functional', 'new_non_functional', 'format'));
+  // We name our button 'jiscpmsdd_non_functional_more'
+  // to avoid conflicts with other modules using
+  // AHAH-enabled buttons with the id 'more'.
+  $form['non_functional_wrapper']['add_non_functional']['jiscpmsdd_non_functional_more'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add Non Functional Requirement'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmsdd_non_functional_add_more_submit'),
+    '#ahah' => array(
+      'path' => 'jiscpmsdd_non_functional/js/0',
+      'wrapper' => 'jiscpmsdd-non_functional',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  // Add ajax form elements for adding terms and definitions.
+  $form['definition_wrapper'] = array(
+    '#tree' => FALSE,
+    '#weight' => 14,
+    '#prefix' => '<h2>Terms and Definitions</h2><div class="clear-block" id="jiscpmsdd-definition-wrapper">',
+    '#suffix' => '</div>',
+  );
+  // Get number of definition.
+  $definition_count = empty($node->definition) ? 0 : count($node->definition);
+  // If a new definition added, add to list and update the definition count.
+  if (isset($form_state['new_definition'])) {
+    if (!isset($node->definition)) {
+      $node->definition = array();
+    }
+    $node->definition = array_merge($node->definition, array($form_state['new_definition']));
+    $definition_count++;
+  }
+  // If a definition removed, remove from list and update the definition count.
+  $remove_delta = -1;
+  if (!empty($form_state['remove_delta'])) {
+    $remove_delta = $form_state['remove_delta'] - 1;
+    unset($node->definition[$remove_delta]);
+    // Re-number the values.
+    $node->definition = array_values($node->definition);
+    $definition_count--;
+  }
+  // Container to display existing definition.
+  $form['definition_wrapper']['definition'] = array(
+    '#prefix' => '<div id="jiscpmsdd-definition">',
+    '#suffix' => '</div>',
+    '#theme' => 'jiscpmsdd_definition_table',
+  );
+  // Add the existing definition to the form.
+  for ($delta = 0; $delta < $definition_count; $delta++) {
+    $definition_term = isset($node->definition[$delta]['definition_term']) ? $node->definition[$delta]['definition_term'] : '';
+    $definition_of_term = isset($node->definition[$delta]['definition_of_term']) ? $node->definition[$delta]['definition_of_term'] : '';
+    // Display existing definition using helper
+    // function jiscpmsdd_definition_display_form().
+    $form['definition_wrapper']['definition'][$delta] = jiscpmsdd_definition_display_form($delta, $definition_term, $definition_of_term);
+  }
+  // Add new definition.
+  $form['definition_wrapper']['add_definition'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add another term and definition'),
+    '#tree' => FALSE,
+    '#weight' => -15,
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
+  );
+  // Define the form fields for the new
+  // definition title and definition_of_term's name.
+  $form['definition_wrapper']['add_definition']['new_definition'] = array(
+    '#tree' => TRUE,
+    '#theme' => 'jiscpmsdd_add_definition_form',
+  );
+  $form['definition_wrapper']['add_definition']['new_definition']['new_definition_term'] = array(
+    '#type' => 'textfield',
+    '#title' => t('A term'),
+    '#weight' => 0,
+  );
+  $form['definition_wrapper']['add_definition']['new_definition']['new_definition_of_term'] = array(
+    '#type' => 'textarea',
+    '#title' => t('The definition of the term'),
+    '#weight' => 1,
+  );
+  $form['definition_wrapper']['add_definition']['new_definition']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'definition_wrapper', 'add_definition', 'new_definition', 'format'));
+  // We name our button 'jiscpmsdd_definition_more'
+  // to avoid conflicts with other modules using
+  // AHAH-enabled buttons with the id 'more'.
+  $form['definition_wrapper']['add_definition']['jiscpmsdd_definition_more'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add definition'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmsdd_definition_add_more_submit'),
+    '#ahah' => array(
+      'path' => 'jiscpmsdd_definition/js/0',
+      'wrapper' => 'jiscpmsdd-definition',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  return $form;
 }
-$form['group1']['project_nid'] = array(
-'#type' => 'select',
-'#title' => t('Project'),
-'#options' => $projects,
-'#default_value' => $node->jiscpmsdds[0]['project_nid'],
-'#process' => array('jiscpm_dependent_select_process'),
-'#required' => TRUE,
-);
-
-$currentdate = date("Y-m-d");
-// Title.
-$title_default = "";
-if ($node->title != "" || $node->title != NULL) {
-$title_default = $node->title;
-}
-else {
-$title_default = '<INSERT PROJECT NAME> SDD';
-}
-$form['title'] = array(
-'#type' => 'textfield',
-'#title' => check_plain($type->title_label),
-'#required' => TRUE,
-'#default_value' => $title_default,
-'#weight' => 2,
-);
-
-$form['group2'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 3,
-);
-
-$form['group2']['system_overview_fieldset'] = array(
-'#type' => 'fieldset',
-'#title' => t('System Overview'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group2']['system_overview_fieldset']['system_overview'] = array(
-'#type' => 'textarea',
-'#title' => t('System Overview'),
-'#default_value' => $node->jiscpmsdds[0]['system_overview'],
-'#description' => t('An overview of the system. For example, "This website serves as a portal for academics etc...".'),
-);
-$form['group2']['system_overview_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group2', 'system_overview_fieldset', 'format'));
-$form['group3'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 4,
-);
-$form['group3']['system_architecture_fieldset'] = array(
-'#type' => 'fieldset',
-'#title' => t('System Architecture'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group3']['system_architecture_fieldset']['system_architecture'] = array(
-'#type' => 'textarea',
-'#title' => t('System Architecture'),
-'#default_value' => $node->jiscpmsdds[0]['system_architecture'],
-'#weight' => 0,
-'#description' => t('An overview of the system architecture e.g. one virtual machine running linux red hat etc...'),
-);
-$form['group3']['system_architecture_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group3', 'system_architecture_fieldset', 'format'));
-$form['group4'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 5,
-);
-$form['group4']['data_design_fieldset'] = array(
-'#type' => 'fieldset',
-'#title' => t('Data Design'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group4']['data_design_fieldset']['data_design'] = array(
-'#type' => 'textarea',
-'#title' => t('Data Design'),
-'#default_value' => check_markup($node->jiscpmsdds[0]['data_design'], FILTER_FORMAT_DEFAULT, FALSE),
-'#description' => t('An overview of the data design e.g. one database that stores etc...'),
-'#weight' => 0,
-);
-$form['group4']['data_design_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group4', 'data_design_fieldset', 'format'));
-$form['group5'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 6,
-);
-$form['group5']['component_design_fieldset'] = array(
-'#type' => 'fieldset',
-'#title' => t('Data Design'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group5']['component_design_fieldset']['component_design'] = array(
-'#type' => 'textarea',
-'#title' => t('Component Design'),
-'#default_value' => check_markup($node->jiscpmsdds[0]['component_design'], FILTER_FORMAT_DEFAULT, FALSE),
-'#description' => t('In this section include pseudocode for functional elements.'),
-'#weight' => 0,
-);
-$form['group5']['component_design_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group5', 'component_design_fieldset', 'format'));
-$form['group6'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 7,
-);
-$form['group6']['user_interfaces_fieldset'] = array(
-'#type' => 'fieldset',
-'#title' => t('User Interfaces'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group6']['user_interfaces_fieldset']['user_interfaces'] = array(
-'#type' => 'textarea',
-'#title' => t('User Interfaces'),
-'#default_value' => check_markup($node->jiscpmsdds[0]['user_interfaces'], FILTER_FORMAT_DEFAULT, FALSE),
-'#description' => t('Describe user interfaces that will be designed/used including relevant screenshots/wireframes.'),
-'#weight' => 0,
-);
-$form['group6']['user_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group6', 'user_interfaces_fieldset', 'format'));
-$form['group7'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 8,
-);
-$form['group7']['hardware_interfaces_fieldset'] = array(
-'#type' => 'fieldset',
-'#title' => t('Hardware Interfaces'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group7']['hardware_interfaces_fieldset']['hardware_interfaces'] = array(
-'#type' => 'textarea',
-'#title' => t('Hardware Interfaces'),
-'#default_value' => check_markup($node->jiscpmsdds[0]['hardware_interfaces'], FILTER_FORMAT_DEFAULT, FALSE),
-'#description' => t('Describe hardware interfaces that will be designed/used including relevant diagrams.'),
-'#weight' => 0,
-);
-$form['group7']['hardware_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group7', 'hardware_interfaces_fieldset', 'format'));
-$form['group8'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 9,
-);
-$form['group8']['software_interfaces_fieldset'] = array(
-'#type' => 'fieldset',
-'#title' => t('Software Interfaces'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group8']['software_interfaces_fieldset']['software_interfaces'] = array(
-'#type' => 'textarea',
-'#title' => t('Software Interfaces'),
-'#default_value' => check_markup($node->jiscpmsdds[0]['software_interfaces'], FILTER_FORMAT_DEFAULT, FALSE),
-'#description' => t('Describe software interfaces that will be designed/used including relevant images.'),
-'#weight' => 0,
-);
-$form['group8']['software_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group8', 'software_interfaces_fieldset', 'format'));
-$form['group9'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => 10,
-);
-$form['group9']['user_documentation_fieldset'] = array(
-'#type' => 'fieldset',
-'#title' => t('User Documentation'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group9']['user_documentation_fieldset']['user_documentation'] = array(
-'#type' => 'textarea',
-'#title' => t('User Documentation'),
-'#default_value' => check_markup($node->jiscpmsdds[0]['user_documentation'], FILTER_FORMAT_DEFAULT, FALSE),
-'#description' => t('Describe the user documentation that will be generated to support system operations.'),
-'#weight' => 0,
-);
-$form['group9']['user_documentation_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group9', 'user_documentation_fieldset', 'format'));
-//add ajax form elements for adding user classes
-$form['userclass_wrapper'] = array(
-'#tree' => FALSE,
-'#weight' => 11,
-'#prefix' => '<h2>User Classes and Characteristics</h2><div class="clear-block" id="jiscpmsdd-userclass-wrapper">',
-'#suffix' => '</div>',
-
-);
-
-// Get number of userclasses.
-$userclass_count = empty($node->userclasses) ? 0 : count($node->userclasses);
-
-// If a new userclass added, add to list and update the userclass count.
-if (isset($form_state['new_userclass'])) {
-if (!isset($node->userclasses)) {
-$node->userclasses = array();
-}
-$node->userclasses = array_merge($node->userclasses, array($form_state['new_userclass']));
-$userclass_count++;
-}
-
-// If a userclass removed, remove from list and update the userclass count.
-$remove_delta = -1;
-if (!empty($form_state['remove_delta'])) {
-$remove_delta = $form_state['remove_delta'] - 1;
-unset($node->userclasses[$remove_delta]);
-// Re-number the values.
-$node->userclasses = array_values($node->userclasses);
-$userclass_count--;
-}
-
-// Container to display existing userclasses.
-$form['userclass_wrapper']['userclasses'] = array(
-'#prefix' => '<div id="jiscpmsdd-userclasses">',
-'#suffix' => '</div>',
-'#theme' => 'jiscpmsdd_userclass_table',
-);
-
-// Add the existing userclasses to the form.
-for ($delta = 0; $delta < $userclass_count; $delta++) {
-$user_class_name = isset($node->userclasses[$delta]['user_class_name']) ? $node->userclasses[$delta]['user_class_name'] : '';
-$user_class_characteristics = isset($node->userclasses[$delta]['user_class_characteristics']) ? $node->userclasses[$delta]['user_class_characteristics'] : '';
-// Display existing userclasses using helper function jiscpmsdd_userclass_display_form().
-$form['userclass_wrapper']['userclasses'][$delta] = jiscpmsdd_userclass_display_form($delta, $user_class_name, $user_class_characteristics);
-}
-
-
-// Add new userclasses
-$form['userclass_wrapper']['add_userclass'] = array(
-'#type' => 'fieldset',
-'#title' => t('Add Another User Class'),
-'#tree' => FALSE,
-'#weight' => -16,
-'#collapsed' => TRUE,
-'#collapsible' => TRUE,
-);
-
-// Define the form fields for the new userclass title and user_class_characteristics's name.
-$form['userclass_wrapper']['add_userclass']['new_userclass'] = array(
-'#tree' => TRUE,
-'#theme' => 'jiscpmsdd_add_userclass_form',
-);
-$form['userclass_wrapper']['add_userclass']['new_userclass']['new_user_class_name'] = array(
-'#type' => 'textfield',
-'#title' => t('A User Class'),
-'#weight' => 0,
-);
-$form['userclass_wrapper']['add_userclass']['new_userclass']['new_user_class_characteristics'] = array(
-'#type' => 'textarea',
-'#title' => t('User class description'),
-'#weight' => 1,
-);
-$form['userclass_wrapper']['add_userclass']['new_userclass']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'userclass_wrapper', 'add_userclass', 'new_userclass', 'format'));
-// We name our button 'jiscpmsdd_userclass_more' to avoid conflicts with other modules using
-// AHAH-enabled buttons with the id 'more'.
-$form['userclass_wrapper']['add_userclass']['jiscpmsdd_userclass_more'] = array(
-'#type' => 'submit',
-'#value' => t('Add userclass'),
-'#weight' => 1,
-'#submit' => array('jiscpmsdd_userclass_add_more_submit'),
-'#ahah' => array(
-'path' => 'jiscpmsdd_userclass/js/0',
-'wrapper' => 'jiscpmsdd-userclasses',
-'method' => 'replace',
-'effect' => 'fade',
-),
-);
-//add ajax form elements for adding functional requirements
-$form['functional_wrapper'] = array(
-'#tree' => FALSE,
-'#weight' => 12,
-'#prefix' => '<h2>Functional Requirements</h2><div class="clear-block" id="jiscpmsdd-functional-wrapper">',
-'#suffix' => '</div>',
-
-);
-
-// Get number of functional.
-$functional_count = empty($node->functional) ? 0 : count($node->functional);
-
-// If a new functional added, add to list and update the functional count.
-if (isset($form_state['new_functional'])) {
-if (!isset($node->functional)) {
-$node->functional = array();
-}
-$node->functional = array_merge($node->functional, array($form_state['new_functional']));
-$functional_count++;
-}
-
-// If a functional removed, remove from list and update the functional count.
-$remove_delta = -1;
-if (!empty($form_state['remove_delta'])) {
-$remove_delta = $form_state['remove_delta'] - 1;
-unset($node->functional[$remove_delta]);
-// Re-number the values.
-$node->functional = array_values($node->functional);
-$functional_count--;
-}
-// Container to display existing functional.
-$form['functional_wrapper']['functional'] = array(
-'#prefix' => '<div id="jiscpmsdd-functional">',
-'#suffix' => '</div>',
-'#theme' => 'jiscpmsdd_functional_table',
-);
-// Add the existing functional to the form.
-for ($delta = 0; $delta < $functional_count; $delta++) {
-$functional_req_desc = isset($node->functional[$delta]['functional_req_desc']) ? $node->functional[$delta]['functional_req_desc'] : '';
-$functional_req_imp = isset($node->functional[$delta]['functional_req_imp']) ? $node->functional[$delta]['functional_req_imp'] : '';
-// Display existing functional using helper function jiscpmsdd_functional_display_form().
-$form['functional_wrapper']['functional'][$delta] = jiscpmsdd_functional_display_form($delta, $functional_req_desc, $functional_req_imp);
-}
-// Add new functional
-$form['functional_wrapper']['add_functional'] = array(
-'#type' => 'fieldset',
-'#title' => t('Add another functional requirement'),
-'#tree' => FALSE,
-'#weight' => -15,
-'#collapsed' => TRUE,
-'#collapsible' => TRUE,
-);
-
-// Define the form fields for the new functional title and functional_req_imp's name.
-$form['functional_wrapper']['add_functional']['new_functional'] = array(
-'#tree' => TRUE,
-'#theme' => 'jiscpmsdd_add_functional_form',
-);
-$form['functional_wrapper']['add_functional']['new_functional']['new_functional_req_desc'] = array(
-'#type' => 'textfield',
-'#title' => t('A Functional Requirement'),
-'#weight' => 0,
-);
-$form['functional_wrapper']['add_functional']['new_functional']['new_functional_req_imp'] = array(
-'#type' => 'textarea',
-'#title' => t('Functional Requirement Implementation'),
-'#weight' => 1,
-);
-$form['functional_wrapper']['add_functional']['new_functional']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'functional_wrapper', 'add_functional', 'new_functional', 'format'));
-// We name our button 'jiscpmsdd_functional_more' to avoid conflicts with other modules using
-// AHAH-enabled buttons with the id 'more'.
-$form['functional_wrapper']['add_functional']['jiscpmsdd_functional_more'] = array(
-'#type' => 'submit',
-'#value' => t('Add functional'),
-'#weight' => 1,
-'#submit' => array('jiscpmsdd_functional_add_more_submit'),
-'#ahah' => array(
-'path' => 'jiscpmsdd_functional/js/0',
-'wrapper' => 'jiscpmsdd-functional',
-'method' => 'replace',
-'effect' => 'fade',
-),
-);
-
-//add ajax form elements for adding non functional requirements
-$form['non_functional_wrapper'] = array(
-'#tree' => FALSE,
-'#weight' => 13,
-'#prefix' => '<h2>Non Functional Requirements</h2><div class="clear-block" id="jiscpmsdd-non_functional-wrapper">',
-'#suffix' => '</div>',
-);
-// Get number of non_functional.
-$non_functional_count = empty($node->non_functional) ? 0 : count($node->non_functional);
-// If a new non_functional added, add to list and update the non_functional count.
-if (isset($form_state['new_non_functional'])) {
-if (!isset($node->non_functional)) {
-$node->non_functional = array();
-}
-$node->non_functional = array_merge($node->non_functional, array($form_state['new_non_functional']));
-$non_functional_count++;
-}
-// If a non_functional removed, remove from list and update the non_functional count.
-$remove_delta = -1;
-if (!empty($form_state['remove_delta'])) {
-$remove_delta = $form_state['remove_delta'] - 1;
-unset($node->non_functional[$remove_delta]);
-// Re-number the values.
-$node->non_functional = array_values($node->non_functional);
-$non_functional_count--;
-}
-// Container to display existing non_functional.
-$form['non_functional_wrapper']['non_functional'] = array(
-'#prefix' => '<div id="jiscpmsdd-non_functional">',
-'#suffix' => '</div>',
-'#theme' => 'jiscpmsdd_non_functional_table',
-);
-// Add the existing non_functional to the form.
-for ($delta = 0; $delta < $non_functional_count; $delta++) {
-$non_functional_req_desc = isset($node->non_functional[$delta]['non_functional_req_desc']) ? $node->non_functional[$delta]['non_functional_req_desc'] : '';
-$non_functional_req_imp = isset($node->non_functional[$delta]['non_functional_req_imp']) ? $node->non_functional[$delta]['non_functional_req_imp'] : '';
-// Display existing non_functional using helper function jiscpmsdd_non_functional_display_form().
-$form['non_functional_wrapper']['non_functional'][$delta] = jiscpmsdd_non_functional_display_form($delta, $non_functional_req_desc, $non_functional_req_imp);
-}
-// Add new non_functional
-$form['non_functional_wrapper']['add_non_functional'] = array(
-'#type' => 'fieldset',
-'#title' => t('Add another non functional requirement'),
-'#tree' => FALSE,
-'#weight' => -15,
-'#collapsed' => TRUE,
-'#collapsible' => TRUE,
-);
-// Define the form fields for the new non_functional title and non_functional_req_imp's name.
-$form['non_functional_wrapper']['add_non_functional']['new_non_functional'] = array(
-'#tree' => TRUE,
-'#theme' => 'jiscpmsdd_add_non_functional_form',
-);
-$form['non_functional_wrapper']['add_non_functional']['new_non_functional']['new_non_functional_req_desc'] = array(
-'#type' => 'textfield',
-'#title' => t('A Non Functional Requirement'),
-'#weight' => 0,
-);
-$form['non_functional_wrapper']['add_non_functional']['new_non_functional']['new_non_functional_req_imp'] = array(
-'#type' => 'textarea',
-'#title' => t('Non Functional Requirement Implementation'),
-'#weight' => 1,
-);
-$form['non_functional_wrapper']['add_non_functional']['new_non_functional']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'non_functional_wrapper', 'add_non_functional', 'new_non_functional', 'format'));
-// We name our button 'jiscpmsdd_non_functional_more' to avoid conflicts with other modules using
-// AHAH-enabled buttons with the id 'more'.
-$form['non_functional_wrapper']['add_non_functional']['jiscpmsdd_non_functional_more'] = array(
-'#type' => 'submit',
-'#value' => t('Add Non Functional Requirement'),
-'#weight' => 1,
-'#submit' => array('jiscpmsdd_non_functional_add_more_submit'),
-'#ahah' => array(
-'path' => 'jiscpmsdd_non_functional/js/0',
-'wrapper' => 'jiscpmsdd-non_functional',
-'method' => 'replace',
-'effect' => 'fade',
-),
-);
-//add ajax form elements for adding terms and definitions
-$form['definition_wrapper'] = array(
-'#tree' => FALSE,
-'#weight' => 14,
-'#prefix' => '<h2>Terms and Definitions</h2><div class="clear-block" id="jiscpmsdd-definition-wrapper">',
-'#suffix' => '</div>',
-);
-// Get number of definition.
-$definition_count = empty($node->definition) ? 0 : count($node->definition);
-// If a new definition added, add to list and update the definition count.
-if (isset($form_state['new_definition'])) {
-if (!isset($node->definition)) {
-$node->definition = array();
-}
-$node->definition = array_merge($node->definition, array($form_state['new_definition']));
-$definition_count++;
-}
-// If a definition removed, remove from list and update the definition count.
-$remove_delta = -1;
-if (!empty($form_state['remove_delta'])) {
-$remove_delta = $form_state['remove_delta'] - 1;
-unset($node->definition[$remove_delta]);
-// Re-number the values.
-$node->definition = array_values($node->definition);
-$definition_count--;
-}
-// Container to display existing definition.
-$form['definition_wrapper']['definition'] = array(
-'#prefix' => '<div id="jiscpmsdd-definition">',
-'#suffix' => '</div>',
-'#theme' => 'jiscpmsdd_definition_table',
-);
-// Add the existing definition to the form.
-for ($delta = 0; $delta < $definition_count; $delta++) {
-$definition_term = isset($node->definition[$delta]['definition_term']) ? $node->definition[$delta]['definition_term'] : '';
-$definition_of_term = isset($node->definition[$delta]['definition_of_term']) ? $node->definition[$delta]['definition_of_term'] : '';
-// Display existing definition using helper function jiscpmsdd_definition_display_form().
-$form['definition_wrapper']['definition'][$delta] = jiscpmsdd_definition_display_form($delta, $definition_term, $definition_of_term);
-}
-// Add new definition
-$form['definition_wrapper']['add_definition'] = array(
-'#type' => 'fieldset',
-'#title' => t('Add another term and definition'),
-'#tree' => FALSE,
-'#weight' => -15,
-'#collapsed' => TRUE,
-'#collapsible' => TRUE,
-);
-// Define the form fields for the new definition title and definition_of_term's name.
-$form['definition_wrapper']['add_definition']['new_definition'] = array(
-'#tree' => TRUE,
-'#theme' => 'jiscpmsdd_add_definition_form',
-);
-$form['definition_wrapper']['add_definition']['new_definition']['new_definition_term'] = array(
-'#type' => 'textfield',
-'#title' => t('A term'),
-'#weight' => 0,
-);
-$form['definition_wrapper']['add_definition']['new_definition']['new_definition_of_term'] = array(
-'#type' => 'textarea',
-'#title' => t('The definition of the term'),
-'#weight' => 1,
-);
-$form['definition_wrapper']['add_definition']['new_definition']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents=array('info', 'definition_wrapper', 'add_definition', 'new_definition', 'format'));
-// We name our button 'jiscpmsdd_definition_more' to avoid conflicts with other modules using
-// AHAH-enabled buttons with the id 'more'.
-$form['definition_wrapper']['add_definition']['jiscpmsdd_definition_more'] = array(
-'#type' => 'submit',
-'#value' => t('Add definition'),
-'#weight' => 1,
-'#submit' => array('jiscpmsdd_definition_add_more_submit'),
-'#ahah' => array(
-'path' => 'jiscpmsdd_definition/js/0',
-'wrapper' => 'jiscpmsdd-definition',
-'method' => 'replace',
-'effect' => 'fade',
-),
-);
-
-return $form;
-}
-
 /**
-* Submit handler for 'Add userclass' button on node form.
-*/
+ * @function
+ * Submit handler for 'Add userclass' button on node form.
+ */
 function jiscpmsdd_userclass_add_more_submit($form, &$form_state) {
-$form_state['remove_delta'] = 0;
-
-// Set the form to rebuild and run submit handlers.
-node_form_submit_build_node($form, $form_state);
-
-// Make the changes we want to the form state.
-if ($form_state['values']['jiscpmsdd_userclass_more']) {
-$new_userclass = array();
-$new_userclass['user_class_name'] = check_plain($form_state['values']['new_userclass']['new_user_class_name']);
-$new_userclass['user_class_characteristics'] = check_plain($form_state['values']['new_userclass']['new_user_class_characteristics']);
-$form_state['new_userclass'] = $new_userclass;
+  $form_state['remove_delta'] = 0;
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmsdd_userclass_more']) {
+    $new_userclass = array();
+    $new_userclass['user_class_name'] = check_plain($form_state['values']['new_userclass']['new_user_class_name']);
+    $new_userclass['user_class_characteristics'] = check_plain($form_state['values']['new_userclass']['new_user_class_characteristics']);
+    $form_state['new_userclass'] = $new_userclass;
+  }
 }
-}
-
 /**
-* Submit handler for 'Add functional requirement' button on node form.
-*/
+ * @function
+ * Submit handler for 'Add functional
+ * requirement' button on node form.
+ */
 function jiscpmsdd_functional_add_more_submit($form, &$form_state) {
-$form_state['remove_delta'] = 0;
-
-// Set the form to rebuild and run submit handlers.
-node_form_submit_build_node($form, $form_state);
-
-// Make the changes we want to the form state.
-if ($form_state['values']['jiscpmsdd_functional_more']) {
-$new_functional = array();
-$new_functional['functional_req_desc'] = check_plain($form_state['values']['new_functional']['new_functional_req_desc']);
-$new_functional['functional_req_imp'] = check_plain($form_state['values']['new_functional']['new_functional_req_imp']);
-$form_state['new_functional'] = $new_functional;
+  $form_state['remove_delta'] = 0;
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmsdd_functional_more']) {
+    $new_functional = array();
+    $new_functional['functional_req_desc'] = check_plain($form_state['values']['new_functional']['new_functional_req_desc']);
+    $new_functional['functional_req_imp'] = check_plain($form_state['values']['new_functional']['new_functional_req_imp']);
+    $form_state['new_functional'] = $new_functional;
+  }
 }
-}
-
 /**
-* Submit handler for 'Add non functional requirement' button on node form.
-*/
+ * @function
+ * Submit handler for 'Add non functional
+ * requirement' button on node form.
+ */
 function jiscpmsdd_non_functional_add_more_submit($form, &$form_state) {
-$form_state['remove_delta'] = 0;
-
-// Set the form to rebuild and run submit handlers.
-node_form_submit_build_node($form, $form_state);
-
-// Make the changes we want to the form state.
-if ($form_state['values']['jiscpmsdd_non_functional_more']) {
-$new_non_functional = array();
-$new_non_functional['non_functional_req_desc'] = check_plain($form_state['values']['new_non_functional']['new_non_functional_req_desc']);
-$new_non_functional['non_functional_req_imp'] = check_plain($form_state['values']['new_non_functional']['new_non_functional_req_imp']);
-$form_state['new_non_functional'] = $new_non_functional;
+  $form_state['remove_delta'] = 0;
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmsdd_non_functional_more']) {
+    $new_non_functional = array();
+    $new_non_functional['non_functional_req_desc'] = check_plain($form_state['values']['new_non_functional']['new_non_functional_req_desc']);
+    $new_non_functional['non_functional_req_imp'] = check_plain($form_state['values']['new_non_functional']['new_non_functional_req_imp']);
+    $form_state['new_non_functional'] = $new_non_functional;
+  }
 }
-}
-
 /**
-* Submit handler for 'Add new term and definition' button on node form.
-*/
+ * @function
+ * Submit handler for 'Add new term and
+ * definition' button on node form.
+ */
 function jiscpmsdd_definition_add_more_submit($form, &$form_state) {
-$form_state['remove_delta'] = 0;
-
-// Set the form to rebuild and run submit handlers.
-node_form_submit_build_node($form, $form_state);
-
-// Make the changes we want to the form state.
-if ($form_state['values']['jiscpmsdd_definition_more']) {
-$new_definition = array();
-$new_definition['definition_term'] = check_plain($form_state['values']['new_definition']['new_definition_term']);
-$new_definition['definition_of_term'] = check_plain($form_state['values']['new_definition']['new_definition_of_term']);
-$form_state['new_definition'] = $new_definition;
+  $form_state['remove_delta'] = 0;
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
+  // Make the changes we want to the form state.
+  if ($form_state['values']['jiscpmsdd_definition_more']) {
+    $new_definition = array();
+    $new_definition['definition_term'] = check_plain($form_state['values']['new_definition']['new_definition_term']);
+    $new_definition['definition_of_term'] = check_plain($form_state['values']['new_definition']['new_definition_of_term']);
+    $form_state['new_definition'] = $new_definition;
+  }
 }
-}
-
-/* javascript functionality for user classes on node form */
+/**
+ * @function
+ * Javascript functionality for user classes on node form.
+ */
 function jiscpmsdd_userclass_js($delta = 0) {
-$form = jiscpmsdd_ajax_form_handler($delta);
-
-// Render the new output.
-$userclass_form = $form['userclass_wrapper']['userclasses'];
-// Prevent duplicate wrappers.
-unset($userclass_form['#prefix'], $userclass_form['#suffix']);
-
-$output = theme('status_messages') . drupal_render($userclass_form);
-
-// AHAH is not being nice to us and doesn't know about the "Remove" button.
-// This causes it not to attach AHAH behaviours to it after modifying the form.
-// So we need to tell it first.
-$javascript = drupal_add_js(NULL, NULL);
-if (isset($javascript['setting'])) {
-$output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  $form = jiscpmsdd_ajax_form_handler($delta);
+  // Render the new output.
+  $userclass_form = $form['userclass_wrapper']['userclasses'];
+  // Prevent duplicate wrappers.
+  unset($userclass_form['#prefix'], $userclass_form['#suffix']);
+  $output = theme('status_messages') . drupal_render($userclass_form);
+  // AHAH is not being nice to us and doesn't
+  // know about the "Remove" button.
+  // This causes it not to attach AHAH
+  // behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+  }
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
 }
-
-// Final rendering callback.
-drupal_json(array('status' => TRUE, 'data' => $output));
-}
-/* javascript functionality for functional requirements on node form */
+/**
+ * @function
+ * Javascript functionality for functional
+ * requirements on node form.
+ */
 function jiscpmsdd_functional_js($delta = 0) {
-$form = jiscpmsdd_ajax_form_handler($delta);
-
-// Render the new output.
-$functional_form = $form['functional_wrapper']['functional'];
-// Prevent duplicate wrappers.
-unset($functional_form['#prefix'], $functional_form['#suffix']);
-
-$output = theme('status_messages') . drupal_render($functional_form);
-
-// AHAH is not being nice to us and doesn't know about the "Remove" button.
-// This causes it not to attach AHAH behaviours to it after modifying the form.
-// So we need to tell it first.
-$javascript = drupal_add_js(NULL, NULL);
-if (isset($javascript['setting'])) {
-$output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  $form = jiscpmsdd_ajax_form_handler($delta);
+  // Render the new output.
+  $functional_form = $form['functional_wrapper']['functional'];
+  // Prevent duplicate wrappers.
+  unset($functional_form['#prefix'], $functional_form['#suffix']);
+  $output = theme('status_messages') . drupal_render($functional_form);
+  // AHAH is not being nice to us and
+  // doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH
+  // behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+  }
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
 }
-
-// Final rendering callback.
-drupal_json(array('status' => TRUE, 'data' => $output));
-}
-/* javascript functionality for non functional requirements on node form */
+/**
+ * @function
+ * Javascript functionality for non functional requirements on node form.
+ */
 function jiscpmsdd_non_functional_js($delta = 0) {
-$form = jiscpmsdd_ajax_form_handler($delta);
-
-// Render the new output.
-$non_functional_form = $form['non_functional_wrapper']['non_functional'];
-// Prevent duplicate wrappers.
-unset($non_functional_form['#prefix'], $non_functional_form['#suffix']);
-
-$output = theme('status_messages') . drupal_render($non_functional_form);
-
-// AHAH is not being nice to us and doesn't know about the "Remove" button.
-// This causes it not to attach AHAH behaviours to it after modifying the form.
-// So we need to tell it first.
-$javascript = drupal_add_js(NULL, NULL);
-if (isset($javascript['setting'])) {
-$output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  $form = jiscpmsdd_ajax_form_handler($delta);
+  // Render the new output.
+  $non_functional_form = $form['non_functional_wrapper']['non_functional'];
+  // Prevent duplicate wrappers.
+  unset($non_functional_form['#prefix'], $non_functional_form['#suffix']);
+  $output = theme('status_messages') . drupal_render($non_functional_form);
+  // AHAH is not being nice to us and
+  // doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH
+  // behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+  }
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
 }
-
-// Final rendering callback.
-drupal_json(array('status' => TRUE, 'data' => $output));
-}
-
-/* javascript functionality for terms and definitions on node form */
+/**
+ * @function
+ * Javascript functionality for terms and definitions on node form.
+ */
 function jiscpmsdd_definition_js($delta = 0) {
-$form = jiscpmsdd_ajax_form_handler($delta);
-// Render the new output.
-$definition_form = $form['definition_wrapper']['definition'];
-// Prevent duplicate wrappers.
-unset($definition_form['#prefix'], $definition_form['#suffix']);
-$output = theme('status_messages') . drupal_render($definition_form);
-// AHAH is not being nice to us and doesn't know about the "Remove" button.
-// This causes it not to attach AHAH behaviours to it after modifying the form.
-// So we need to tell it first.
-$javascript = drupal_add_js(NULL, NULL);
-if (isset($javascript['setting'])) {
-$output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, '. drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) .');</script>';
+  $form = jiscpmsdd_ajax_form_handler($delta);
+  // Render the new output.
+  $definition_form = $form['definition_wrapper']['definition'];
+  // Prevent duplicate wrappers.
+  unset($definition_form['#prefix'], $definition_form['#suffix']);
+  $output = theme('status_messages') . drupal_render($definition_form);
+  // AHAH is not being nice to us and
+  // doesn't know about the "Remove" button.
+  // This causes it not to attach AHAH
+  // behaviours to it after modifying the form.
+  // So we need to tell it first.
+  $javascript = drupal_add_js(NULL, NULL);
+  if (isset($javascript['setting'])) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings, ' . drupal_to_js(call_user_func_array('array_merge_recursive', $javascript['setting'])) . ');</script>';
+  }
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
 }
-// Final rendering callback.
-drupal_json(array('status' => TRUE, 'data' => $output));
-}
-
-/* outputs the userclass table for display on the node form */
+/**
+ * @function
+ * Outputs the userclass table for display on the node form.
+ */
 function theme_jiscpmsdd_userclass_table($form) {
-$rows = array();
-$headers = array(
-t('Name'),
-t('Characteristics'),
-'',  // Blank header title for the remove link.
-);
-
-foreach (element_children($form) as $key) {
-// No need to print the field title every time.
-unset(
-$form[$key]['user_class_name_text']['#title'],
-$form[$key]['user_class_characteristics_text']['#title'],
-$form[$key]['remove_userclass']['#title']
-);
-
-// Build the table row.
-$row = array(
-'data' => array(
-array('data' => drupal_render($form[$key]['user_class_name']) . drupal_render($form[$key]['user_class_name_text']), 'class' => 'userclass-name'),
-array('data' => drupal_render($form[$key]['user_class_characteristics']) . drupal_render($form[$key]['user_class_characteristics_text']), 'class' => 'userclass-characteristics'),
-array('data' => drupal_render($form[$key]['remove_userclass']), 'class' => 'remove-userclass'),
-),
-);
-
-// Add additional attributes to the row, such as a class for this row.
-if (isset($form[$key]['#attributes'])) {
-$row = array_merge($row, $form[$key]['#attributes']);
+  $rows = array();
+  $headers = array(
+    t('Name'),
+    t('Characteristics'),
+    '',
+  );
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+    $form[$key]['user_class_name_text']['#title'],
+    $form[$key]['user_class_characteristics_text']['#title'],
+    $form[$key]['remove_userclass']['#title']
+    );
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['user_class_name']) . drupal_render($form[$key]['user_class_name_text']), 'class' => 'userclass-name'),
+        array('data' => drupal_render($form[$key]['user_class_characteristics']) . drupal_render($form[$key]['user_class_characteristics_text']), 'class' => 'userclass-characteristics'),
+        array('data' => drupal_render($form[$key]['remove_userclass']), 'class' => 'remove-userclass'),
+      ),
+    );
+    // Add additional attributes to the row,
+    // such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
 }
-$rows[] = $row;
-}
-
-$output = theme('table', $headers, $rows);
-$output .= drupal_render($form);
-return $output;
-}
-
-/* output the functional requirements table for display on the node form */
+/**
+ * @function
+ * Output the functional requirements table for display on the node form.
+ */
 function theme_jiscpmsdd_functional_table($form) {
-$rows = array();
-$headers = array(
-t('Functional Requirements'),
-t('Implementation'),
-'',  // Blank header title for the remove link.
-);
-
-foreach (element_children($form) as $key) {
-// No need to print the field title every time.
-unset(
-$form[$key]['functional_req_desc_text']['#title'],
-$form[$key]['functional_req_imp_text']['#title'],
-$form[$key]['remove_functional']['#title']
-);
-
-// Build the table row.
-$row = array(
-'data' => array(
-array('data' => drupal_render($form[$key]['functional_req_desc']) . drupal_render($form[$key]['functional_req_desc_text']), 'class' => 'functional-req-desc'),
-array('data' => drupal_render($form[$key]['functional_req_imp']) . drupal_render($form[$key]['functional_req_imp_text']), 'class' => 'functional-req-imp'),
-array('data' => drupal_render($form[$key]['remove_functional']), 'class' => 'remove-functional'),
-),
-);
-
-// Add additional attributes to the row, such as a class for this row.
-if (isset($form[$key]['#attributes'])) {
-$row = array_merge($row, $form[$key]['#attributes']);
+  $rows = array();
+  $headers = array(
+    t('Functional Requirements'),
+    t('Implementation'),
+    '',
+  );
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+    $form[$key]['functional_req_desc_text']['#title'],
+    $form[$key]['functional_req_imp_text']['#title'],
+    $form[$key]['remove_functional']['#title']
+    );
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['functional_req_desc']) . drupal_render($form[$key]['functional_req_desc_text']), 'class' => 'functional-req-desc'),
+        array('data' => drupal_render($form[$key]['functional_req_imp']) . drupal_render($form[$key]['functional_req_imp_text']), 'class' => 'functional-req-imp'),
+        array('data' => drupal_render($form[$key]['remove_functional']), 'class' => 'remove-functional'),
+      ),
+    );
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
 }
-$rows[] = $row;
-}
-
-$output = theme('table', $headers, $rows);
-$output .= drupal_render($form);
-return $output;
-}
-/* output the non functional requirements table for display on the node form */
+/**
+ * @function
+ * Output the non functional requirements table for display on the node form.
+ */
 function theme_jiscpmsdd_non_functional_table($form) {
-$rows = array();
-$headers = array(
-t('Non Functional Requirements'),
-t('Implementation'),
-'',  // Blank header title for the remove link.
-);
-
-foreach (element_children($form) as $key) {
-// No need to print the field title every time.
-unset(
-$form[$key]['non_functional_req_desc_text']['#title'],
-$form[$key]['non_functional_req_imp_text']['#title'],
-$form[$key]['remove_non_functional']['#title']
-);
-
-// Build the table row.
-$row = array(
-'data' => array(
-array('data' => drupal_render($form[$key]['non_functional_req_desc']) . drupal_render($form[$key]['non_functional_req_desc_text']), 'class' => 'non_functional-req-desc'),
-array('data' => drupal_render($form[$key]['non_functional_req_imp']) . drupal_render($form[$key]['non_functional_req_imp_text']), 'class' => 'non_functional-req-imp'),
-array('data' => drupal_render($form[$key]['remove_non_functional']), 'class' => 'remove-non_functional'),
-),
-);
-
-// Add additional attributes to the row, such as a class for this row.
-if (isset($form[$key]['#attributes'])) {
-$row = array_merge($row, $form[$key]['#attributes']);
+  $rows = array();
+  $headers = array(
+    t('Non Functional Requirements'),
+    t('Implementation'),
+    '',
+  );
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+    $form[$key]['non_functional_req_desc_text']['#title'],
+    $form[$key]['non_functional_req_imp_text']['#title'],
+    $form[$key]['remove_non_functional']['#title']
+    );
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['non_functional_req_desc']) . drupal_render($form[$key]['non_functional_req_desc_text']), 'class' => 'non_functional-req-desc'),
+        array('data' => drupal_render($form[$key]['non_functional_req_imp']) . drupal_render($form[$key]['non_functional_req_imp_text']), 'class' => 'non_functional-req-imp'),
+        array('data' => drupal_render($form[$key]['remove_non_functional']), 'class' => 'remove-non_functional'),
+      ),
+    );
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
 }
-$rows[] = $row;
-}
-
-$output = theme('table', $headers, $rows);
-$output .= drupal_render($form);
-return $output;
-}
-/* output the terms and definitions table for display on the node form */
+/**
+ * @function
+ * Output the terms and definitions table for display on the node form.
+ */
 function theme_jiscpmsdd_definition_table($form) {
-$rows = array();
-$headers = array(
-t('Term'),
-t('Definition'),
-'',  // Blank header title for the remove link.
-);
-foreach (element_children($form) as $key) {
-// No need to print the field title every time.
-unset(
-$form[$key]['definition_term_text']['#title'],
-$form[$key]['definition_of_term_text']['#title'],
-$form[$key]['remove_definition']['#title']
-);
-// Build the table row.
-$row = array(
-'data' => array(
-array('data' => drupal_render($form[$key]['definition_term']) . drupal_render($form[$key]['definition_term_text']), 'class' => 'definition-req-desc'),
-array('data' => drupal_render($form[$key]['definition_of_term']) . drupal_render($form[$key]['definition_of_term_text']), 'class' => 'definition-req-imp'),
-array('data' => drupal_render($form[$key]['remove_definition']), 'class' => 'remove-definition'),
-),
-);
-// Add additional attributes to the row, such as a class for this row.
-if (isset($form[$key]['#attributes'])) {
-$row = array_merge($row, $form[$key]['#attributes']);
-}
-$rows[] = $row;
-}
-$output = theme('table', $headers, $rows);
-$output .= drupal_render($form);
-return $output;
+  $rows = array();
+  $headers = array(
+    t('Term'),
+    t('Definition'),
+    '',
+  );
+  foreach (element_children($form) as $key) {
+    // No need to print the field title every time.
+    unset(
+    $form[$key]['definition_term_text']['#title'],
+    $form[$key]['definition_of_term_text']['#title'],
+    $form[$key]['remove_definition']['#title']
+    );
+    // Build the table row.
+    $row = array(
+      'data' => array(
+        array('data' => drupal_render($form[$key]['definition_term']) . drupal_render($form[$key]['definition_term_text']), 'class' => 'definition-req-desc'),
+        array('data' => drupal_render($form[$key]['definition_of_term']) . drupal_render($form[$key]['definition_of_term_text']), 'class' => 'definition-req-imp'),
+        array('data' => drupal_render($form[$key]['remove_definition']), 'class' => 'remove-definition'),
+      ),
+    );
+    // Add additional attributes to the row, such as a class for this row.
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $rows[] = $row;
+  }
+  $output = theme('table', $headers, $rows);
+  $output .= drupal_render($form);
+  return $output;
 }
 /**
-* Helper function to define populated form field elements for jiscpmsdd userclass node form.
-*/
+ * @function
+ * Helper function to define populated form field elements
+ * for jiscpmsdd userclass node form.
+ */
 function jiscpmsdd_userclass_display_form($delta, $user_class_name, $user_class_characteristics) {
-
-$form = array(
-'#tree' => TRUE,
-);
-
-// userclass title.
-$form['user_class_name'] = array(
-'#type' => 'hidden',
-'#value' => $user_class_name,
-'#parents' => array('userclasses', $delta, 'user_class_name'),
-);
-$form['user_class_name_text'] = array(
-'#type' => 'item',
-'#title' => t('Name'),
-'#weight' => 1,
-'#parents' => array('userclasses', $delta, 'user_class_name'),
-'#value' => $user_class_name,
-);
-
-// user_class_characteristics.
-$form['user_class_characteristics'] = array(
-'#type' => 'hidden',
-'#value' => $user_class_characteristics,
-'#parents' => array('userclasses', $delta, 'user_class_characteristics'),
-);
-$form['user_class_characteristics_text'] = array(
-'#type' => 'item',
-'#title' => t('Description'),
-'#weight' => 2,
-'#parents' => array('userclasses', $delta, 'user_class_characteristics'),
-'#value' => $user_class_characteristics,
-);
-
-// Remove button.
-$form['remove_userclass'] = array(
-'#type' => 'submit',
-'#name' => 'remove_userclass_' . $delta,
-'#value' => t('Remove'),
-'#weight' => 1,
-'#submit' => array('jiscpmteam_remove_row_submit'),
-'#parents' => array('userclasses', $delta, 'remove_userclass'),
-'#ahah' => array(
-'path' => 'jiscpmsdd_userclass/js/' . ($delta + 1),
-'wrapper' => 'jiscpmteam-userclasses',
-'method' => 'replace',
-'effect' => 'fade',
-),
-);
-
-return $form;
+  $form = array(
+    '#tree' => TRUE,
+  );
+  // Userclass title.
+  $form['user_class_name'] = array(
+    '#type' => 'hidden',
+    '#value' => $user_class_name,
+    '#parents' => array('userclasses', $delta, 'user_class_name'),
+  );
+  $form['user_class_name_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Name'),
+    '#weight' => 1,
+    '#parents' => array('userclasses', $delta, 'user_class_name'),
+    '#value' => $user_class_name,
+  );
+  // User_class_characteristics.
+  $form['user_class_characteristics'] = array(
+    '#type' => 'hidden',
+    '#value' => $user_class_characteristics,
+    '#parents' => array('userclasses', $delta, 'user_class_characteristics'),
+  );
+  $form['user_class_characteristics_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Description'),
+    '#weight' => 2,
+    '#parents' => array('userclasses', $delta, 'user_class_characteristics'),
+    '#value' => $user_class_characteristics,
+  );
+  // Remove button.
+  $form['remove_userclass'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_userclass_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmteam_remove_row_submit'),
+    '#parents' => array('userclasses', $delta, 'remove_userclass'),
+    '#ahah' => array(
+      'path' => 'jiscpmsdd_userclass/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmteam-userclasses',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  return $form;
 }
-
 /**
-* Helper function to define populated form field elements for jiscpmsdd functional requirements node form.
-*/
+ * @function
+ * Helper function to define populated form field elements
+ * for jiscpmsdd functional requirements node form.
+ */
 function jiscpmsdd_functional_display_form($delta, $functional_req_desc, $functional_req_imp) {
-
-$form = array(
-'#tree' => TRUE,
-);
-
-// functional title.
-$form['functional_req_desc'] = array(
-'#type' => 'hidden',
-'#value' => $functional_req_desc,
-'#parents' => array('functional', $delta, 'functional_req_desc'),
-);
-$form['functional_req_desc_text'] = array(
-'#type' => 'item',
-'#title' => t('Functional Requirement'),
-'#weight' => 1,
-'#parents' => array('functional', $delta, 'functional_req_desc'),
-'#value' => $functional_req_desc,
-);
-
-// functional_req_imp.
-$form['functional_req_imp'] = array(
-'#type' => 'hidden',
-'#value' => $functional_req_imp,
-'#parents' => array('functional', $delta, 'functional_req_imp'),
-);
-$form['functional_req_imp_text'] = array(
-'#type' => 'item',
-'#title' => t('Implementation'),
-'#weight' => 2,
-'#parents' => array('functional', $delta, 'functional_req_imp'),
-'#value' => $functional_req_imp,
-);
-
-// Remove button.
-$form['remove_functional'] = array(
-'#type' => 'submit',
-'#name' => 'remove_functional_' . $delta,
-'#value' => t('Remove'),
-'#weight' => 1,
-'#submit' => array('jiscpmteam_remove_row_submit'),
-'#parents' => array('functional', $delta, 'remove_functional'),
-'#ahah' => array(
-'path' => 'jiscpmsdd_functional/js/' . ($delta + 1),
-'wrapper' => 'jiscpmteam-functional',
-'method' => 'replace',
-'effect' => 'fade',
-),
-);
-
-return $form;
+  $form = array(
+    '#tree' => TRUE,
+  );
+  // Functional title.
+  $form['functional_req_desc'] = array(
+    '#type' => 'hidden',
+    '#value' => $functional_req_desc,
+    '#parents' => array('functional', $delta, 'functional_req_desc'),
+  );
+  $form['functional_req_desc_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Functional Requirement'),
+    '#weight' => 1,
+    '#parents' => array('functional', $delta, 'functional_req_desc'),
+    '#value' => $functional_req_desc,
+  );
+  // Functional_req_imp.
+  $form['functional_req_imp'] = array(
+    '#type' => 'hidden',
+    '#value' => $functional_req_imp,
+    '#parents' => array('functional', $delta, 'functional_req_imp'),
+  );
+  $form['functional_req_imp_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Implementation'),
+    '#weight' => 2,
+    '#parents' => array('functional', $delta, 'functional_req_imp'),
+    '#value' => $functional_req_imp,
+  );
+  // Remove button.
+  $form['remove_functional'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_functional_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmteam_remove_row_submit'),
+    '#parents' => array('functional', $delta, 'remove_functional'),
+    '#ahah' => array(
+      'path' => 'jiscpmsdd_functional/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmteam-functional',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  return $form;
 }
 /**
-* Helper function to define populated form field elements for jiscpmsdd non functional requirements node form.
-*/
+ * @function
+ * Helper function to define populated form field
+ * elements for jiscpmsdd non functional requirements node form.
+ */
 function jiscpmsdd_non_functional_display_form($delta, $non_functional_req_desc, $non_functional_req_imp) {
-
-$form = array(
-'#tree' => TRUE,
-);
-
-// non_functional title.
-$form['non_functional_req_desc'] = array(
-'#type' => 'hidden',
-'#value' => $non_functional_req_desc,
-'#parents' => array('non_functional', $delta, 'non_functional_req_desc'),
-);
-$form['non_functional_req_desc_text'] = array(
-'#type' => 'item',
-'#title' => t('non_functional Requirement'),
-'#weight' => 1,
-'#parents' => array('non_functional', $delta, 'non_functional_req_desc'),
-'#value' => $non_functional_req_desc,
-);
-
-// non_functional_req_imp.
-$form['non_functional_req_imp'] = array(
-'#type' => 'hidden',
-'#value' => $non_functional_req_imp,
-'#parents' => array('non_functional', $delta, 'non_functional_req_imp'),
-);
-$form['non_functional_req_imp_text'] = array(
-'#type' => 'item',
-'#title' => t('Implementation'),
-'#weight' => 2,
-'#parents' => array('non_functional', $delta, 'non_functional_req_imp'),
-'#value' => $non_functional_req_imp,
-);
-
-// Remove button.
-$form['remove_non_functional'] = array(
-'#type' => 'submit',
-'#name' => 'remove_non_functional_' . $delta,
-'#value' => t('Remove'),
-'#weight' => 1,
-'#submit' => array('jiscpmteam_remove_row_submit'),
-'#parents' => array('non_functional', $delta, 'remove_non_functional'),
-'#ahah' => array(
-'path' => 'jiscpmsdd_non_functional/js/' . ($delta + 1),
-'wrapper' => 'jiscpmteam-non_functional',
-'method' => 'replace',
-'effect' => 'fade',
-),
-);
-
-return $form;
+  $form = array(
+    '#tree' => TRUE,
+  );
+  // Non_functional title.
+  $form['non_functional_req_desc'] = array(
+    '#type' => 'hidden',
+    '#value' => $non_functional_req_desc,
+    '#parents' => array('non_functional', $delta, 'non_functional_req_desc'),
+  );
+  $form['non_functional_req_desc_text'] = array(
+    '#type' => 'item',
+    '#title' => t('non_functional Requirement'),
+    '#weight' => 1,
+    '#parents' => array('non_functional', $delta, 'non_functional_req_desc'),
+    '#value' => $non_functional_req_desc,
+  );
+  // Non_functional_req_imp.
+  $form['non_functional_req_imp'] = array(
+    '#type' => 'hidden',
+    '#value' => $non_functional_req_imp,
+    '#parents' => array('non_functional', $delta, 'non_functional_req_imp'),
+  );
+  $form['non_functional_req_imp_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Implementation'),
+    '#weight' => 2,
+    '#parents' => array('non_functional', $delta, 'non_functional_req_imp'),
+    '#value' => $non_functional_req_imp,
+  );
+  // Remove button.
+  $form['remove_non_functional'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_non_functional_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmteam_remove_row_submit'),
+    '#parents' => array('non_functional', $delta, 'remove_non_functional'),
+    '#ahah' => array(
+      'path' => 'jiscpmsdd_non_functional/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmteam-non_functional',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  return $form;
 }
 /**
-* Helper function to define populated form field elements for jiscpmsdd terms and definitions node form.
-*/
+ * @function
+ * Helper function to define populated form field
+ * elements for jiscpmsdd terms and definitions node form.
+ */
 function jiscpmsdd_definition_display_form($delta, $definition_term, $definition_of_term) {
-
-$form = array(
-'#tree' => TRUE,
-);
-
-// definition title.
-$form['definition_term'] = array(
-'#type' => 'hidden',
-'#value' => $definition_term,
-'#parents' => array('definition', $delta, 'definition_term'),
-);
-$form['definition_term_text'] = array(
-'#type' => 'item',
-'#title' => t('definition Requirement'),
-'#weight' => 1,
-'#parents' => array('definition', $delta, 'definition_term'),
-'#value' => $definition_term,
-);
-
-// definition_of_term.
-$form['definition_of_term'] = array(
-'#type' => 'hidden',
-'#value' => $definition_of_term,
-'#parents' => array('definition', $delta, 'definition_of_term'),
-);
-$form['definition_of_term_text'] = array(
-'#type' => 'item',
-'#title' => t('Implementation'),
-'#weight' => 2,
-'#parents' => array('definition', $delta, 'definition_of_term'),
-'#value' => $definition_of_term,
-);
-
-// Remove button.
-$form['remove_definition'] = array(
-'#type' => 'submit',
-'#name' => 'remove_definition_' . $delta,
-'#value' => t('Remove'),
-'#weight' => 1,
-'#submit' => array('jiscpmteam_remove_row_submit'),
-'#parents' => array('definition', $delta, 'remove_definition'),
-'#ahah' => array(
-'path' => 'jiscpmsdd_definition/js/' . ($delta + 1),
-'wrapper' => 'jiscpmteam-definition',
-'method' => 'replace',
-'effect' => 'fade',
-),
-);
-
-return $form;
+  $form = array(
+    '#tree' => TRUE,
+  );
+  // Definition title.
+  $form['definition_term'] = array(
+    '#type' => 'hidden',
+    '#value' => $definition_term,
+    '#parents' => array('definition', $delta, 'definition_term'),
+  );
+  $form['definition_term_text'] = array(
+    '#type' => 'item',
+    '#title' => t('definition Requirement'),
+    '#weight' => 1,
+    '#parents' => array('definition', $delta, 'definition_term'),
+    '#value' => $definition_term,
+  );
+  // Definition_of_term.
+  $form['definition_of_term'] = array(
+    '#type' => 'hidden',
+    '#value' => $definition_of_term,
+    '#parents' => array('definition', $delta, 'definition_of_term'),
+  );
+  $form['definition_of_term_text'] = array(
+    '#type' => 'item',
+    '#title' => t('Implementation'),
+    '#weight' => 2,
+    '#parents' => array('definition', $delta, 'definition_of_term'),
+    '#value' => $definition_of_term,
+  );
+  // Remove button.
+  $form['remove_definition'] = array(
+    '#type' => 'submit',
+    '#name' => 'remove_definition_' . $delta,
+    '#value' => t('Remove'),
+    '#weight' => 1,
+    '#submit' => array('jiscpmteam_remove_row_submit'),
+    '#parents' => array('definition', $delta, 'remove_definition'),
+    '#ahah' => array(
+      'path' => 'jiscpmsdd_definition/js/' . ($delta + 1),
+      'wrapper' => 'jiscpmteam-definition',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  return $form;
 }
-
 /**
-* Implement hook_insert().
-*/
+ * @function
+ * Implement hook_insert().
+ */
 function jiscpmsdd_insert($node) {
-//insert the user classes
-//check to see if data is valid
-if ($node->userclasses != NULL || $node->userclasses != 0 || $node->userclasses != '') {
-foreach ($node->userclasses as $userclass) {
-db_query("INSERT INTO {jiscpmsdd_user_classes} (sdd_nid, user_class_name, user_class_characteristics) VALUES('%d','%s', '%s')", $node->nid, $userclass['user_class_name'], $userclass['user_class_characteristics']);
+  // Insert the user classes.
+  // Check to see if data is valid.
+  if ($node->userclasses != NULL || $node->userclasses != 0 || $node->userclasses != '') {
+    foreach ($node->userclasses as $userclass) {
+      db_query("INSERT INTO {jiscpmsdd_user_classes} (sdd_nid, user_class_name, user_class_characteristics) VALUES('%d','%s', '%s')", $node->nid, $userclass['user_class_name'], $userclass['user_class_characteristics']);
+    }
+  }
+  // Insert the functional requirements.
+  // Check to see if data is valid.
+  if ($node->functional != NULL || $node->functional != 0 || $node->functional != '') {
+    foreach ($node->functional as $function) {
+      db_query("INSERT INTO {jiscpmsdd_functional} (sdd_nid, functional_req_desc, functional_req_imp) VALUES('%d','%s', '%s')", $node->nid, $function['functional_req_desc'], $function['functional_req_imp']);
+    }
+  }
+  // INSERT the non functional requirements.
+  // Check to see if data is valid.
+  if ($node->non_functional != NULL || $node->non_functional != 0 || $node->non_functional != '') {
+    foreach ($node->non_functional as $non_function) {
+      db_query("INSERT INTO {jiscpmsdd_non_functional} (sdd_nid, non_functional_req_desc, non_functional_req_imp) VALUES('%d','%s', '%s')", $node->nid, $non_function['non_functional_req_desc'], $non_function['non_functional_req_imp']);
+    }
+  }
+  // INSERT the terms and definitions.
+  // Check to see if data is valid.
+  if ($node->definition != NULL || $node->definition != 0 || $node->definition != '') {
+    foreach ($node->definition as $def) {
+      db_query("INSERT INTO {jiscpmsdd_definitions} (sdd_nid, definition_term, definition_of_term) VALUES('%d','%s', '%s')", $node->nid, $def['definition_term'], $def['definition_of_term']);
+    }
+  }
+  // Insert the jiscpmsdd node.
+  db_query("INSERT INTO {jiscpmsdd} (nid, vid, project_nid, system_overview, system_architecture, data_design, component_design, user_interfaces, hardware_interfaces, software_interfaces, user_documentation) 
+  VALUES(%d, %d, %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+  $node->nid, $node->vid, $node->project_nid, $node->system_overview, $node->system_architecture, $node->data_design, $node->component_design, $node->user_interfaces, $node->hardware_interfaces, $node->software_interfaces, $node->user_documentation);
 }
-}
-//insert the functional requirements
-//check to see if data is valid
-if ($node->functional != NULL || $node->functional != 0 || $node->functional != '') {
-foreach ($node->functional as $function) {
-db_query("INSERT INTO {jiscpmsdd_functional} (sdd_nid, functional_req_desc, functional_req_imp) VALUES('%d','%s', '%s')", $node->nid, $function['functional_req_desc'], $function['functional_req_imp']);
-}
-}
-//INSERT the non functional requirements
-//check to see if data is valid
-if ($node->non_functional != NULL || $node->non_functional != 0 || $node->non_functional != '') {
-foreach ($node->non_functional as $non_function) {
-db_query("INSERT INTO {jiscpmsdd_non_functional} (sdd_nid, non_functional_req_desc, non_functional_req_imp) VALUES('%d','%s', '%s')", $node->nid, $non_function['non_functional_req_desc'], $non_function['non_functional_req_imp']);
-}
-}
-//INSERT the terms and definitions
-//check to see if data is valid
-if ($node->definition != NULL || $node->definition != 0 || $node->definition != '') {
-foreach ($node->definition as $def) {
-db_query("INSERT INTO {jiscpmsdd_definitions} (sdd_nid, definition_term, definition_of_term) VALUES('%d','%s', '%s')", $node->nid, $def['definition_term'], $def['definition_of_term']);
-}
-}
-//insert the jiscpmsdd node
-db_query("INSERT INTO {jiscpmsdd} (nid, vid, project_nid, system_overview, system_architecture, data_design, component_design, user_interfaces, hardware_interfaces, software_interfaces, user_documentation) 
-VALUES(%d, %d, %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", 
-$node->nid, $node->vid, $node->project_nid, $node->system_overview, $node->system_architecture, $node->data_design, $node->component_design, $node->user_interfaces, $node->hardware_interfaces, $node->software_interfaces, $node->user_documentation);
-}
-
+/**
+ * @function
+ * Implements hook_update().
+ */
 function jiscpmsdd_update($node) {
-// if this is a new node or we're adding a new revision,
-if ($node->revision) {
-jiscpmsdd_insert($node);
+  // If this is a new node or we're adding a new revision.
+  if ($node->revision) {
+    jiscpmsdd_insert($node);
+  }
+  else {
+    db_query('DELETE FROM {jiscpmsdd} WHERE vid = %d', $node->vid);
+    db_query('DELETE FROM {jiscpmsdd_user_classes} WHERE sdd_nid = %d', $node->nid);
+    db_query('DELETE FROM {jiscpmsdd_functional} WHERE sdd_nid = %d', $node->nid);
+    db_query('DELETE FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
+    db_query('DELETE FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
+    jiscpmsdd_insert($node);
+  }
 }
-else {
-db_query('DELETE FROM {jiscpmsdd} WHERE vid = %d', $node->vid);
-db_query('DELETE FROM {jiscpmsdd_user_classes} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_functional} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
-jiscpmsdd_insert($node);
-}
-}
-
+/**
+ * @function
+ * Implements hook_nodeapi().
+ */
 function jiscpmsdd_nodeapi(&$node, $op, $teaser, $page) {
-switch ($op) {
-case 'prepare':
-
-break;
-case 'delete revision':
-// Notice that we're matching a single revision based on the node's vid.
-db_query('DELETE FROM {jiscpmsdd} WHERE vid = %d', $node->vid);
-db_query('DELETE FROM {jiscpmsdd_user_classes} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_functional} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
-break;
+  switch ($op) {
+    case 'prepare':
+      break;
+    case 'delete revision':
+      // Notice that we're matching a single revision based on the node's vid.
+      db_query('DELETE FROM {jiscpmsdd} WHERE vid = %d', $node->vid);
+      db_query('DELETE FROM {jiscpmsdd_user_classes} WHERE sdd_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmsdd_functional} WHERE sdd_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
+      db_query('DELETE FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
+      break;
+  }
 }
-}
-
+/**
+ * @function
+ * Implements hook_delete().
+ */
 function jiscpmsdd_delete($node) {
-// Notice that we're matching all revision, by using the node's nid.
-db_query('DELETE FROM {jiscpmsdd} WHERE nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_user_classes} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_functional} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
-db_query('DELETE FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
+  // Notice that we're matching all revision, by using the node's nid.
+  db_query('DELETE FROM {jiscpmsdd} WHERE nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmsdd_user_classes} WHERE sdd_nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmsdd_functional} WHERE sdd_nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
+  db_query('DELETE FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
 }
-
+/**
+ * @function
+ * Implements hook_load().
+ */
 function jiscpmsdd_load($node) {
-$result_r = db_query('SELECT project_nid, system_overview, system_architecture, data_design, component_design, user_interfaces, hardware_interfaces, software_interfaces, user_documentation FROM {jiscpmsdd} WHERE vid = %d', $node->vid);
-$node->jiscpmsdds = array();
-while ($row_r = db_fetch_object($result_r)) {
-$jiscpmsdd = array(
-'project_nid' => $row_r->project_nid,
-'system_overview' => $row_r->system_overview,
-'system_architecture' => $row_r->system_architecture,
-'data_design' => $row_r->data_design,
-'component_design' => $row_r->component_design,
-'user_interfaces' => $row_r->user_interfaces,
-'hardware_interfaces' => $row_r->hardware_interfaces,
-'software_interfaces' => $row_r->software_interfaces,
-'user_documentation' => $row_r->user_documentation,
-);
-$node->jiscpmsdds[] = $jiscpmsdd;
+  $result_r = db_query('SELECT project_nid, system_overview, system_architecture, data_design, component_design, user_interfaces, hardware_interfaces, software_interfaces, user_documentation FROM {jiscpmsdd} WHERE vid = %d', $node->vid);
+  $node->jiscpmsdds = array();
+  while ($row_r = db_fetch_object($result_r)) {
+    $jiscpmsdd = array(
+      'project_nid' => $row_r->project_nid,
+      'system_overview' => $row_r->system_overview,
+      'system_architecture' => $row_r->system_architecture,
+      'data_design' => $row_r->data_design,
+      'component_design' => $row_r->component_design,
+      'user_interfaces' => $row_r->user_interfaces,
+      'hardware_interfaces' => $row_r->hardware_interfaces,
+      'software_interfaces' => $row_r->software_interfaces,
+      'user_documentation' => $row_r->user_documentation,
+    );
+    $node->jiscpmsdds[] = $jiscpmsdd;
+  }
+  // Load the user classes data.
+  $result_m = db_query('SELECT sdd_nid, user_class_id, user_class_name, user_class_characteristics FROM {jiscpmsdd_user_classes} WHERE sdd_nid = %d', $node->nid);
+  $node->userclasses = array();
+  while ($row_m = db_fetch_object($result_m)) {
+    $uc = array(
+      'sdd_nid' => $row_m->sdd_nid,
+      'user_class_id' => $row_m->user_class_id,
+      'user_class_name' => $row_m->user_class_name,
+      'user_class_characteristics' => $row_m->user_class_characteristics,
+    );
+    $node->userclasses[] = $uc;
+  }
+  // Load the functional requirements data.
+  $result_f = db_query('SELECT sdd_nid, functional_id, functional_req_desc, functional_req_imp FROM {jiscpmsdd_functional} WHERE sdd_nid = %d', $node->nid);
+  $node->functional = array();
+  while ($row_f = db_fetch_object($result_f)) {
+    $fr = array(
+      'sdd_nid' => $row_f->sdd_nid,
+      'functional_id' => $row_f->functional_id,
+      'functional_req_desc' => $row_f->functional_req_desc,
+      'functional_req_imp' => $row_f->functional_req_imp,
+    );
+    $node->functional[] = $fr;
+  }
+  // Load the non functional requirements data.
+  $result_nf = db_query('SELECT sdd_nid, non_functional_id, non_functional_req_desc, non_functional_req_imp FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
+  $node->non_functional = array();
+  while ($row_nf = db_fetch_object($result_nf)) {
+    $nfr = array(
+      'sdd_nid' => $row_nf->sdd_nid,
+      'non_functional_id' => $row_nf->non_functional_id,
+      'non_functional_req_desc' => $row_nf->non_functional_req_desc,
+      'non_functional_req_imp' => $row_nf->non_functional_req_imp,
+    );
+    $node->non_functional[] = $nfr;
+  }
+  // Load the terms and definitions data.
+  $result_td = db_query('SELECT sdd_nid, definition_id, definition_term, definition_of_term FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
+  $node->definition = array();
+  while ($row_d = db_fetch_object($result_td)) {
+    $d = array(
+      'sdd_nid' => $row_d->sdd_nid,
+      'definition_id' => $row_d->definition_id,
+      'definition_term' => $row_d->definition_term,
+      'definition_of_term' => $row_d->definition_of_term,
+    );
+    $node->definition[] = $d;
+  }
+  return $node;
 }
-//load the user classes data
-$result_m = db_query('SELECT sdd_nid, user_class_id, user_class_name, user_class_characteristics FROM {jiscpmsdd_user_classes} WHERE sdd_nid = %d', $node->nid);
-$node->userclasses = array();
-while ($row_m = db_fetch_object($result_m)) {
-$uc = array(
-'sdd_nid' => $row_m->sdd_nid,
-'user_class_id' => $row_m->user_class_id,
-'user_class_name' => $row_m->user_class_name,
-'user_class_characteristics' => $row_m->user_class_characteristics,
-);
-$node->userclasses[] = $uc;
-}
-//load the functional requirements data
-$result_f = db_query('SELECT sdd_nid, functional_id, functional_req_desc, functional_req_imp FROM {jiscpmsdd_functional} WHERE sdd_nid = %d', $node->nid);
-$node->functional = array();
-while ($row_f = db_fetch_object($result_f)) {
-$fr = array(
-'sdd_nid' => $row_f->sdd_nid,
-'functional_id' => $row_f->functional_id,
-'functional_req_desc' => $row_f->functional_req_desc,
-'functional_req_imp' => $row_f->functional_req_imp,
-);
-$node->functional[] = $fr;
-}
-//load the non functional requirements data
-$result_nf = db_query('SELECT sdd_nid, non_functional_id, non_functional_req_desc, non_functional_req_imp FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
-$node->non_functional = array();
-while ($row_nf = db_fetch_object($result_nf)) {
-$nfr = array(
-'sdd_nid' => $row_nf->sdd_nid,
-'non_functional_id' => $row_nf->non_functional_id,
-'non_functional_req_desc' => $row_nf->non_functional_req_desc,
-'non_functional_req_imp' => $row_nf->non_functional_req_imp,
-);
-$node->non_functional[] = $nfr;
-}
-//load the terms and definitions data
-$result_td = db_query('SELECT sdd_nid, definition_id, definition_term, definition_of_term FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
-$node->definition = array();
-while ($row_d = db_fetch_object($result_td)) {
-$d = array(
-'sdd_nid' => $row_d->sdd_nid,
-'definition_id' => $row_d->definition_id,
-'definition_term' => $row_d->definition_term,
-'definition_of_term' => $row_d->definition_of_term,
-);
-$node->definition[] = $d;
-}
-return $node;
-}
-
 /**
-* Submit handler for 'Remove' button on node form.
-*/
+ * @function
+ * Submit handler for 'Remove' button on node form.
+ */
 function jiscpmsdd_remove_row_submit($form, &$form_state) {
-// Set the form to rebuild and run submit handlers.
-node_form_submit_build_node($form, $form_state);
+  // Set the form to rebuild and run submit handlers.
+  node_form_submit_build_node($form, $form_state);
 }
-
 /**
-* AJAX form handler.
-*/
+ * @function
+ * AJAX form handler.
+ */
 function jiscpmsdd_ajax_form_handler($delta = 0) {
-// The form is generated in an include file which we need to include manually.
-include_once 'modules/node/node.pages.inc';
-$form_state = array('storage' => NULL, 'submitted' => FALSE);
-$form_build_id = $_POST['form_build_id'];
-
-// Get the form from the cache.
-$form = form_get_cache($form_build_id, $form_state);
-$args = $form['#parameters'];
-$form_id = array_shift($args);
-
-// We need to process the form, prepare for that by setting a few internals.
-$form_state['post'] = $form['#post'] = $_POST;
-$form['#programmed'] = $form['#redirect'] = FALSE;
-
-// Set up our form state variable, needed for removing staff_costs.
-$form_state['remove_delta'] = $delta;
-
-// Build, validate and if possible, submit the form.
-drupal_process_form($form_id, $form, $form_state);
-// If validation fails, force form submission.
-if (form_get_errors()) {
-form_execute_handlers('submit', $form, $form_state);
+  // The form is generated in an include file
+  // which we need to include manually.
+  include_once 'modules/node/node.pages.inc';
+   $form_state = array('storage' => NULL, 'submitted' => FALSE);
+  $form_build_id = $_POST['form_build_id'];
+  // Get the form from the cache.
+  $form = form_get_cache($form_build_id, $form_state);
+  $args = $form['#parameters'];
+  $form_id = array_shift($args);
+  // We need to process the form, prepare
+  // for that by setting a few internals.
+  $form_state['post'] = $form['#post'] = $_POST;
+  $form['#programmed'] = $form['#redirect'] = FALSE;
+  // Set up our form state variable,
+  // needed for removing staff_costs.
+  $form_state['remove_delta'] = $delta;
+  // Build, validate and if possible, submit the form.
+  drupal_process_form($form_id, $form, $form_state);
+  // If validation fails, force form submission.
+  if (form_get_errors()) {
+    form_execute_handlers('submit', $form, $form_state);
+  }
+  // This call recreates the form relying
+  // solely on the form_state that the
+  // drupal_process_form set up.
+  $form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
+  return $form;
 }
-
-// This call recreates the form relying solely on the form_state that the
-// drupal_process_form set up.
-$form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
-
-return $form;
-}
-
+/**
+ * @function
+ * Implements hook_view().
+ */
 function jiscpmsdd_view($node, $teaser = FALSE, $page = FALSE) {
-$breadcrumb = array();
-$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
-$breadcrumb[] = l(t('System Design Documents'), 'jiscpm/dashboard/srs');
-drupal_set_breadcrumb($breadcrumb);
-
-return theme('jiscpmsdd_view', $node, $teaser, $page);
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('System Design Documents'), 'jiscpm/dashboard/srs');
+  drupal_set_breadcrumb($breadcrumb);
+  return theme('jiscpmsdd_view', $node, $teaser, $page);
 }
-
+/**
+ * @function
+ * Implements hook_views_api().
+ */
 function jiscpmsdd_views_api() {
-return array(
-'api' => 2,
-'path' => drupal_get_path('module', 'jiscpmsdd'),
-);
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'jiscpmsdd'),
+  );
 }
-

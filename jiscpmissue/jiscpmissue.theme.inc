@@ -3,15 +3,19 @@
  * @file
  */
 
+/**
+ * @function
+ * Include stylesheet.
+ */
 function theme_jiscpmissue_list($header, $issues) {
-  drupal_add_css(drupal_get_path('module', 'jiscpm') .'/jiscpm.css', 'module');
+  drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm.css', 'module');
 }
-
+/**
+ * @function
+ */
 function theme_jiscpmissue_view($node, $teaser = FALSE, $page = FALSE) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm-node.css', 'module');
-  
   $node = node_prepare($node, $teaser);
-  
   $node->content['group1'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
@@ -24,7 +28,6 @@ function theme_jiscpmissue_view($node, $teaser = FALSE, $page = FALSE) {
     '#value' => l($project->title, 'node/' . $project->nid),
     '#weight' => 1,
   );
-
   $node->content['group2'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
@@ -77,6 +80,5 @@ function theme_jiscpmissue_view($node, $teaser = FALSE, $page = FALSE) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'body_field') : -15,
   );
   unset($node->content['body']);
-  
   return $node;
 }

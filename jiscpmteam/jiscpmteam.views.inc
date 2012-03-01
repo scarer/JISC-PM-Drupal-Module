@@ -3,6 +3,10 @@
  * @file
  */
 
+/**
+ * @function
+ * Implements hook_views_data().
+ */
 function jiscpmteam_views_data() {
   $data['jiscpmteam']['table']['group']  = 'jiscpm';
   $data['jiscpmteam']['table']['join'] = array(
@@ -11,7 +15,6 @@ function jiscpmteam_views_data() {
       'field' => 'vid',
     ),
   );
-  
   $data['jiscpmteam']['members'] = array(
     'title' => t('Team Members'),
     'help' => 'jiscpm Team Members',
@@ -20,10 +23,12 @@ function jiscpmteam_views_data() {
       'click sortable' => FALSE,
     ),
   );
-  
   return $data;
 }
-
+/**
+ * @function
+ * Implements hook_views_handlers().
+ */
 function jiscpmteam_views_handlers() {
   return array(
     'info' => array(

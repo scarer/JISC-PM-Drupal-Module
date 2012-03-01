@@ -40,4 +40,3 @@ function jiscpmtask_organization_project_tasks(_organization_select, _project_se
   var _organization_select_id = $(_organization_select).attr('id');
   jiscpmtask_project_tasks(_organization_select_id, project_select, _task_select_id, _assign_select_id, _with_all_option, _all_text);
 };
-

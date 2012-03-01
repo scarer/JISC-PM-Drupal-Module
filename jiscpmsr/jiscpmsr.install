@@ -3,80 +3,93 @@
  * @file
  */
 
+/**
+ * @function
+ * Implements hook_install().
+ */
 function jiscpmsr_install() {
   drupal_install_schema('jiscpmsr');
   drupal_install_schema('jiscpmsr_md');
 }
-
+/**
+ * @function
+ * Implements hook_disable().
+ */
 function jiscpmsr_disable() {
   drupal_set_message(t('Nodes of type "jiscpmsr" have not been deleted on disabling jiscpm sr. Please note that they will now have reduced functionality, and will not be protected by jiscpm sr access controls.'), 'warning');
 }
-
+/**
+ * @function
+ * Implements hook_uninstall().
+ */
 function jiscpmsr_uninstall() {
   drupal_uninstall_schema('jiscpmsr');
   drupal_uninstall_schema('jiscpmsr_md');
 }
-
+/**
+ * @function
+ * Implements hook_schema().
+ */
 function jiscpmsr_schema() {
   $schema['jiscpmsr'] = array(
     'fields'                => array(
-      'nid'                 => array('description' => t('The nid of a status report'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'    => array('description' => t('The nid for the project a status report belongs to'), 'type' => 'int'),
-      'sr_focus_area'  => array('description' => t('The focus area for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_product_process'  => array('description' => t('The process/product for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_overview'  => array('description' => t('The overview of a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_milestone_report'  => array('description' => t('The milestone report for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_risk_management_report'  => array('description' => t('The risk management report for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_issues_report'  => array('description' => t('The issues report for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_project_recommendations'  => array('description' => t('The project recommendations for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_start'  => array('description' => t('The start of the reporting period for a status report'), 'type' => 'int', 'default' => 0),
-      'sr_end'  => array('description' => t('The end of the reporting period for a status report'), 'type' => 'int', 'default' => 0),
-      'sr_overall_status'  => array('description' => t('The overall status of a project for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_project_summary'  => array('description' => t('The project summary for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_objectives_for_next_sr'  => array('description' => t('The objectives for the next status report for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'sr_related_project_information'  => array('description' => t('The related project information for a status report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'nid'                 => array('description' => 'The nid of a status report', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('description' => 'The nid for the project a status report belongs to', 'type' => 'int'),
+      'sr_focus_area'  => array('description' => 'The focus area for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_product_process'  => array('description' => 'The process/product for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_overview'  => array('description' => 'The overview of a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_milestone_report'  => array('description' => 'The milestone report for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_risk_management_report'  => array('description' => 'The risk management report for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_issues_report'  => array('description' => 'The issues report for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_project_recommendations'  => array('description' => 'The project recommendations for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_start'  => array('description' => 'The start of the reporting period for a status report', 'type' => 'int', 'default' => 0),
+      'sr_end'  => array('description' => 'The end of the reporting period for a status report', 'type' => 'int', 'default' => 0),
+      'sr_overall_status'  => array('description' => 'The overall status of a project for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_project_summary'  => array('description' => 'The project summary for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_objectives_for_next_sr'  => array('description' => 'The objectives for the next status report for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'sr_related_project_information'  => array('description' => 'The related project information for a status report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array('nid', 'vid'),
   );
   $schema['jiscpmsr_md'] = array(
     'fields'                => array(
-      'md_id'                 => array('description' => t('The id for a description on progress for a milestone. Primary key.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'sr_nid'    => array('description' => t('The nid for the status report node that this milestone entry belongs to'), 'type' => 'int'),
-      'milestone_id'    => array('description' => t('The id for the milestone that this milestone report is referring to'), 'type' => 'int'),
-      'md_title'  => array('description' => t('The title for the description on progress for a milestone'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'md_due_date'  => array('description' => t('The due date for the description on progress for a milestone'), 'type' => 'int', 'default' => 0),
-      'md_percentage_completed'  => array('description' => t('The percentage completed for the description on progress for a milestone'), 'type' => 'int', 'default' => 0),
-      'md_deliverable_status'  => array('description' => t('The deliverable status for the description on progress for a milestone'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'md_current_sr'  => array('description' => t('The current progress for the description on progress for a milestone'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'md_id'                 => array('description' => 'The id for a description on progress for a milestone. Primary key.', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sr_nid'    => array('description' => 'The nid for the status report node that this milestone entry belongs to', 'type' => 'int'),
+      'milestone_id'    => array('description' => 'The id for the milestone that this milestone report is referring to', 'type' => 'int'),
+      'md_title'  => array('description' => 'The title for the description on progress for a milestone', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'md_due_date'  => array('description' => 'The due date for the description on progress for a milestone', 'type' => 'int', 'default' => 0),
+      'md_percentage_completed'  => array('description' => 'The percentage completed for the description on progress for a milestone', 'type' => 'int', 'default' => 0),
+      'md_deliverable_status'  => array('description' => 'The deliverable status for the description on progress for a milestone', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'md_current_sr'  => array('description' => 'The current progress for the description on progress for a milestone', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array('md_id'),
   );
   $schema['jiscpmsr_pm'] = array(
     'fields'                => array(
-      'pm_id'                 => array('description' => t('The id for the project management entry for a milestone for the status report. Primary key.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'sr_nid'    => array('description' => t('The nid for the status report node that this project management entry belongs to'), 'type' => 'int'),
-      'milestone_id'    => array('description' => t('The id for the milestone that this project management report is referring to'), 'type' => 'int'),
-      'pm_success'  => array('description' => t('Details on the successes of the project management approach'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'pm_failure'  => array('description' => t('Details on the failures of the project management approach'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'pm_id'                 => array('description' => 'The id for the project management entry for a milestone for the status report. Primary key.', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sr_nid'    => array('description' => 'The nid for the status report node that this project management entry belongs to', 'type' => 'int'),
+      'milestone_id'    => array('description' => 'The id for the milestone that this project management report is referring to', 'type' => 'int'),
+      'pm_success'  => array('description' => 'Details on the successes of the project management approach', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'pm_failure'  => array('description' => 'Details on the failures of the project management approach', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array('pm_id'),
   );
   $schema['jiscpmsr_rm'] = array(
     'fields'                => array(
-      'rm_id'                 => array('description' => t('The id for the risk report/management on a risk for the status report. Primary key.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'sr_nid'    => array('description' => t('The nid for the status report node that this risk report entry belongs to'), 'type' => 'int'),
-      'risk_nid'    => array('description' => t('The nid for the risk node that this entry belongs to'), 'type' => 'int'),
-      'rm_changes'  => array('description' => t('A description of the changes to the risk management strategies for the risk'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'rm_id'                 => array('description' => 'The id for the risk report/management on a risk for the status report. Primary key.', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sr_nid'    => array('description' => 'The nid for the status report node that this risk report entry belongs to', 'type' => 'int'),
+      'risk_nid'    => array('description' => 'The nid for the risk node that this entry belongs to', 'type' => 'int'),
+      'rm_changes'  => array('description' => 'A description of the changes to the risk management strategies for the risk', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array('rm_id'),
   );
   $schema['jiscpmsr_im'] = array(
     'fields'                => array(
-      'im_id'                 => array('description' => t('The id for the issue report/management on a issue for the status report. Primary key.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'sr_nid'    => array('description' => t('The nid for the status report node that this issue report entry belongs to'), 'type' => 'int'),
-      'issue_nid'    => array('description' => t('The nid for the issue node that this entry belongs to'), 'type' => 'int'),
-      'im_resolution'  => array('description' => t('The resolution for the issue based on this report'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'im_id'                 => array('description' => 'The id for the issue report/management on a issue for the status report. Primary key.', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sr_nid'    => array('description' => 'The nid for the status report node that this issue report entry belongs to', 'type' => 'int'),
+      'issue_nid'    => array('description' => 'The nid for the issue node that this entry belongs to', 'type' => 'int'),
+      'im_resolution'  => array('description' => 'The resolution for the issue based on this report', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array('im_id'),
   );

@@ -160,7 +160,7 @@ function jiscpmattribute_list_submit($form, &$form_state) {
       if ($ar[1] == 'isactive') {
         $attributes[$ar[2]]['isactive'] = $value;
       }
-      if ($ar[1 ]== 'default') {
+      if ($ar[1] == 'default') {
         $domain = str_replace('|', ' ', $ar[2]);
         $default_for_domain[$domain] = $value;
       }

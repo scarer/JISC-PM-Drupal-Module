@@ -2,7 +2,7 @@
 /**
  * @file
  */
- 
+
 /**
  * @function
  * Implementation of hook_help
@@ -12,7 +12,7 @@ function jiscpmattribute_help($path, $arg) {
 
   switch ($path) {
     case "admin/help#jiscpmattribute":
-      $output = '<p>'.  t("Provides attributes support for jiscpm") .'</p>';
+      $output = '<p>' .  t("Provides attributes support for jiscpm") . '</p>';
       break;
   }
 
@@ -101,17 +101,19 @@ function jiscpmattribute_access($op, $item = NULL, $account = NULL) {
   if ($op == 'update') {
     return user_access('jiscpm: access administration pages');
   }
-  
+
   return FALSE;
 }
 /**
  * @function
  */
-function jiscpmattribute_attributes_bydomain($domain) {
+function jiscpmattributeattributesbydomain($domain) {
   static $attributes_cache = array();
   $attributes = array();
 
-  if (array_key_exists($domain, $attributes_cache)) return $attributes_cache[$domain];
+  if (array_key_exists($domain, $attributes_cache)) {
+    return $attributes_cache[$domain];
+  }
 
   $s = "SELECT * FROM {jiscpmattribute} WHERE LOWER(domain) LIKE LOWER('%s') AND isactive=1 ORDER BY weight, avalue";
   $r = db_query($s, $domain);
@@ -135,7 +137,7 @@ function jiscpmattribute_attributes_bydomain($domain) {
  * @function
  */
 function jiscpmattribute_value($domain, $key) {
-  $attributes_array = jiscpmattribute_attributes_bydomain($domain);
+  $attributes_array = jiscpmattributeattributesbydomain($domain);
   $attributes = $attributes_array['values'];
   if (array_key_exists($key, $attributes)) {
     return $attributes[$key];

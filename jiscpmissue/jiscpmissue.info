@@ -5,4 +5,3 @@ dependencies[] = jiscpmattribute
 dependencies[] = jiscpmproject
 package = JISC Project Management
 core = 6.x
-

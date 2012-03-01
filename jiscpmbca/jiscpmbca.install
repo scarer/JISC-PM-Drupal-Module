@@ -3,137 +3,168 @@
  * @file
  */
 
+/**
+ * @function
+ * Implementation of hook_install.
+ */
 function jiscpmbca_install() {
   drupal_install_schema('jiscpmbca');
+  drupal_install_schema('jiscpmbca_action');
+  drupal_install_schema('jiscpmbca_staff_cost');
+  drupal_install_schema('jiscpmbca_training_cost');
+  drupal_install_schema('jiscpmbca_equipment_cost');
+  drupal_install_schema('jiscpmbca_other_cost');
+  drupal_install_schema('jiscpmbca_running_cost_training');
+  drupal_install_schema('jiscpmbca_running_cost_licensing');
+  drupal_install_schema('jiscpmbca_running_cost_maintenance');
+  drupal_install_schema('jiscpmbca_running_cost_other');
 }
-
+/**
+ * @function
+ * Implementation of hook_disable.
+ */
 function jiscpmbca_disable() {
   drupal_set_message(t('Nodes of type "business case assessment" have not been deleted on disabling jiscpm bca. Please note that they will now have reduced functionality, and will not be protected by jiscpm bca access controls.'), 'warning');
 }
-
+/**
+ * @function
+ * Implementation of hook_uninstall.
+ */
 function jiscpmbca_uninstall() {
   drupal_uninstall_schema('jiscpmbca');
+  drupal_uninstall_schema('jiscpmbca_action');
+  drupal_uninstall_schema('jiscpmbca_staff_cost');
+  drupal_uninstall_schema('jiscpmbca_training_cost');
+  drupal_uninstall_schema('jiscpmbca_equipment_cost');
+  drupal_uninstall_schema('jiscpmbca_other_cost');
+  drupal_uninstall_schema('jiscpmbca_running_cost_training');
+  drupal_uninstall_schema('jiscpmbca_running_cost_licensing');
+  drupal_uninstall_schema('jiscpmbca_running_cost_maintenance');
+  drupal_uninstall_schema('jiscpmbca_running_cost_other');
 }
-
+/**
+ * @function
+ * Implementation of hook_schema.
+ */
 function jiscpmbca_schema() {
   $schema['jiscpmbca'] = array(
-    'fields'                => array(
-      'nid'                 => array('description' => t('The nid of the business case assessment'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'    => array('description' => t('The nid for the project the business case assessment belongs to'), 'type' => 'int'),
-      'bca_strategies'  => array('description' => t('The strategies for the project in the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_benefits'  => array('description' => t('The benefits gained by the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_implications'  => array('description' => t('The implications of the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_alternatives'  => array('description' => t('The alternatives for the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_payback'  => array('description' => t('The payback for the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_staff_changes'  => array('description' => t('The staff changes caused by the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_hr_related_issues'  => array('description' => t('HR related issues caused by the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_changes_technology'  => array('description' => t('Changes to technology caused by the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_process_changes'  => array('description' => t('Process changes caused by the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_internal_support'  => array('description' => t('Internal support required by the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'bca_external_support'  => array('description' => t('External support required by the project for the business case assessment'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    'fields' => array(
+      'nid' => array('description' => 'The nid of the business case assessment', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid' => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid' => array('description' => 'The nid for the project the business case assessment belongs to', 'type' => 'int'),
+      'bca_strategies' => array('description' => 'The strategies for the project in the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_benefits' => array('description' => 'The benefits gained by the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_implications' => array('description' => 'The implications of the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_alternatives' => array('description' => 'The alternatives for the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_payback' => array('description' => 'The payback for the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_staff_changes' => array('description' => 'The staff changes caused by the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_hr_related_issues' => array('description' => 'HR related issues caused by the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_changes_technology' => array('description' => 'Changes to technology caused by the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_process_changes' => array('description' => 'Process changes caused by the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_internal_support' => array('description' => 'Internal support required by the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'bca_external_support' => array('description' => 'External support required by the project for the business case assessment', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array('nid', 'project_nid'),
   );
-  /* schema for jiscpmbca actions */
-   $schema['jiscpmbca_action'] = array(
-    'fields'                => array(
-      'action_id'                 => array('description' => t('The id of an action for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the action belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'action_title' => array('description' => t('The action title'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'action_description' => array('description' => t('The action description'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'action_deliverydate'             => array('description' => t('The action delivery date'), 'type' => 'int', 'default' => 0),
-    ),
+  // Schema for jiscpmbca actions.
+  $schema['jiscpmbca_action'] = array(
+    'fields' => array(
+      'action_id' => array('description' => 'The id of an action for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+    'bca_nid' => array('description' => 'The nid for the business case assessment the action belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+    'action_title' => array('description' => 'The action title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    'action_description' => array('description' => 'The action description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    'action_deliverydate' => array('description' => 'The action delivery date', 'type' => 'int', 'default' => 0),
+  ),
     'primary key' => array('action_id'),
   );
-   /* schema for jiscpmbca staff costs */
-   $schema['jiscpmbca_staff_cost'] = array(
-    'fields'                => array(
-      'staff_cost_id'                 => array('description' => t('The id of a staff cost for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the staff cost belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'staff_cost_title' => array('description' => t('The staff cost title'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'staff_cost_quantity' => array('description' => t('The staff cost quantity'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'staff_cost_hours' => array('description' => t('The staff cost hours'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'staff_cost_rate' => array('description' => t('The rate of the staff cost'), 'type' => 'float', 'not null' => TRUE, 'default' => 0),
+  // Schema for jiscpmbca staff costs.
+  $schema['jiscpmbca_staff_cost'] = array(
+    'fields' => array(
+      'staff_cost_id' => array('description' => 'The id of a staff cost for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid' => array('description' => 'The nid for the business case assessment the staff cost belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'staff_cost_title' => array('description' => 'The staff cost title', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'staff_cost_quantity' => array('description' => 'The staff cost quantity', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'staff_cost_hours' => array('description' => 'The staff cost hours', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'staff_cost_rate' => array('description' => 'The rate of the staff cost', 'type' => 'float', 'not null' => TRUE, 'default' => 0),
     ),
     'primary key' => array('staff_cost_id'),
   );
-   /* schema for jiscpmbca training costs */
-   $schema['jiscpmbca_training_cost'] = array(
-    'fields'                => array(
-      'training_cost_id'                 => array('description' => t('The id of a training cost for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the training cost belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'training_cost_title' => array('description' => t('The training cost title'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'training_cost_description' => array('description' => t('The training cost description'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'training_cost_total'             => array('description' => t('The training cost total'), 'type' => 'float', 'default' => 0),
+  // Schema for jiscpmbca training costs.
+  $schema['jiscpmbca_training_cost'] = array(
+    'fields' => array(
+      'training_cost_id' => array('description' => 'The id of a training cost for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid' => array('description' => 'The nid for the business case assessment the training cost belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'training_cost_title' => array('description' => 'The training cost title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'training_cost_description' => array('description' => 'The training cost description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'training_cost_total' => array('description' => 'The training cost total', 'type' => 'float', 'default' => 0),
     ),
     'primary key' => array('training_cost_id'),
   );
-   /* schema for jiscpmbca equipment costs */
-   $schema['jiscpmbca_equipment_cost'] = array(
-    'fields'                => array(
-      'equipment_cost_id'                 => array('description' => t('The id of a equipment cost for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the equipment cost belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'equipment_cost_title' => array('description' => t('The equipment cost title'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'equipment_cost_description' => array('description' => t('The equipment cost description'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'equipment_cost_total'             => array('description' => t('The equipment cost total'), 'type' => 'float', 'default' => 0),
+  // Schema for jiscpmbca equipment costs.
+  $schema['jiscpmbca_equipment_cost'] = array(
+    'fields' => array(
+      'equipment_cost_id' => array('description' => 'The id of a equipment cost for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid' => array('description' => 'The nid for the business case assessment the equipment cost belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'equipment_cost_title' => array('description' => 'The equipment cost title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'equipment_cost_description' => array('description' => 'The equipment cost description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'equipment_cost_total' => array('description' => 'The equipment cost total', 'type' => 'float', 'default' => 0),
     ),
     'primary key' => array('equipment_cost_id'),
   );
-   /* schema for jiscpmbca other costs */
-   $schema['jiscpmbca_other_cost'] = array(
-    'fields'                => array(
-      'other_cost_id'                 => array('description' => t('The id of an other cost for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the other cost belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'other_cost_title' => array('description' => t('The other cost title'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'other_cost_description' => array('description' => t('The other cost description'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'other_cost_total'             => array('description' => t('The other cost total'), 'type' => 'float', 'default' => 0),
+  // Schema for jiscpmbca other costs.
+  $schema['jiscpmbca_other_cost'] = array(
+    'fields' => array(
+      'other_cost_id' => array('description' => 'The id of an other cost for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid' => array('description' => 'The nid for the business case assessment the other cost belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'other_cost_title' => array('description' => 'The other cost title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'other_cost_description' => array('description' => 'The other cost description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'other_cost_total' => array('description' => 'The other cost total', 'type' => 'float', 'default' => 0),
     ),
     'primary key' => array('other_cost_id'),
   );
-   /* schema for jiscpmbca running costs training*/
-   $schema['jiscpmbca_running_cost_training'] = array(
-    'fields'                => array(
-      'running_cost_training_id'                 => array('description' => t('The id of a running training cost for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the running training cost belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'running_cost_training_title' => array('description' => t('The running training cost title'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'running_cost_training_description' => array('description' => t('The running training cost description'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'running_cost_training_total'             => array('description' => t('The running training cost total'), 'type' => 'float', 'default' => 0),
+  // Schema for jiscpmbca running costs training.
+  $schema['jiscpmbca_running_cost_training'] = array(
+    'fields' => array(
+      'running_cost_training_id' => array('description' => 'The id of a running training cost for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid' => array('description' => 'The nid for the business case assessment the running training cost belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'running_cost_training_title' => array('description' => 'The running training cost title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_training_description' => array('description' => 'The running training cost description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_training_total' => array('description' => 'The running training cost total', 'type' => 'float', 'default' => 0),
     ),
     'primary key' => array('running_cost_training_id'),
   );
-   /* schema for jiscpmbca running costs licensing*/
-   $schema['jiscpmbca_running_cost_licensing'] = array(
-    'fields'                => array(
-      'running_cost_licensing_id'                 => array('description' => t('The id of a running licensing cost for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the running licensing cost belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'running_cost_licensing_title' => array('description' => t('The running licensing cost title'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'running_cost_licensing_description' => array('description' => t('The running licensing cost description'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'running_cost_licensing_total'             => array('description' => t('The running licensing cost total'), 'type' => 'float', 'default' => 0),
+  // Schema for jiscpmbca running costs licensing.
+  $schema['jiscpmbca_running_cost_licensing'] = array(
+    'fields' => array(
+      'running_cost_licensing_id' => array('description' => 'The id of a running licensing cost for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid' => array('description' => 'The nid for the business case assessment the running licensing cost belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'running_cost_licensing_title' => array('description' => 'The running licensing cost title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_licensing_description' => array('description' => 'The running licensing cost description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_licensing_total' => array('description' => 'The running licensing cost total', 'type' => 'float', 'default' => 0),
     ),
     'primary key' => array('running_cost_licensing_id'),
   );
-     /* schema for jiscpmbca running costs maintenance*/
-   $schema['jiscpmbca_running_cost_maintenance'] = array(
-    'fields'                => array(
-      'running_cost_maintenance_id'                 => array('description' => t('The id of a running maintenance cost for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the running maintenance cost belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'running_cost_maintenance_title' => array('description' => t('The running maintenance cost title'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'running_cost_maintenance_description' => array('description' => t('The running maintenance cost description'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'running_cost_maintenance_total'             => array('description' => t('The running maintenance cost total'), 'type' => 'float', 'default' => 0),
+  // Schema for jiscpmbca running costs maintenance.
+  $schema['jiscpmbca_running_cost_maintenance'] = array(
+    'fields' => array(
+      'running_cost_maintenance_id' => array('description' => 'The id of a running maintenance cost for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'bca_nid' => array('description' => 'The nid for the business case assessment the running maintenance cost belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'running_cost_maintenance_title' => array('description' => 'The running maintenance cost title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_maintenance_description' => array('description' => 'The running maintenance cost description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'running_cost_maintenance_total'             => array('description' => 'The running maintenance cost total', 'type' => 'float', 'default' => 0),
     ),
     'primary key' => array('running_cost_maintenance_id'),
   );
-   /* schema for jiscpmbca running costs other*/
+  // Schema for jiscpmbca running costs other.
    $schema['jiscpmbca_running_cost_other'] = array(
-    'fields'                => array(
-      'running_cost_other_id'                 => array('description' => t('The id of a running other cost for the business case assessment. The primary key for the table'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'bca_nid'                 => array('description' => t('The nid for the business case assessment the running other cost belongs to'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'running_cost_other_title' => array('description' => t('The running other cost title'), 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'running_cost_other_description' => array('description' => t('The running other cost description'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'running_cost_other_total'             => array('description' => t('The running other cost total'), 'type' => 'float', 'default' => 0),
-    ),
-    'primary key' => array('running_cost_other_id'),
-  );
+     'fields' => array(
+       'running_cost_other_id' => array('description' => 'The id of a running other cost for the business case assessment. The primary key for the table', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+       'bca_nid' => array('description' => 'The nid for the business case assessment the running other cost belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+       'running_cost_other_title' => array('description' => 'The running other cost title', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+       'running_cost_other_description' => array('description' => 'The running other cost description', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+       'running_cost_other_total' => array('description' => 'The running other cost total', 'type' => 'float', 'default' => 0),
+     ),
+     'primary key' => array('running_cost_other_id'),
+   );
   return $schema;
 }

@@ -7,4 +7,3 @@ dependencies[] = date_api
 dependencies[] = ahah_helper
 package = JISC Project Management
 core = 6.x
-

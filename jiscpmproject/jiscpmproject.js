@@ -15,4 +15,3 @@ function jiscpmproject_organization_projects(_organization_select, _project_sele
     }
   });
 };
-

@@ -1,47 +1,43 @@
 <?php
 /**
  * @file
- * Install, uninstall and update functions for the jiscpm Team module
+ * Install, uninstall and update functions for the jiscpm Team module.
  */
 
 /**
  * @function
- * Implementation of hook_install
+ * Implementation of hook_install().
  */
 function jiscpmteam_install() {
   drupal_install_schema('jiscpmteam');
   drupal_install_schema('jiscpmteam_members');
-  //variable_set('node_options_jiscpmteam', array('status'));
 }
-
 /**
  * @function
- * Implementation of hook_disable
+ * Implementation of hook_disable().
  */
 function jiscpmteam_disable() {
   drupal_set_message(t('Nodes of type "Team" have not been deleted on disabling jiscpm Team. Please note that they will now have reduced functionality, and will not be protected by jiscpm Team access controls.'), 'warning');
 }
-
 /**
  * @function
- * Implementation of hook_uninstall
+ * Implementation of hook_uninstall().
  */
 function jiscpmteam_uninstall() {
   drupal_uninstall_schema('jiscpmteam');
   drupal_uninstall_schema('jiscpmteam_members');
 }
-
 /**
  * @function
- * Implementation of hook_schema
+ * Implementation of hook_schema().
  */
 function jiscpmteam_schema() {
   $schema['jiscpmteam'] = array(
-  'fields'                => array(
-      'nid'                 => array('description' => t('The nid of a project team'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'    => array('description' => t('The node nid for the project this team belongs to'), 'type' => 'int'),
-      'team_description' => array('description' => t('A description of the project team'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    'fields'                => array(
+      'nid'                 => array('description' => 'The nid of a project team', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('description' => 'The node nid for the project this team belongs to', 'type' => 'int'),
+      'team_description' => array('description' => 'A description of the project team', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array(
       'nid',
@@ -49,17 +45,15 @@ function jiscpmteam_schema() {
     ),
   );
   $schema['jiscpmteam_members'] = array(
-  'fields'                => array(
-      'member_id'                 => array('description' => t('The id of a member entry. The primary key for this table.'), 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'team_nid'    => array('description' => t('The nid of a project team that the member belongs to'), 'type' => 'int'),
-      'member_uid'    => array('description' => t('The uid of a project team member'), 'type' => 'int'),
-      'member_description' => array('description' => t('The description of a project team member and what duties they perform'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+    'fields'                => array(
+      'member_id'                 => array('description' => 'The id of a member entry. The primary key for this table.', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'team_nid'    => array('description' => 'The nid of a project team that the member belongs to', 'type' => 'int'),
+      'member_uid'    => array('description' => 'The uid of a project team member', 'type' => 'int'),
+      'member_description' => array('description' => 'The description of a project team member and what duties they perform', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
     ),
     'primary key' => array(
       'member_id',
     ),
   );
-  
   return $schema;
 }
-

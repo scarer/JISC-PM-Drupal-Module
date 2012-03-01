@@ -1,338 +1,348 @@
 <?php
 /**
-* @file
-*/
+ * @file
+ */
 
-/** 
-* @function
-* Implementation of hook_help
-*/
+/**
+ * @function
+ * Implements hook_help().
+ */
 function jiscpmrfc_help($path, $arg) {
-$o = '';
-
-switch ($path) {
-case "admin/help#jiscpmrfc":
-$o = '<p>'.  t("Provides request for change support for jiscpm") .'</p>';
-break;
+  $o = '';
+  switch ($path) {
+    case "admin/help#jiscpmrfc":
+      $o = '<p>' . t("Provides request for change support for jiscpm") . '</p>';
+      break;
+  }
+  return $o;
 }
-
-return $o;
-}
-
 /**
-* @function
-* Implementation of hook_perm
-*/
+ * @function
+ * Implements hook_perm().
+ */
 function jiscpmrfc_perm() {
-return array(
-'jiscpm RFC: access',
-'jiscpm RFC: add',
-'jiscpm RFC: edit all',
-'jiscpm RFC: edit own',
-'jiscpm RFC: delete all',
-'jiscpm RFC: delete own',
-);
+  return array(
+    'jiscpm RFC: access',
+    'jiscpm RFC: add',
+    'jiscpm RFC: edit all',
+    'jiscpm RFC: edit own',
+    'jiscpm RFC: delete all',
+    'jiscpm RFC: delete own',
+  );
 }
-
 /**
-* @function
-* Implementation of hook_init
-*/
+ * @function
+ * Implements hook_init().
+ */
 function jiscpmrfc_init() {
-/*$settings = array(
-'jiscpm' => array(
-'organization_risks_url' => url('jiscpm/organization_risks_js/')
-),
-);
-drupal_add_js($settings, 'setting');*/
-
-drupal_add_js(drupal_get_path('module', 'jiscpm') .'/jiscpm.js', 'module', 'header', FALSE);
-drupal_add_js(drupal_get_path('module', 'jiscpmrfc') .'/jiscpmrfc.js', 'module', 'header', FALSE);
+  drupal_add_js(drupal_get_path('module', 'jiscpm') . '/jiscpm.js', 'module', 'header', FALSE);
+  drupal_add_js(drupal_get_path('module', 'jiscpmrfc') . '/jiscpmrfc.js', 'module', 'header', FALSE);
 }
-
-function jiscpmrfc_access($op, $node, $account=NULL) {
-if (empty($account)) {
-global $user;
-$account = $user;
+/**
+ * @function
+ * Implements hook_access().
+ */
+function jiscpmrfc_access($op, $node, $account = NULL) {
+  if (empty($account)) {
+    global $user;
+    $account = $user;
+  }
+  if (is_numeric($node)) {
+    $node = node_load($node);
+  }
+  if ($op == 'create') {
+    return user_access('jiscpm risk: add');
+  }
+  if ($op == 'delete') {
+    if (user_access('jiscpm risk: delete all')) {
+      return TRUE;
+    }
+    elseif (user_access('jiscpm risk: delete own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    }
+  }
+  if ($op == 'update') {
+    if (user_access('jiscpm risk: edit all')) {
+      return TRUE;
+    }
+    elseif (user_access('jiscpm risk: edit own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    }
+  }
+  if ($op == 'view') {
+    if (user_access('jiscpm risk: view all')) {
+      return TRUE;
+    }
+    elseif (user_access('jiscpm risk: view own') && ($account->uid == $node->uid)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
-
-if (is_numeric($node)) {
-$node = node_load($node);
-}
-
-if ($op == 'create') {
-return user_access('jiscpm risk: add');
-}
-
-if ($op == 'delete') {
-if (user_access('jiscpm risk: delete all')) {
-return TRUE;
-} 
-elseif (user_access('jiscpm risk: delete own') && ($account->uid == $node->uid)) {
-return TRUE;
-} 
-}
-
-if ($op == 'update') {
-if (user_access('jiscpm risk: edit all')) {
-return TRUE;
-} 
-elseif (user_access('jiscpm risk: edit own') && ($account->uid == $node->uid)) {
-return TRUE;
-} 
-}
-
-if ($op == 'view') {
-if (user_access('jiscpm risk: view all')) {
-return TRUE;
-} 
-elseif (user_access('jiscpm risk: view own') && ($account->uid == $node->uid)) {
-return TRUE;
-} 
-}
-return FALSE;
-}
-
+/**
+ * @function
+ * Implements access_sql().
+ */
 function jiscpmrfc_access_sql($sql, $where = array()) {
-if (user_access('jiscpm risk: view all')) {
-$where[] = "'jiscpm_access'='jiscpm_access'";
-return jiscpm_rewrite_sql($sql, $where);
+  if (user_access('jiscpm risk: view all')) {
+    $where[] = "'jiscpm_access'='jiscpm_access'";
+    return jiscpm_rewrite_sql($sql, $where);
+  }
+  global $user;
+  $cond = '';
+  if (user_access('jiscpm risk: view own')) {
+    $cond .= 'n.uid=' . $user->uid;
+  }
+  if (empty($cond)) {
+    $cond = '0=1';
+  }
+  $where[] = $cond;
+  $where[] = "'jiscpm_access'='jiscpm_access'";
+  return jiscpm_rewrite_sql($sql, $where);
 }
-
-global $user;
-
-$cond = '';
-if (user_access('jiscpm risk: view own')) {
-$cond .= 'n.uid='. $user->uid;
-}
-
-if (empty($cond)) $cond = '0=1';
-$where[] = $cond;
-
-$where[] = "'jiscpm_access'='jiscpm_access'";
-return jiscpm_rewrite_sql($sql, $where);
-}
-
-
+/**
+ * @function
+ * Implements hook_menu().
+ */
 function jiscpmrfc_menu() {
-$items = array();
-
-$items['jiscpm/dashboard/rfcs'] = array(
-'title' => 'RFCs',
-'description' => 'jiscpm RFCs',
-'page callback' => 'jiscpmrfc_list',
-'access arguments' => array('jiscpm risk: access'),
-'file' => 'jiscpmrfc.admin.inc',
-'type' => MENU_NORMAL_ITEM
-);
-
-$items['jiscpm/project_rfcs_js/%'] = array(
-'title' => 'RFCs',
-'page callback' => '_jiscpmrfc_project_rfcs_js',
-'page arguments' => array(2),
-'access arguments' => array('jiscpm rfc: access'),
-'file' => 'jiscpmrfc.admin.inc',
-'type' => MENU_CALLBACK,
-);
-
-return $items;
+  $items = array();
+  $items['jiscpm/dashboard/rfcs'] = array(
+    'title' => 'RFCs',
+    'description' => 'jiscpm RFCs',
+    'page callback' => 'jiscpmrfc_list',
+    'access arguments' => array('jiscpm risk: access'),
+    'file' => 'jiscpmrfc.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['jiscpm/project_rfcs_js/%'] = array(
+    'title' => 'RFCs',
+    'page callback' => '_jiscpmrfc_project_rfcs_js',
+    'page arguments' => array(2),
+    'access arguments' => array('jiscpm rfc: access'),
+    'file' => 'jiscpmrfc.admin.inc',
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
 }
-
+/**
+ * @function
+ * Implements hook_theme().
+ */
 function jiscpmrfc_theme() {
-return array(
-'jiscpmrfc_list' => array(
-'file'      => 'jiscpmrfc.theme.inc',
-'arguments' => array('header', 'rfcs'),
-),
-'jiscpmrfc_view' => array(
-'file'      => 'jiscpmrfc.theme.inc',
-'arguments' => array('node', 'teaser', 'page'),
-),
-);
+  return array(
+    'jiscpmrfc_list' => array(
+      'file'      => 'jiscpmrfc.theme.inc',
+      'arguments' => array('header', 'rfcs'),
+    ),
+    'jiscpmrfc_view' => array(
+      'file'      => 'jiscpmrfc.theme.inc',
+      'arguments' => array('node', 'teaser', 'page'),
+    ),
+  );
 }
-
+/**
+ * @function
+ * Implements hook_node_info().
+ *
+ */
 function jiscpmrfc_node_info() {
-return array(
-'jiscpmrfc' => array(
-'name' => t('JISCPM RFC'),
-'module' => 'jiscpmrfc',
-'description' => t("A request for change for a jiscpm project or jiscpmprogramme."),
-'title_label' => t("Title"),
-'body_label' => t("Description"),
-)
-);
+  return array(
+    'jiscpmrfc' => array(
+      'name' => t('JISCPM RFC'),
+      'module' => 'jiscpmrfc',
+      'description' => t("A request for change for a jiscpm project or jiscpmprogramme."),
+      'title_label' => t("Title"),
+      'body_label' => t("Description"),
+    ),
+  );
 }
-
+/**
+ * @function
+ * Provides content fields.
+ */
 function jiscpmrfc_content_extra_fields($type_name) {
-if ($type_name == 'jiscpmrfc') {
-return array(
-'group1' => array('label' => 'requestor', 'weight' => -20),
-'group2' => array('label' => 'Project title', 'weight' => -19),
-'group3' => array('label' => 'Probability', 'weight' => -18),
-'group4' => array('label' => 'Impact', 'weight' => -17),
-'group5' => array('label' => 'Timescale', 'weight' => -16),
-'group6' => array('label' => 'Residual risk', 'weight' => -15),
-'group7' => array('label' => 'Early warning signs', 'weight' => -14),
-'group8' => array('label' => 'Timescale', 'weight' => -13),
-);
+  if ($type_name == 'jiscpmrfc') {
+    return array(
+      'group1' => array('label' => 'requestor', 'weight' => -20),
+      'group2' => array('label' => 'Project title', 'weight' => -19),
+      'group3' => array('label' => 'Probability', 'weight' => -18),
+      'group4' => array('label' => 'Impact', 'weight' => -17),
+      'group5' => array('label' => 'Timescale', 'weight' => -16),
+      'group6' => array('label' => 'Residual risk', 'weight' => -15),
+      'group7' => array('label' => 'Early warning signs', 'weight' => -14),
+      'group8' => array('label' => 'Timescale', 'weight' => -13),
+    );
+  }
 }
-}
-
+/**
+ * @function
+ * Implements hook_form().
+ */
 function jiscpmrfc_form(&$node) {
-$breadcrumb = array();
-$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
-$breadcrumb[] = l(t('RFCs'), 'jiscpm/dashboard/rfcs');
-drupal_set_breadcrumb($breadcrumb);
-
-//if (arg(1)=='add') {
-$s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
-$s_pro = db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid");
-//}
-
-$type = node_get_types('type', $node);
-
-$form['#attributes']['class'] = 'jiscpmcomponent_node_form';
-
-$form['group1'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
-);
-
-/* print out requestor options */
-$s_own = db_rewrite_sql($s_own);
-$r = db_query($s_own);
-$requestors = array();
-while ($requestor = db_fetch_object($r)) {
-$requestors[$requestor->uid] = $requestor->name;
-if (!$node->requestor_uid) $node->requestor_uid = $requestor->uid;
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('RFCs'), 'jiscpm/dashboard/rfcs');
+  drupal_set_breadcrumb($breadcrumb);
+  $s_own = "SELECT u.uid, u.name FROM {users} u ORDER BY u.name";
+  $s_pro = db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE type = 'jiscpmproject' ORDER BY n.nid");
+  $type = node_get_types('type', $node);
+  $form['#attributes']['class'] = 'jiscpmcomponent_node_form';
+  $form['group1'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
+  );
+  // Print out requestor options.
+  $s_own = db_rewrite_sql($s_own);
+  $r = db_query($s_own);
+  $requestors = array();
+  while ($requestor = db_fetch_object($r)) {
+    $requestors[$requestor->uid] = $requestor->name;
+    if (!$node->requestor_uid) {
+      $node->requestor_uid = $requestor->uid;
+    }
+  }
+  $form['group1']['rfc_requestor_uid'] = array(
+    '#type' => 'select',
+    '#title' => t('RFC Requestor'),
+    '#options' => $requestors,
+    '#required' => TRUE,
+    '#default_value' => $node->rfcs[0]['rfc_requestor_uid'],
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+    // Print out project options.
+  $s_pro = db_rewrite_sql($s_pro);
+  $r = db_query($s_pro);
+  $projects = array();
+  while ($project = db_fetch_object($r)) {
+    $projects[$project->nid] = $project->title;
+    if (!$node->project_nid) {
+      $node->project_nid = $project->nid;
+    }
+  }
+  $form['group2']['project_nid'] = array(
+    '#type' => 'select',
+    '#title' => t('Project'),
+    '#options' => $projects,
+    '#required' => TRUE,
+    '#default_value' => $node->rfcs[0]['project_nid'],
+    '#process' => array('jiscpm_dependent_select_process'),
+  );
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Change'),
+    '#required' => TRUE,
+    '#default_value' => $node->title,
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
+  );
+  if ($type->has_body) {
+    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+  }
+  $form['group3'] = array(
+    '#type' => 'markup',
+    '#theme' => 'jiscpm_form_group',
+    '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -19,
+  );
+  $form['group3']['rfc_rationale_wrapper'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Request for Change Rationale'),
+    '#tree' => FALSE,
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  $form['group3']['rfc_rationale_wrapper']['rfc_rationale'] = array(
+    '#type' => 'textarea',
+    '#title' => t('RFC Rationale'),
+    '#required' => TRUE,
+    '#default_value' => $node->rfcs[0]['rfc_rationale'],
+    '#process' => array('jiscpm_dependent_select_process'),
+    '#weight' => 0,
+  );
+  $form['group3']['rfc_rationale_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group3', 'rfc_rationale_wrapper', 'format'));
+  return $form;
 }
-$form['group1']['rfc_requestor_uid'] = array(
-'#type' => 'select',
-'#title' => t('RFC Requestor'),
-'#options' => $requestors,
-'#required' => TRUE,
-'#default_value' => $node->rfcs[0]['rfc_requestor_uid'],
-'#process' => array('jiscpm_dependent_select_process'),
-);
-/* print out project options */
-$s_pro = db_rewrite_sql($s_pro);
-$r = db_query($s_pro);
-$projects = array();
-while ($project = db_fetch_object($r)) {
-$projects[$project->nid] = $project->title;
-if (!$node->project_nid) $node->project_nid = $project->nid;
-}
-$form['group2']['project_nid'] = array(
-'#type' => 'select',
-'#title' => t('Project'),
-'#options' => $projects,
-'#required' => TRUE,
-'#default_value' => $node->rfcs[0]['project_nid'],
-'#process' => array('jiscpm_dependent_select_process'),
-);
-
-$form['title'] = array(
-'#type' => 'textfield',
-'#title' => t('Change'),
-'#required' => TRUE,
-'#default_value' => $node->title,
-'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'title') : -21,
-);
-
-if ($type->has_body) {
-$form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
-}
-
-$form['group3'] = array(
-'#type' => 'markup',
-'#theme' => 'jiscpm_form_group',
-'#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -19,
-);
-$form['group3']['rfc_rationale_wrapper'] = array(
-'#type' => 'fieldset',
-'#title' => t('Request for Change Rationale'),
-'#tree' => FALSE,
-'#collapsed' => FALSE,
-'#collapsible' => TRUE,
-);
-$form['group3']['rfc_rationale_wrapper']['rfc_rationale'] = array(
-'#type' => 'textarea',
-'#title' => t('RFC Rationale'),
-'#required' => TRUE,
-'#default_value' => $node->rfcs[0]['rfc_rationale'],
-'#process' => array('jiscpm_dependent_select_process'),
-'#weight' => 0,
-);
-$form['group3']['rfc_rationale_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents=array('info', 'group3', 'rfc_rationale_wrapper', 'format'));
-
-return $form;
-}
-
+/**
+ * @function
+ * Implements hook_insert().
+ */
 function jiscpmrfc_insert($node) {
-
-db_query("INSERT INTO {jiscpmrfc}
-(vid, nid, project_nid, rfc_rationale, rfc_requestor_uid)
-VALUES
-(%d, %d, %d, '%s', %s)",
-$node->vid, $node->nid, $node->project_nid, $node->rfc_rationale, $node->rfc_requestor_uid);
+  db_query("INSERT INTO {jiscpmrfc}
+  (vid, nid, project_nid, rfc_rationale, rfc_requestor_uid)
+  VALUES
+  (%d, %d, %d, '%s', %s)",
+  $node->vid, $node->nid, $node->project_nid, $node->rfc_rationale, $node->rfc_requestor_uid);
 }
-
+/**
+ * @function
+ * Implements hook_update().
+ */
 function jiscpmrfc_update($node) {
-
-// if this is a new node or we're adding a new revision,
-if ($node->revision) {
-jiscpmrfc_insert($node);
+  // If this is a new node or we're adding a new revision.
+  if ($node->revision) {
+    jiscpmrfc_insert($node);
+  }
+  else {
+    db_query("DELETE FROM {jiscpmrfc} WHERE nid = %d AND vid = %d", $node->nid, $node->vid);
+    jiscpmrfc_insert($node);
+  }
 }
-else {   
-db_query("DELETE FROM {jiscpmrfc} WHERE nid = %d AND vid = %d", $node->nid, $node->vid);
-jiscpmrfc_insert($node);
-}
-}
-
+/**
+ * @function
+ * Implements hook_nodeapi().
+ */
 function jiscpmrfc_nodeapi(&$node, $op, $teaser, $page) {
-switch ($op) {
-case 'prepare':
-break;
-case 'delete revision':
-// Notice that we're matching a single revision based on the node's vid.
-db_query('DELETE FROM {jiscpmrfc} WHERE nid = %d', $node->nid);
-break;
+  switch ($op) {
+    case 'prepare':
+      break;
+    case 'delete revision':
+      // Notice that we're matching a single revision based on the node's vid.
+      db_query('DELETE FROM {jiscpmrfc} WHERE nid = %d', $node->nid);
+      break;
+  }
 }
-}
-
+/**
+ * @function
+ * Implements hook_delete().
+ */
 function jiscpmrfc_delete($node) {
-// Notice that we're matching all revision, by using the node's nid.
-db_query('DELETE FROM {jiscpmrfc} WHERE nid = %d', $node->nid);
+  // Notice that we're matching all revision, by using the node's nid.
+  db_query('DELETE FROM {jiscpmrfc} WHERE nid = %d', $node->nid);
 }
-
+/**
+ * @function
+ * Implements hook_load().
+ */
 function jiscpmrfc_load($node) {
-$result = db_query('SELECT project_nid, rfc_rationale, rfc_requestor_uid FROM {jiscpmrfc} WHERE nid = %d', $node->nid);
-$node->rfcs = array();
-while ($row = db_fetch_object($result)) {
-$rfc = array(
-'project_nid' => check_plain($row->project_nid),
-'rfc_rationale' => check_plain($row->rfc_rationale),
-'rfc_requestor_uid' => check_plain($row->rfc_requestor_uid),     
-);
-
-$node->rfcs[0] = $rfc;
+  $result = db_query('SELECT project_nid, rfc_rationale, rfc_requestor_uid FROM {jiscpmrfc} WHERE nid = %d', $node->nid);
+  $node->rfcs = array();
+  while ($row = db_fetch_object($result)) {
+    $rfc = array(
+      'project_nid' => check_plain($row->project_nid),
+      'rfc_rationale' => check_plain($row->rfc_rationale),
+      'rfc_requestor_uid' => check_plain($row->rfc_requestor_uid),
+    );
+    $node->rfcs[0] = $rfc;
+  }
+  return $node;
 }
-return $node;
-}
-
+/**
+ * @function
+ * Implements hook_view().
+ */
 function jiscpmrfc_view($node, $teaser = FALSE, $page = FALSE) {
-$breadcrumb = array();
-$breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
-$breadcrumb[] = l(t('RFCs'), 'jiscpm/dashboard/rfcs');
-drupal_set_breadcrumb($breadcrumb);
-
-return theme('jiscpmrfc_view', $node, $teaser, $page);
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('JISC PM'), 'jiscpm/dashboard');
+  $breadcrumb[] = l(t('RFCs'), 'jiscpm/dashboard/rfcs');
+  drupal_set_breadcrumb($breadcrumb);
+  return theme('jiscpmrfc_view', $node, $teaser, $page);
 }
-
+/**
+ * @function
+ * Implements hook_views_api().
+ */
 function jiscpmrfc_views_api() {
-return array(
-'api' => 2,
-'path' => drupal_get_path('module', 'jiscpmrfc'),
-);
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'jiscpmrfc'),
+  );
 }

@@ -15,4 +15,3 @@ function jiscpmrisk_organization_risks(_organization_select, _risk_select_id, _w
     }
   });
 };
-

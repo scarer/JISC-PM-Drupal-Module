@@ -3,21 +3,26 @@
  * @file
  */
 
+/**
+ * @function
+ * List of RFCs.
+ */
 function theme_jiscpmrfc_list($header, $risks) {
-  drupal_add_css(drupal_get_path('module', 'jiscpm') .'/jiscpm.css', 'module');
+  drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm.css', 'module');
 }
-
+/**
+ * @function
+ * Implements hook_view().
+ */
 function theme_jiscpmrfc_view($node, $teaser = FALSE, $page = FALSE) {
   drupal_add_css(drupal_get_path('module', 'jiscpm') . '/jiscpm-node.css', 'module');
-  
   $node = node_prepare($node, $teaser);
-  
   $node->content['group0'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group0') : -21,
   );
-  $project = node_load($node->rfcs[0]['project_nid']); 
+  $project = node_load($node->rfcs[0]['project_nid']);
   $node->content['group0']['project'] = array(
     '#prefix' => '<strong>Project</strong><div class="project">',
     '#suffix' => '</div>',
@@ -29,14 +34,12 @@ function theme_jiscpmrfc_view($node, $teaser = FALSE, $page = FALSE) {
     '#suffix' => '</div>',
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'group1') : -20,
   );
-
   $node->content['group1']['rationale'] = array(
     '#prefix' => '<strong>Rationale</strong><div class="rationale">',
     '#suffix' => '</div>',
     '#value' => $node->rfcs[0]['rfc_rationale'],
     '#weight' => 1,
   );
-
   $node->content['group2'] = array(
     '#prefix' => '<div class="jiscpmfields">',
     '#suffix' => '</div>',
@@ -49,7 +52,6 @@ function theme_jiscpmrfc_view($node, $teaser = FALSE, $page = FALSE) {
     '#value' => l($requestor->name, 'user/' . $requestor->uid),
     '#weight' => 2,
   );
-  
   $node->content['body_field'] = array(
     '#prefix' => '<div class="jiscpmbody">',
     '#suffix' => '</div>',
@@ -57,6 +59,5 @@ function theme_jiscpmrfc_view($node, $teaser = FALSE, $page = FALSE) {
     '#weight' => module_exists('content') ? content_extra_field_weight($node->type, 'body_field') : -18,
   );
   unset($node->content['body']);
-  
   return $node;
 }

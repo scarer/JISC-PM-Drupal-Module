@@ -577,7 +577,6 @@ function jiscpm_issues() {
 function jiscpm_export_form($form_state) {
   $form = array();
   $projects = array();
-  $projects[-1] = '--SELECT A PROJECT--';
   $result = db_query(db_rewrite_sql("SELECT n.nid, n.title FROM {node} n WHERE n.type = 'jiscpmproject' ORDER BY n.title ASC"));
   while ($rows = db_fetch_object($result)) {
     $projects[$rows->nid] = check_plain($rows->title);

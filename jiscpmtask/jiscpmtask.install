@@ -3,42 +3,53 @@
  * @file
  */
 
+/**
+ * @function
+ * Implements hook_install().
+ */
 function jiscpmtask_install() {
   drupal_install_schema('jiscpmtask');
   variable_set('node_options_jiscpmtask', array('status'));
 }
-
+/**
+ * @function
+ * Implements hook_disable().
+ */
 function jiscpmtask_disable() {
   drupal_set_message(t('Nodes of type "Task" have not been deleted on disabling jiscpm Task. Please note that they will now have reduced functionality, and will not be protected by jiscpm Task access controls.'), 'warning');
 }
-
+/**
+ * @function
+ * Implements hook_uninstall().
+ */
 function jiscpmtask_uninstall() {
   drupal_uninstall_schema('jiscpmtask');
 }
-
+/**
+ * @function
+ * Implements hook_schema().
+ */
 function jiscpmtask_schema() {
   $schema['jiscpmtask'] = array(
     'fields'        => array(
-    'nid'                 => array('description' => t('The nid of a project task'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-    'vid'                 => array('description' => t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-    'project_nid'         => array('description' => t('The nid for the project a task belongs to'), 'type' => 'int'),
-'stepno' => array('description' => t('The step number for a project task'), 'type' => 'int'),
-'taskcategory' => array('description' => t('The category a task belongs to'), 'type' => 'text'),
-'taskstatus' => array('description' => t('The status of a task'), 'type' => 'text'),
-'taskpriority' => array('description' => t('The priority of a task'), 'type' => 'text'),
-'weight' => array('description' => t('The weight of a task'), 'type' => 'text'),
-    'datebegin'           => array('description' => t('The date a task begins'), 'type' => 'int'),
-    'dateend'             => array('description' => t('The date a task ends'), 'type' => 'int'),
-'durationunit' => array('description' => t('The duration unit assigned to the time for a task'), 'type' => 'int'),
-'duration' => array('description' => t('The duration of a task'), 'type' => 'float'),
-'pricemode' => array('description' => t('The pricemode assigned to a task'), 'type' => 'text'),
-'price' => array('description' => t('The price of a task'), 'type' => 'float'),
-'currency' => array('description' => t('The currency assigned to a task'), 'type' => 'text'),
-    'assigned_uid'        => array('description' => t('The uid of the assigned person to the task'), 'type' => 'int'),
+      'nid'                 => array('description' => 'The nid of a project task', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'         => array('description' => 'The nid for the project a task belongs to', 'type' => 'int'),
+      'stepno' => array('description' => 'The step number for a project task', 'type' => 'int'),
+      'taskcategory' => array('description' => 'The category a task belongs to', 'type' => 'text'),
+      'taskstatus' => array('description' => 'The status of a task', 'type' => 'text'),
+      'taskpriority' => array('description' => 'The priority of a task', 'type' => 'text'),
+      'weight' => array('description' => 'The weight of a task', 'type' => 'text'),
+      'datebegin'           => array('description' => 'The date a task begins', 'type' => 'int'),
+      'dateend'             => array('description' => 'The date a task ends', 'type' => 'int'),
+      'durationunit' => array('description' => 'The duration unit assigned to the time for a task', 'type' => 'int'),
+      'duration' => array('description' => 'The duration of a task', 'type' => 'float'),
+      'pricemode' => array('description' => 'The pricemode assigned to a task', 'type' => 'text'),
+      'price' => array('description' => 'The price of a task', 'type' => 'float'),
+      'currency' => array('description' => 'The currency assigned to a task', 'type' => 'text'),
+      'assigned_uid'        => array('description' => 'The uid of the assigned person to the task', 'type' => 'int'),
     ),
     'primary key' => array('nid', 'vid'),
   );
-
   return $schema;
 }
-

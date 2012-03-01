@@ -3,6 +3,10 @@
  * @file
  */
 
+/**
+ * @function
+ * Implementation of hook_install.
+ */
 function jiscpmattribute_install() {
   drupal_install_schema('jiscpmattribute');
 
@@ -41,12 +45,12 @@ function jiscpmattribute_install() {
     'development' => 'development',
     'support' => 'support',
   );
-  
+
   $attributes['Project priority'] = array(
     '1-low' => 'low',
     '2-normal' => 'normal',
     '3-high' => 'high',
-    '4-urgent' => 'urgent'
+    '4-urgent' => 'urgent',
   );
 
   $attributes['Project priority search'] = array(
@@ -92,7 +96,7 @@ function jiscpmattribute_install() {
     '1-low' => 'low',
     '2-normal' => 'normal',
     '3-high' => 'high',
-    '4-urgent' => 'urgent'
+    '4-urgent' => 'urgent',
   );
 
   $attributes['Task category search'] = array(
@@ -371,7 +375,7 @@ function jiscpmattribute_install() {
     'outstanding' => 'Outstanding',
     'paid' => 'Paid',
   );
-  
+
   $attributes['Expense status search'] = array(
     'outstanding' => 'Outstanding',
     'paid' => 'Paid',
@@ -381,7 +385,9 @@ function jiscpmattribute_install() {
   $prevdomain = '';
   $weight = 0;
   foreach ($attributes as $domain => $attribute) {
-    if ($domain != $prevdomain) $weight=0;
+    if ($domain != $prevdomain) {
+      $weight = 0;
+    }
     foreach ($attribute as $key => $value) {
       db_query($s, $domain, $key, $value, $weight);
       $weight++;
@@ -390,11 +396,17 @@ function jiscpmattribute_install() {
   }
 
 }
-
+/**
+ * @function
+ * Implementation of hook_uninstall.
+ */
 function jiscpmattribute_uninstall() {
   drupal_uninstall_schema('jiscpmattribute');
 }
-
+/**
+ * @function
+ * Implementation of hook_schema.
+ */
 function jiscpmattribute_schema() {
   $schema['jiscpmattribute'] = array(
     'fields'          => array(

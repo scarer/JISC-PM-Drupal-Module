@@ -3,29 +3,41 @@
  * @file
  */
 
+/**
+ * @function
+ * Implements hook_install().
+ */
 function jiscpmrfc_install() {
   drupal_install_schema('jiscpmrfc');
 }
-
+/**
+ * @function
+ * Implements hook_disable().
+ */
 function jiscpmrfc_disable() {
   drupal_set_message(t('Nodes of type "RFC" have not been deleted on disabling jiscpm rfc. Please note that they will now have reduced functionality, and will not be protected by jiscpm rfc access controls.'), 'warning');
 }
-
+/**
+ * @function
+ * Implements hook_uninstall().
+ */
 function jiscpmrfc_uninstall() {
   drupal_uninstall_schema('jiscpmrfc');
 }
-
+/**
+ * @function
+ * Implements hook_schema().
+ */
 function jiscpmrfc_schema() {
   $schema['jiscpmrfc'] = array(
     'fields'                => array(
-      'nid'                 => array('description' => t('The nid of a request for change'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => t('The current {node_revisions}.vid version identifier'), 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'    => array('description' => t('The nid for the project the request for change belongs to'), 'type' => 'int'),
-      'rfc_rationale' => array('description' => t('The rationale for the request for change'), 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'rfc_requestor_uid'  => array('description' => t('The uid for the user who made the request for change'), 'type' => 'varchar', 'length' => 100),
+      'nid'                 => array('description' => 'The nid of a request for change', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'project_nid'    => array('description' => 'The nid for the project the request for change belongs to', 'type' => 'int'),
+      'rfc_rationale' => array('description' => 'The rationale for the request for change', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'rfc_requestor_uid'  => array('description' => 'The uid for the user who made the request for change', 'type' => 'varchar', 'length' => 100),
     ),
     'primary key' => array('nid', 'vid'),
   );
-
   return $schema;
 }
