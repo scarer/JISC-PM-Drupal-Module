@@ -210,6 +210,7 @@ function jiscpmproject_insert($node) {
   VALUES(%d, %d, %s, %s, '%s', '%s', '%s', %s, %s, '%s', '%s', '%s')",
   $node->nid, $node->vid, $node->project_manager_uid, $node->client_uid, $node->projectstatus, $node->projectcategory, $node->projectpriority, $node->datebegin, $node->dateend, $node->organisational_scope, $node->logical_scope, $node->out_of_scope);
   }
+}
 /**
  * @function
  * Updates the relationship listing.
