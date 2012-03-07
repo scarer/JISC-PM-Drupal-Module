@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * JISC PM issue module.
  */
 
 /**
@@ -258,7 +259,11 @@ function jiscpmissue_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group3']['issue_progress_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group3', 'issue_progress_wrapper', 'format'));
+  $form['group3']['issue_progress_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group3',
+    'issue_progress_wrapper',
+    'format'));
   $form['group4'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -295,7 +300,11 @@ function jiscpmissue_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group5']['issue_resolution_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group5', 'issue_resolution_wrapper', 'format'));
+  $form['group5']['issue_resolution_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group5',
+    'issue_resolution_wrapper',
+    'format'));
   return $form;
 }
 /**
@@ -329,12 +338,11 @@ function jiscpmissue_update($node) {
  */
 function jiscpmissue_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
-    case 'prepare':
-      break;
     case 'delete revision':
       // Notice that we're matching a single revision based on the node's vid.
       db_query('DELETE FROM {jiscpmissue} WHERE nid = %d', $node->nid);
       break;
+
   }
 }
 /**

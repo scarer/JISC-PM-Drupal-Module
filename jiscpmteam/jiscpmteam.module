@@ -154,10 +154,12 @@ function jiscpmteam_nodeapi(&$node, $op, $teaser, $page) {
       if (!$node->nid) {
       }
       break;
+
     case 'delete revision':
       db_query('DELETE FROM {jiscpmteam} WHERE nid = %d AND vid = %d', $node->nid, $node->vid);
       db_query('DELETE FROM {jiscpmteam_members} WHERE team_nid = %d', $node->nid);
       break;
+
   }
 }
 /**
@@ -301,7 +303,13 @@ function jiscpmteam_form(&$node, $form_state) {
       '#title' => t('Team Member description'),
       '#weight' => 1,
     );
-    $form['member_wrapper']['add_member']['new_member']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'member_wrapper', 'add_member', 'new_member', 'format'));
+    $form['member_wrapper']['add_member']['new_member']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+      'info',
+      'member_wrapper',
+      'add_member',
+      'new_member',
+      'format')
+    );
     // We name our button 'jiscpmteam_member_more'
     // to avoid conflicts with other modules using
     // AHAH-enabled buttons with the id 'more'.
@@ -338,7 +346,11 @@ function jiscpmteam_form(&$node, $form_state) {
     '#default_value' => check_markup($node->jiscpmteams[0]['team_description'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => 5,
   );
-  $form['team']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 6, $parents = array('info', 'team', 'format'));
+  $form['team']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 6, $parents = array(
+    'info',
+    'team',
+    'format')
+  );
     return $form;
 }
 /**

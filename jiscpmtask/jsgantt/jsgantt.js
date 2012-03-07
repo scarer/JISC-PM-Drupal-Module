@@ -56,9 +56,13 @@ var vBenchTime = new Date().getTime();
 // Function JSGantt(){}.
 JSGantt.isIE = function (){
   if(typeof document.all != 'undefined')
+  {
     return true;
+  }
   else
+  {
     return false;
+  }
 }
 JSGantt.TaskItem = function(pID, pName, pStart, pEnd, pColor, pLink, pMile, pRes, pComp, pGroup, pParent, pOpen, pDepend, pCaption){
   var vID    = pID;
@@ -84,146 +88,164 @@ JSGantt.TaskItem = function(pID, pName, pStart, pEnd, pColor, pLink, pMile, pRes
     vStart = JSGantt.parseDateStr(pStart,g.getDateInputFormat());
     vEnd = JSGantt.parseDateStr(pEnd,g.getDateInputFormat());
   }
-  this.getID = function(){
+  this.getID = function() {
     return vID
   };
-  this.getName = function(){
+  this.getName = function() {
     return vName
   };
-  this.getStart = function(){
+  this.getStart = function() {
     return vStart
   };
-  this.getEnd = function(){
+  this.getEnd = function() {
     return vEnd
   };
-  this.getColor = function(){
+  this.getColor = function() {
     return vColor
   };
-  this.getLink = function(){
+  this.getLink = function() {
     return vLink
   };
-  this.getMile = function(){
+  this.getMile = function() {
     return vMile
   };
-  this.getDepend = function(){
-    if(vDepend)
+  this.getDepend = function() {
+    if(vDepend) {
       return vDepend;
-    else return null
-  };
-  this.getCaption = function(){
-    if(vCaption)
-      return vCaption;
-    else
-      return '';
-  };
-  this.getResource = function(){
-    if(vRes)
-      return vRes;
-    else
-      return '&nbsp';
-  };
-  this.getCompVal = function(){
-    if(vComp)
-      return vComp;
-    else
-      return 0;
-  };
-  this.getCompStr = function(){
-    if(vComp)
-      return vComp+'%';
-    else
-      return '';
-  };
-  this.getDuration = function(vFormat){
-    if (vMile)
-      vDuration = '-';
-    else if (vFormat=='hour'){
-      tmpPer =  Math.ceil((this.getEnd()- this.getStart())/  (60 * 60 * 1000));
-    if(tmpPer == 1)
-      vDuration = '1 Hour';
-    else
-      vDuration = tmpPer + ' Hours';
     }
-    else if (vFormat=='minute'){
+    else {
+      return null
+    }
+  };
+  this.getCaption = function() {
+    if(vCaption) {
+      return vCaption;
+    }
+    else {
+      return '';
+    }
+  };
+  this.getResource = function() {
+    if(vRes) {
+      return vRes;
+    }
+    else {
+      return '&nbsp';
+    }
+  };
+  this.getCompVal = function() {
+    if(vComp) {
+      return vComp;
+    }
+    else {
+      return 0;
+    }
+  };
+  this.getCompStr = function() {
+    if(vComp) {
+      return vComp+'%';
+    }
+    else {
+      return '';
+    }
+  };
+  this.getDuration = function(vFormat) {
+    if (vMile) {
+      vDuration = '-';
+    }
+    else if (vFormat=='hour') {
+      tmpPer =  Math.ceil((this.getEnd()- this.getStart())/  (60 * 60 * 1000));
+      if(tmpPer == 1) {
+        vDuration = '1 Hour';
+      }
+      else {
+        vDuration = tmpPer + ' Hours';
+      }
+    }
+    else if (vFormat=='minute') {
       tmpPer =  Math.ceil((this.getEnd()- this.getStart())/  (60 * 1000));
-      if(tmpPer == 1)
+      if(tmpPer == 1) {
         vDuration = '1 Minute';
-      else
+      }
+      else {
         vDuration = tmpPer + ' Minutes';
+      }
     }
     else {
       tmpPer =  Math.ceil((this.getEnd()- this.getStart())/  (24 * 60 * 60 * 1000)+ 1);
-      if(tmpPer == 1)
+      if(tmpPer == 1) {
         vDuration = '1 Day';
-      else
+      }
+      else {
         vDuration = tmpPer + ' Days';
+      }
     }
-  return(vDuration )
+    return(vDuration)
   };
-  this.getParent = function(){
+  this.getParent = function() {
     return vParent
   };
-  this.getGroup = function(){
+  this.getGroup = function() {
     return vGroup
   };
-  this.getOpen = function(){
+  this.getOpen = function() {
     return vOpen
   };
-  this.getLevel = function(){
+  this.getLevel = function() {
     return vLevel
   };
-  this.getNumKids = function(){
+  this.getNumKids = function() {
     return vNumKid
   };
-  this.getStartX = function(){
+  this.getStartX = function() {
    return x1
   };
-  this.getStartY = function(){
+  this.getStartY = function() {
     return y1
   };
-  this.getEndX = function(){
+  this.getEndX = function() {
     return x2
   };
-  this.getEndY = function(){
+  this.getEndY = function() {
     return y2
   };
-  this.getVisible = function(){
+  this.getVisible = function() {
     return vVisible
   };
-  this.setDepend = function(pDepend){
+  this.setDepend = function(pDepend) {
     vDepend = pDepend;
   };
-  this.setStart = function(pStart){
+  this.setStart = function(pStart) {
     vStart = pStart;
   };
-  this.setEnd = function(pEnd){
+  this.setEnd = function(pEnd) {
     vEnd   = pEnd;
   };
-  this.setLevel = function(pLevel){
+  this.setLevel = function(pLevel) {
     vLevel = pLevel;
   };
-  this.setNumKid = function(pNumKid){
+  this.setNumKid = function(pNumKid) {
     vNumKid = pNumKid;
   };
-  this.setCompVal = function(pCompVal){
+  this.setCompVal = function(pCompVal) {
     vComp = pCompVal;
   };
-  this.setStartX = function(pX){
+  this.setStartX = function(pX) {
     x1 = pX;
   };
-  this.setStartY = function(pY){
+  this.setStartY = function(pY) {
     y1 = pY;
   };
-  this.setEndX = function(pX){
+  this.setEndX = function(pX) {
     x2 = pX;
   };
-  this.setEndY = function(pY){
+  this.setEndY = function(pY) {
     y2 = pY;
   };
-  this.setOpen = function(pOpen){
+  this.setOpen = function(pOpen) {
     vOpen = pOpen;
   };
-  this.setVisible = function(pVisible){
+  this.setVisible = function(pVisible) {
     vVisible = pVisible;
   };
 }
@@ -258,67 +280,68 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
   var vQuarterArr   = new Array(1,1,1,2,2,2,3,3,3,4,4,4);
   var vMonthDaysArr = new Array(31,28,31,30,31,30,31,31,30,31,30,31);
   var vMonthArr     = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
-  this.setFormatArr = function(){
+  this.setFormatArr = function() {
     vFormatArr = new Array();
     for (var i = 0; i < arguments.length; i++) {
       vFormatArr[i] = arguments[i];
     }
-    if(vFormatArr.length>4){
+    if(vFormatArr.length>4) {
       vFormatArr.length=4;
     }
   };
-  this.setShowRes  = function(pShow){
+  this.setShowRes  = function(pShow) {
     vShowRes  = pShow;
   };
-  this.setShowDur  = function(pShow){
+  this.setShowDur  = function(pShow) {
     vShowDur  = pShow;
   };
-  this.setShowComp = function(pShow){
+  this.setShowComp = function(pShow) {
     vShowComp = pShow;
   };
-  this.setShowStartDate = function(pShow){
+  this.setShowStartDate = function(pShow) {
     vShowStartDate = pShow;
   };
-  this.setShowEndDate = function(pShow){
+  this.setShowEndDate = function(pShow) {
     vShowEndDate = pShow;
   };
-  this.setDateInputFormat = function(pShow){
+  this.setDateInputFormat = function(pShow) {
     vDateInputFormat = pShow;
   };
-  this.setDateDisplayFormat = function(pShow){
-    vDateDisplayFormat = pShow;};
-  this.setCaptionType = function(pType){
+  this.setDateDisplayFormat = function(pShow) {
+    vDateDisplayFormat = pShow;
+  };
+  this.setCaptionType = function(pType) {
     vCaptionType = pType
   };
-  this.setFormat = function(pFormat){
+  this.setFormat = function(pFormat) {
     vFormat = pFormat;
     this.Draw();
   };
-  this.getShowRes = function(){
+  this.getShowRes = function() {
     return vShowRes
   };
-  this.getShowDur = function(){
+  this.getShowDur = function() {
     return vShowDur
   };
-  this.getShowComp = function(){
+  this.getShowComp = function() {
     return vShowComp
   };
-  this.getShowStartDate = function(){
+  this.getShowStartDate = function() {
     return vShowStartDate
   };
-  this.getShowEndDate = function(){
+  this.getShowEndDate = function() {
     return vShowEndDate
   };
-  this.getDateInputFormat = function(){
+  this.getDateInputFormat = function() {
     return vDateInputFormat
   };
-  this.getDateDisplayFormat = function(){
+  this.getDateDisplayFormat = function() {
     return vDateDisplayFormat
-};
-  this.getCaptionType = function(){
+  };
+  this.getCaptionType = function() {
     return vCaptionType
-};
-  this.CalcTaskXY = function (){
+  };
+  this.CalcTaskXY = function() {
     var vList = this.getList();
     var vTaskDiv;
     var vParDiv;
@@ -328,33 +351,33 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
       vTaskDiv = document.getElementById("taskbar_"+vID);
       vBarDiv  = document.getElementById("bardiv_"+vID);
       vParDiv  = document.getElementById("childgrid_"+vID);
-      if(vBarDiv){
-        vList[i].setStartX(vBarDiv.offsetLeft );
-        vList[i].setStartY(vParDiv.offsetTop+vBarDiv.offsetTop+6 );
-        vList[i].setEndX(vBarDiv.offsetLeft + vBarDiv.offsetWidth );
-        vList[i].setEndY(vParDiv.offsetTop+vBarDiv.offsetTop+6 );
+      if(vBarDiv) {
+        vList[i].setStartX(vBarDiv.offsetLeft);
+        vList[i].setStartY(vParDiv.offsetTop+vBarDiv.offsetTop+6);
+        vList[i].setEndX(vBarDiv.offsetLeft + vBarDiv.offsetWidth);
+        vList[i].setEndY(vParDiv.offsetTop+vBarDiv.offsetTop+6);
       }
     }
-      }
-  this.AddTaskItem = function(value){
+  }
+  this.AddTaskItem = function(value) {
     vTaskList.push(value);
   }
-  this.getList   = function(){
+  this.getList   = function() {
     return vTaskList
   };
-  this.clearDependencies = function(){
+  this.clearDependencies = function() {
     var parent = document.getElementById('rightside');
     var depLine;
     var vMaxId = vDepId;
     for (i=1; i < vMaxId; i++) {
       depLine = document.getElementById("line"+i);
-      if (depLine){
+      if (depLine) {
         parent.removeChild(depLine);
       }
     }
     vDepId = 1;
   }
-  this.sLine = function(x1,y1,x2,y2){
+  this.sLine = function(x1,y1,x2,y2) {
     vLeft = Math.min(x1,x2);
     vTop  = Math.min(y1,y2);
     vWid  = Math.abs(x2-x1)+ 1;
@@ -376,7 +399,7 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
     oDiv.style.visibility = "visible";
     vDoc.appendChild(oDiv);
   }
-  this.dLine = function(x1,y1,x2,y2){
+  this.dLine = function(x1,y1,x2,y2) {
     var dx = x2 - x1;
     var dy = y2 - y1;
     var x = x1;
@@ -392,8 +415,8 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
         y += dy;
     }
   }
-  this.drawDependency =function(x1,y1,x2,y2){
-    if(x1 + 10 < x2){
+  this.drawDependency =function(x1,y1,x2,y2) {
+    if(x1 + 10 < x2) {
       this.sLine(x1,y1,x1+4,y1);
       this.sLine(x1+4,y1,x1+4,y2);
       this.sLine(x1+4,y2,x2,y2);
@@ -414,7 +437,7 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
       this.dLine(x2-1,y2,x2-3,y2+2);
     }
   }
-  this.DrawDependencies = function (){
+  this.DrawDependencies = function() {
     // First recalculate the x,y.
     this.CalcTaskXY();
     this.clearDependencies();
@@ -427,20 +450,22 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
         var n = vDepList.length;
         for (var k = 0; k < n; k++) {
           var vTask = this.getArrayLocationByID(vDepList[k]);
-          if(vList[vTask].getVisible()==1)
+          if(vList[vTask].getVisible() == 1) {
             this.drawDependency(vList[vTask].getEndX(),vList[vTask].getEndY(),vList[i].getStartX()-1,vList[i].getStartY())
+          }
         }
       }
     }
   }
-  this.getArrayLocationByID = function(pId){
+  this.getArrayLocationByID = function(pId) {
     var vList = this.getList();
     for (var i = 0; i < vList.length; i++) {
-      if(vList[i].getID()==pId)
+      if(vList[i].getID()==pId) {
         return i;
+      }
     }
   }
-  this.Draw = function(){
+  this.Draw = function() {
     var vMaxDate = new Date();
     var vMinDate = new Date();
     var vTmpDate = new Date();
@@ -464,7 +489,7 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
     var vNameWidth = 220;
     var vStatusWidth = 70;
     var vLeftWidth = 15 + 220 + 70 + 70 + 70 + 70 + 70;
-    if(vTaskList.length > 0){
+    if (vTaskList.length > 0) {
       // Process all tasks preset parent date and completion.
       JSGantt.processRows(vTaskList, 0, -1, 1, 1);
       // Get overall min/max dates plus padding.
@@ -474,27 +499,27 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
       // manually to change each column width.
       // May be smart to make this a parameter of GanttChart
       // or set it based on existing pWidth parameter.
-      if(vFormat == 'day'){
+      if (vFormat == 'day') {
         vColWidth = 18;
         vColUnit = 1;
       }
-      else if(vFormat == 'week'){
+      else if (vFormat == 'week') {
         vColWidth = 37;
         vColUnit = 7;
       }
-      else if(vFormat == 'month'){
+      else if (vFormat == 'month') {
         vColWidth = 37;
         vColUnit = 30;
       }
-      else if(vFormat == 'quarter'){
+      else if (vFormat == 'quarter') {
         vColWidth = 60;
         vColUnit = 90;
       }
-      else if(vFormat=='hour'){
+      else if (vFormat =='hour') {
         vColWidth = 18;
         vColUnit = 1;
       }
-      else if(vFormat=='minute'){
+      else if (vFormat =='minute') {
         vColWidth = 18;
         vColUnit = 1;
       }
@@ -503,27 +528,57 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
       vChartWidth = vNumUnits * vColWidth + 1;
       vDayWidth = (vColWidth / vColUnit)+ (1/vColUnit);
       vMainTable = '<TABLE id=theTable cellSpacing=0 cellPadding=0 border=0><TBODY><TR>' + '<TD vAlign=top bgColor=#ffffff>';
-      if(vShowRes !=1)vNameWidth+=vStatusWidth;
-      if(vShowDur !=1)vNameWidth+=vStatusWidth;
-      if(vShowComp!=1)vNameWidth+=vStatusWidth;
-      if(vShowStartDate!=1)vNameWidth+=vStatusWidth;
-      if(vShowEndDate!=1)vNameWidth+=vStatusWidth;
+      if (vShowRes != 1) {
+        vNameWidth+=vStatusWidth;
+      }
+      if (vShowDur != 1) {
+        vNameWidth+=vStatusWidth;
+      }
+      if (vShowComp != 1) {
+        vNameWidth+=vStatusWidth;
+      }
+      if (vShowStartDate != 1) {
+        vNameWidth+=vStatusWidth;
+      }
+      if (vShowEndDate != 1) {
+        vNameWidth+=vStatusWidth;
+      }
       // DRAW the Left-side of the chart (names, resources, comp%).
-      vLeftTable = '<DIV class=scroll id=leftside style="width: ' + 400 + 'px"><TABLE cellSpacing=0 cellPadding=0 border=0><TBODY>' + '<TR style="HEIGHT: 17px">' +' <TD style="WIDTH: 15px;HEIGHT: 17px"></TD>' + ' <TD style="WIDTH: ' + vNameWidth + 'px;HEIGHT: 17px"><NOBR></NOBR></TD>';
-      if(vShowRes ==1)vLeftTable += '  <TD style="WIDTH: ' + vStatusWidth + 'px;HEIGHT: 17px"></TD>' ;
-      if(vShowDur ==1)vLeftTable += '  <TD style="WIDTH: ' + vStatusWidth + 'px;HEIGHT: 17px"></TD>' ;
-      if(vShowComp==1)vLeftTable += '  <TD style="WIDTH: ' + vStatusWidth + 'px;HEIGHT: 17px"></TD>' ;
-      if(vShowStartDate==1)vLeftTable += ' <TD style="WIDTH: ' + vStatusWidth + 'px;HEIGHT: 17px"></TD>' ;
-      if(vShowEndDate==1)vLeftTable += ' <TD style="WIDTH: ' + vStatusWidth + 'px;HEIGHT: 17px"></TD>' ;
-        vLeftTable += '<TR style="HEIGHT: 20px">' + ' <TD style="BORDER-TOP: #efefef 1px solid;WIDTH: 15px;HEIGHT: 20px"></TD>' + ' <TD style="BORDER-TOP: #efefef 1px solid;WIDTH: ' + vNameWidth + 'px;HEIGHT: 20px"><NOBR></NOBR></TD>' ;
-      if(vShowRes ==1)vLeftTable += ' <TD style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;WIDTH: 60px;HEIGHT: 20px" align=center nowrap>Resource</TD>' ;
-      if(vShowDur ==1)vLeftTable += ' <TD style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;WIDTH: 60px;HEIGHT: 20px" align=center nowrap>Duration</TD>' ;
-      if(vShowComp==1)vLeftTable += ' <TD style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;WIDTH: 60px;HEIGHT: 20px" align=center nowrap>% Comp.</TD>' ;
-      if(vShowStartDate==1)vLeftTable += ' <TD style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;WIDTH: 60px;HEIGHT: 20px" align=center nowrap>Start Date</TD>' ;
-      if(vShowEndDate==1)vLeftTable += '  <TD style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;WIDTH: 60px;HEIGHT: 20px" align=center nowrap>End Date</TD>' ;
-      vLeftTable += '</TR>';
+      vLeftTable = '<DIV class=scroll id=leftside style="width:' + 400 + 'px"><TABLE cellSpacing=0 cellPadding=0 border=0><TBODY><TR style="HEIGHT:17px"><TD style="WIDTH:15px;HEIGHT:17px"></TD><TD style="WIDTH: ' + vNameWidth + 'px;HEIGHT:17px"><NOBR></NOBR></TD>';
+      if (vShowRes == 1) {
+        vLeftTable += '<TD style="WIDTH:' + vStatusWidth + 'px;HEIGHT:17px"></TD>';
+      }
+      if (vShowDur ==1) {
+        vLeftTable += '<TD style="WIDTH:' + vStatusWidth + 'px;HEIGHT:17px"></TD>';
+      }
+      if (vShowComp == 1) {
+        vLeftTable += '<TD style="WIDTH:' + vStatusWidth + 'px;HEIGHT:17px"></TD>';
+      }
+      if (vShowStartDate == 1) {
+        vLeftTable += '<TD style="WIDTH:' + vStatusWidth + 'px;HEIGHT:17px"></TD>';
+      }
+      if (vShowEndDate == 1) {
+        vLeftTable += '<TD style="WIDTH:' + vStatusWidth + 'px;HEIGHT:17px"></TD>';
+        vLeftTable += '<TR style="HEIGHT:20px">' + ' <TD style="BORDER-TOP:#efefef 1px solid;WIDTH:15px;HEIGHT:20px"></TD>' + ' <TD style="BORDER-TOP: #efefef 1px solid;WIDTH: ' + vNameWidth + 'px;HEIGHT: 20px"><NOBR></NOBR></TD>';
+      }
+      if (vShowRes == 1) {
+        vLeftTable += '<TD style="BORDER-TOP:#efefef 1px solid;FONT-SIZE:12px;BORDER-LEFT:#efefef 1px solid;WIDTH:60px;HEIGHT:20px" align=center nowrap>Resource</TD>';
+      }
+      if (vShowDur == 1) {
+        vLeftTable += '<TD style="BORDER-TOP:#efefef 1px solid;FONT-SIZE:12px;BORDER-LEFT:#efefef 1px solid;WIDTH:60px;HEIGHT:20px" align=center nowrap>Duration</TD>';
+      }
+      if (vShowComp == 1) {
+        vLeftTable += '<TD style="BORDER-TOP:#efefef 1px solid;FONT-SIZE:12px;BORDER-LEFT:#efefef 1px solid;WIDTH:60px;HEIGHT:20px" align=center nowrap>% Comp.</TD>';
+      }
+      if (vShowStartDate == 1) {
+        vLeftTable += '<TD style="BORDER-TOP:#efefef 1px solid;FONT-SIZE:12px;BORDER-LEFT:#efefef 1px solid;WIDTH:60px;HEIGHT:20px" align=center nowrap>Start Date</TD>';
+      }
+      if (vShowEndDate == 1) {
+        vLeftTable += '<TD style="BORDER-TOP:#efefef 1px solid;FONT-SIZE:12px;BORDER-LEFT:#efefef 1px solid;WIDTH:60px;HEIGHT:20px" align=center nowrap>End Date</TD>';
+        vLeftTable += '</TR>';
+      }
       for (i = 0; i < vTaskList.length; i++) {
-        if(vTaskList[i].getGroup()){
+        if (vTaskList[i].getGroup()) {
           vBGColor = "f3f3f3";
           vRowType = "group";
         }
@@ -532,58 +587,95 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
           vRowType  = "row";
         }
         vID = vTaskList[i].getID();
-        if(vTaskList[i].getVisible()== 0)
-          vLeftTable += '<TR id=child_' + vID + ' bgcolor=#' + vBGColor + ' style="display:none"  onMouseover=g.mouseOver(this,' + vID + ',"left","' + vRowType + '")onMouseout=g.mouseOut(this,' + vID + ',"left","' + vRowType + '")>' ;
-        else
+        if (vTaskList[i].getVisible() == 0) {
+          vLeftTable += '<TR id=child_' + vID + ' bgcolor=#' + vBGColor + ' style="display:none"  onMouseover=g.mouseOver(this,' + vID + ',"left","' + vRowType + '")onMouseout=g.mouseOut(this,' + vID + ',"left","' + vRowType + '")>';
+        }
+        else {
           vLeftTable += '<TR id=child_' + vID + ' bgcolor=#' + vBGColor + ' onMouseover=g.mouseOver(this,' + vID + ',"left","' + vRowType + '")onMouseout=g.mouseOut(this,' + vID + ',"left","' + vRowType + '")>';
-          vLeftTable += ' <TD class=gdatehead style="WIDTH: 15px;HEIGHT: 20px;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;">&nbsp;</TD>' + ' <TD class=gname style="WIDTH: ' + vNameWidth + 'px;HEIGHT: 20px;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;" nowrap><NOBR><span style="color: #aaaaaa">';
+          vLeftTable += '<TD class=gdatehead style="WIDTH:15px;HEIGHT:20px;BORDER-TOP:#efefef 1px solid;FONT-SIZE:12px;BORDER-LEFT:#efefef 1px solid;">&nbsp;</TD>' + ' <TD class=gname style="WIDTH: ' + vNameWidth + 'px;HEIGHT:20px;BORDER-TOP:#efefef 1px solid;FONT-SIZE:12px;" nowrap><NOBR><span style="color: #aaaaaa">';
           for (j=1; j < vTaskList[i].getLevel(); j++) {
             vLeftTable += '&nbsp&nbsp&nbsp&nbsp';
           }
           vLeftTable += '</span>';
-          if(vTaskList[i].getGroup()){
-            if(vTaskList[i].getOpen()== 1)
+          if (vTaskList[i].getGroup()) {
+            if (vTaskList[i].getOpen()== 1) {
               vLeftTable += '<SPAN id="group_' + vID + '" style="color:#000000;cursor:pointer;font-weight:bold;FONT-SIZE: 12px;" onclick="JSGantt.folder(' + vID + ','+vGanttVar+');'+vGanttVar+'.DrawDependencies();">&ndash;</span><span style="color:#000000">&nbsp</SPAN>';
-            else
+            }
+            else {
               vLeftTable += '<SPAN id="group_' + vID + '" style="color:#000000;cursor:pointer;font-weight:bold;FONT-SIZE: 12px;" onclick="JSGantt.folder(' + vID + ','+vGanttVar+');'+vGanttVar+'.DrawDependencies();">+</span><span style="color:#000000">&nbsp</SPAN>';
+            }
           }
           else {
             vLeftTable += '<span style="color: #000000;font-weight:bold;FONT-SIZE: 12px;">&nbsp&nbsp&nbsp</span>';
           }
-          vLeftTable += '<span onclick=JSGantt.taskLink("' + vTaskList[i].getLink()+ '",300,200);style="cursor:pointer"> ' + vTaskList[i].getName()+ '</span></NOBR></TD>' ;
-          if(vShowRes ==1)vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + vTaskList[i].getResource()+ '</NOBR></TD>';
-          if(vShowDur ==1)vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + vTaskList[i].getDuration(vFormat)+ '</NOBR></TD>';
-          if(vShowComp==1)vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + vTaskList[i].getCompStr() + '</NOBR></TD>';
-          if(vShowStartDate==1)vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + JSGantt.formatDateStr(vTaskList[i].getStart(), vDateDisplayFormat)+ '</NOBR></TD>';
-          if(vShowEndDate==1)vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + JSGantt.formatDateStr(vTaskList[i].getEnd(), vDateDisplayFormat)+ '</NOBR></TD>';
+          vLeftTable += '<span onclick=JSGantt.taskLink("' + vTaskList[i].getLink()+ '",300,200);style="cursor:pointer"> ' + vTaskList[i].getName()+ '</span></NOBR></TD>';
+          if (vShowRes ==1) {
+            vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + vTaskList[i].getResource()+ '</NOBR></TD>';
+          }
+          if (vShowDur ==1) {
+            vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + vTaskList[i].getDuration(vFormat)+ '</NOBR></TD>';
+          }
+          if (vShowComp==1) {
+            vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + vTaskList[i].getCompStr() + '</NOBR></TD>';
+          }
+          if (vShowStartDate==1) {
+            vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + JSGantt.formatDateStr(vTaskList[i].getStart(), vDateDisplayFormat)+ '</NOBR></TD>';
+          }
+          if (vShowEndDate==1) {
+            vLeftTable += '  <TD class=gname style="WIDTH: 60px;HEIGHT: 20px;TEXT-ALIGN: center;BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><NOBR>' + JSGantt.formatDateStr(vTaskList[i].getEnd(), vDateDisplayFormat)+ '</NOBR></TD>';
             vLeftTable += '</TR>';
           }
-          // DRAW the date format selector at bottom left.
-          // Another potential GanttChart parameter to hide/show this selector.
+        }
+        // DRAW the date format selector at bottom left.
+        // Another potential GanttChart parameter to hide/show this selector.
           vLeftTable += '</TD></TR>' + '<TR><TD border=1 colspan=5 align=left style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 11px;BORDER-LEFT: #efefef 1px solid;height=18px">&nbsp;&nbsp;Powered by <a href=http://www.jsgantt.com>jsGantt</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Format:';
-          if (vFormatArr.join().indexOf("minute")!=-1){
-            if (vFormat=='minute')vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="minute" checked>Minute';
-            else                vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("minute",'+vGanttVar+');VALUE="minute">Minute';
+          if (vFormatArr.join().indexOf("minute")!=-1) {
+            if (vFormat=='minute') {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="minute" checked>Minute';
+            }
+            else {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("minute",'+vGanttVar+');VALUE="minute">Minute';
+            }
           }
           if (vFormatArr.join().indexOf("hour")!=-1){
-            if (vFormat=='hour')vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="hour" checked>Hour';
-            else vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("hour",'+vGanttVar+');VALUE="hour">Hour';
+            if (vFormat=='hour') {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="hour" checked>Hour';
+            }
+            else {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("hour",'+vGanttVar+');VALUE="hour">Hour';
+            }
           }
           if (vFormatArr.join().indexOf("day")!=-1){
-            if (vFormat=='day')vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="day" checked>Day';
-            else                vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("day",'+vGanttVar+');VALUE="day">Day';
+            if (vFormat=='day') {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="day" checked>Day';
+            }
+            else {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("day",'+vGanttVar+');VALUE="day">Day';
+            }
           }
           if (vFormatArr.join().indexOf("week")!=-1){
-            if (vFormat=='week')vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="week" checked>Week';
-            else                vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("week",'+vGanttVar+')VALUE="week">Week';
+            if (vFormat=='week') {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="week" checked>Week';
+            }
+            else {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("week",'+vGanttVar+')VALUE="week">Week';
+            }
           }
-          if (vFormatArr.join().indexOf("month")!=-1){
-            if (vFormat=='month')vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="month" checked>Month';
-            else                vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("month",'+vGanttVar+')VALUE="month">Month';
+          if (vFormatArr.join().indexOf("month")!=-1) {
+            if (vFormat=='month') {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="month" checked>Month';
+            }
+            else {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("month",'+vGanttVar+')VALUE="month">Month';
+            }
           }
           if (vFormatArr.join().indexOf("quarter")!=-1){
-            if (vFormat=='quarter')vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="quarter" checked>Quarter';
-            else                vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("quarter",'+vGanttVar+')VALUE="quarter">Quarter';
+            if (vFormat=='quarter') {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" VALUE="quarter" checked>Quarter';
+            }
+            else {
+              vLeftTable += '<INPUT TYPE=RADIO NAME="radFormat" onclick=JSGantt.changeFormat("quarter",'+vGanttVar+')VALUE="quarter">Quarter';
+            }
           }
 //            vLeftTable += '<INPUT TYPE=RADIO NAME="other" VALUE="other" style="display:none"> .';
             vLeftTable += '</TD></TR></TBODY></TABLE></TD>';
@@ -593,24 +685,24 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
             vTmpDate.setFullYear(vMinDate.getFullYear(), vMinDate.getMonth(), vMinDate.getDate());
             vTmpDate.setHours(0);
             vTmpDate.setMinutes(0);
-         // Major Date Header
+         // Major Date Header.
          while(Date.parse(vTmpDate)<= Date.parse(vMaxDate))
          {
             vStr = vTmpDate.getFullYear()+ '';
             vStr = vStr.substring(2,4);
-            if(vFormat == 'minute')
+            if (vFormat == 'minute')
             {
-                vRightTable += '<td class=gdatehead style="FONT-SIZE: 12px;HEIGHT: 19px;" align=center colspan=60>' ;
+                vRightTable += '<td class=gdatehead style="FONT-SIZE: 12px;HEIGHT: 19px;" align=center colspan=60>';
                 vRightTable += JSGantt.formatDateStr(vTmpDate, vDateDisplayFormat)+ ' ' + vTmpDate.getHours()+ ':00 -' + vTmpDate.getHours()+ ':59 </td>';
                 vTmpDate.setHours(vTmpDate.getHours()+1);
             }
-            if(vFormat == 'hour')
+            if (vFormat == 'hour')
             {
-                vRightTable += '<td class=gdatehead style="FONT-SIZE: 12px;HEIGHT: 19px;" align=center colspan=24>' ;
+                vRightTable += '<td class=gdatehead style="FONT-SIZE: 12px;HEIGHT: 19px;" align=center colspan=24>';
                 vRightTable += JSGantt.formatDateStr(vTmpDate, vDateDisplayFormat)+ '</td>';
                 vTmpDate.setDate(vTmpDate.getDate()+1);
             }
-            if(vFormat == 'day')
+            if (vFormat == 'day')
             {
              vRightTable += '<td class=gdatehead style="FONT-SIZE: 12px;HEIGHT: 19px;" align=center colspan=7>' +
              JSGantt.formatDateStr(vTmpDate,vDateDisplayFormat.substring(0,5))+ ' - ';
@@ -618,25 +710,25 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
               vRightTable += JSGantt.formatDateStr(vTmpDate, vDateDisplayFormat)+ '</td>';
                vTmpDate.setDate(vTmpDate.getDate()+1);
             }
-            else if(vFormat == 'week')
+            else if (vFormat == 'week')
             {
                 vRightTable += '<td class=gdatehead align=center style="FONT-SIZE: 12px;HEIGHT: 19px;" width='+vColWidth+'px>`'+ vStr + '</td>';
                vTmpDate.setDate(vTmpDate.getDate()+7);
             }
-            else if(vFormat == 'month')
+            else if (vFormat == 'month')
             {
              vRightTable += '<td class=gdatehead align=center style="FONT-SIZE: 12px;HEIGHT: 19px;" width='+vColWidth+'px>`'+ vStr + '</td>';
                vTmpDate.setDate(vTmpDate.getDate()+ 1);
-               while(vTmpDate.getDate()> 1)
+               while (vTmpDate.getDate()> 1)
                {
                  vTmpDate.setDate(vTmpDate.getDate()+ 1);
                }
             }
-            else if(vFormat == 'quarter')
+            else if (vFormat == 'quarter')
             {
              vRightTable += '<td class=gdatehead align=center style="FONT-SIZE: 12px;HEIGHT: 19px;" width='+vColWidth+'px>`'+ vStr + '</td>';
                vTmpDate.setDate(vTmpDate.getDate()+ 81);
-               while(vTmpDate.getDate()> 1)
+               while (vTmpDate.getDate()> 1)
                {
                  vTmpDate.setDate(vTmpDate.getDate()+ 1);
                }
@@ -647,129 +739,156 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
          vTmpDate.setFullYear(vMinDate.getFullYear(), vMinDate.getMonth(), vMinDate.getDate());
          vNxtDate.setFullYear(vMinDate.getFullYear(), vMinDate.getMonth(), vMinDate.getDate());
          vNumCols = 0;
-         while(Date.parse(vTmpDate)<= Date.parse(vMaxDate))
+         while (Date.parse(vTmpDate)<= Date.parse(vMaxDate))
          {
             if (vFormat == 'minute')
             {
-         if(vTmpDate.getMinutes()==0 )
+              if (vTmpDate.getMinutes() == 0) {
                   vWeekdayColor = "ccccff";
-               else
-                  vWeekdayColor = "ffffff";
+              }
+              else {
+                vWeekdayColor = "ffffff";
                 vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;"  bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">' + vTmpDate.getMinutes()+ '</div></td>';
                 vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;cursor: default;"  bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
                 vTmpDate.setMinutes(vTmpDate.getMinutes()+ 1);
+              }
             }
             else if (vFormat == 'hour')
             {
-          if(vTmpDate.getHours()==0  )
+              if (vTmpDate.getHours() == 0) {
                   vWeekdayColor = "ccccff";
-               else
-                  vWeekdayColor = "ffffff";
+              }
+              else {
+                vWeekdayColor = "ffffff";
                 vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;"  bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">' + vTmpDate.getHours()+ '</div></td>';
                 vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;cursor: default;"  bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
                 vTmpDate.setHours(vTmpDate.getHours()+ 1);
+              }
             }
-         else if(vFormat == 'day')
-             {
-               if(JSGantt.formatDateStr(vCurrDate,'mm/dd/yyyy')== JSGantt.formatDateStr(vTmpDate,'mm/dd/yyyy')){
+            else if (vFormat == 'day') {
+               if (JSGantt.formatDateStr(vCurrDate,'mm/dd/yyyy')== JSGantt.formatDateStr(vTmpDate,'mm/dd/yyyy')) {
                   vWeekdayColor  = "ccccff";
                   vWeekendColor  = "9999ff";
                   vWeekdayGColor  = "bbbbff";
                   vWeekendGColor = "8888ff";
-               } else {
+               }
+               else {
                   vWeekdayColor = "ffffff";
                   vWeekendColor = "cfcfcf";
                   vWeekdayGColor = "f3f3f3";
                   vWeekendGColor = "c3c3c3";
                }
-               if(vTmpDate.getDay()% 6 == 0){
+               if (vTmpDate.getDay()% 6 == 0) {
                   vDateRowStr  += '<td class="gheadwkend" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekendColor + ' align=center><div style="width: '+vColWidth+'px">' + vTmpDate.getDate()+ '</div></td>';
                   vItemRowStr  += '<td class="gheadwkend" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;cursor: default;"  bgcolor=#' + vWeekendColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp</div></td>';
                }
                else {
                   vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;"  bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">' + vTmpDate.getDate()+ '</div></td>';
-                  if(JSGantt.formatDateStr(vCurrDate,'mm/dd/yyyy')== JSGantt.formatDateStr(vTmpDate,'mm/dd/yyyy'))
+                  if (JSGantt.formatDateStr(vCurrDate,'mm/dd/yyyy')== JSGantt.formatDateStr(vTmpDate,'mm/dd/yyyy')) {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;cursor: default;"  bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
-                  else
+                  }
+                  else {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;cursor: default;"  align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
                }
                vTmpDate.setDate(vTmpDate.getDate()+ 1);
             }
           else if(vFormat == 'week')
             {
                vNxtDate.setDate(vNxtDate.getDate()+ 7);
-               if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
+               if (vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
                   vWeekdayColor = "ccccff";
-               else
+               }
+               else {
                   vWeekdayColor = "ffffff";
-               if(vNxtDate <= vMaxDate){
+               }
+               if(vNxtDate <= vMaxDate) {
                   vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center width:'+vColWidth+'px><div style="width: '+vColWidth+'px">' + (vTmpDate.getMonth()+1)+ '/' + vTmpDate.getDate()+ '</div></td>';
-                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
+                  if (vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
-                  else
+                  }
+                  else {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
                } else {
                   vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;bgcolor=#' + vWeekdayColor + ' BORDER-RIGHT: #efefef 1px solid;" align=center width:'+vColWidth+'px><div style="width: '+vColWidth+'px">' + (vTmpDate.getMonth()+1)+ '/' + vTmpDate.getDate()+ '</div></td>';
-                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
+                  if (vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
-                  else
+                  }
+                  else {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
                }
                vTmpDate.setDate(vTmpDate.getDate()+ 7);
             }
-          else if(vFormat == 'month')
-            {
+          else if (vFormat == 'month') {
                vNxtDate.setFullYear(vTmpDate.getFullYear(), vTmpDate.getMonth(), vMonthDaysArr[vTmpDate.getMonth()]);
-               if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
+               if (vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
                   vWeekdayColor = "ccccff";
-               else
-                  vWeekdayColor = "ffffff";
-               if(vNxtDate <= vMaxDate){
-                  vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center width:'+vColWidth+'px><div style="width: '+vColWidth+'px">' + vMonthArr[vTmpDate.getMonth()].substr(0,3)+ '</div></td>';
-                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
-                     vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
-                  else
-                     vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
-               } else {
-                  vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center width:'+vColWidth+'px><div style="width: '+vColWidth+'px">' + vMonthArr[vTmpDate.getMonth()].substr(0,3)+ '</div></td>';
-                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
-                     vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
-                  else
-                     vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
                }
-               vTmpDate.setDate(vTmpDate.getDate()+ 1);
-               while(vTmpDate.getDate()> 1)
-               {
-                  vTmpDate.setDate(vTmpDate.getDate()+ 1);
+               else {
+                  vWeekdayColor = "ffffff";
+               }
+               if (vNxtDate <= vMaxDate) {
+                  vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center width:'+vColWidth+'px><div style="width: '+vColWidth+'px">' + vMonthArr[vTmpDate.getMonth()].substr(0,3)+ '</div></td>';
+                  if (vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
+                     vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
+                  else {
+                     vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
+               }
+               else {
+                  vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center width:'+vColWidth+'px><div style="width: '+vColWidth+'px">' + vMonthArr[vTmpDate.getMonth()].substr(0,3)+ '</div></td>';
+                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
+                     vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
+                  else {
+                     vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
+               }
+               vTmpDate.setDate(vTmpDate.getDate() + 1);
+               while (vTmpDate.getDate() > 1) {
+                  vTmpDate.setDate(vTmpDate.getDate() + 1);
                }
             }
-          else if(vFormat == 'quarter')
+          else if (vFormat == 'quarter')
             {
                vNxtDate.setDate(vNxtDate.getDate()+ 122);
-               if(vTmpDate.getMonth()==0 || vTmpDate.getMonth()==1 || vTmpDate.getMonth()==2 )
+               if(vTmpDate.getMonth()==0 || vTmpDate.getMonth()==1 || vTmpDate.getMonth()==2) {
                   vNxtDate.setFullYear(vTmpDate.getFullYear(), 2, 31);
-               else if(vTmpDate.getMonth()==3 || vTmpDate.getMonth()==4 || vTmpDate.getMonth()==5 )
+               }
+               else if(vTmpDate.getMonth()==3 || vTmpDate.getMonth()==4 || vTmpDate.getMonth()==5) {
                   vNxtDate.setFullYear(vTmpDate.getFullYear(), 5, 30);
-               else if(vTmpDate.getMonth()==6 || vTmpDate.getMonth()==7 || vTmpDate.getMonth()==8 )
+               }
+               else if(vTmpDate.getMonth()==6 || vTmpDate.getMonth()==7 || vTmpDate.getMonth()==8) {
                   vNxtDate.setFullYear(vTmpDate.getFullYear(), 8, 30);
-               else if(vTmpDate.getMonth()==9 || vTmpDate.getMonth()==10 || vTmpDate.getMonth()==11 )
+               }
+               else if(vTmpDate.getMonth()==9 || vTmpDate.getMonth()==10 || vTmpDate.getMonth()==11) {
                   vNxtDate.setFullYear(vTmpDate.getFullYear(), 11, 31);
-               if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
+               }
+               if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
                   vWeekdayColor = "ccccff";
-               else
+               }
+               else {
                   vWeekdayColor = "ffffff";
-               if(vNxtDate <= vMaxDate){
+               }
+               if(vNxtDate <= vMaxDate) {
                   vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center width:'+vColWidth+'px><div style="width: '+vColWidth+'px">Qtr. ' + vQuarterArr[vTmpDate.getMonth()] + '</div></td>';
-                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
+                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
-                  else
+                  }
+                  else {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;" align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
                } else {
                   vDateRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;HEIGHT: 19px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center width:'+vColWidth+'px><div style="width: '+vColWidth+'px">Qtr. ' + vQuarterArr[vTmpDate.getMonth()] + '</div></td>';
-                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate )
+                  if(vCurrDate >= vTmpDate && vCurrDate < vNxtDate) {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" bgcolor=#' + vWeekdayColor + ' align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
-                  else
+                  }
+                  else {
                      vItemRowStr += '<td class="ghead" style="BORDER-TOP: #efefef 1px solid;FONT-SIZE: 12px;BORDER-LEFT: #efefef 1px solid;BORDER-RIGHT: #efefef 1px solid;" align=center><div style="width: '+vColWidth+'px">&nbsp&nbsp</div></td>';
+                  }
                }
                vTmpDate.setDate(vTmpDate.getDate()+ 81);
                while(vTmpDate.getDate()> 1)
@@ -792,17 +911,19 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
             vNumUnits = (vTaskList[i].getEnd()- vTaskList[i].getStart())/ (24 * 60 * 60 * 1000)+ 1;
         if (vFormat=='hour')
         {
-                vNumUnits = (vTaskList[i].getEnd()- vTaskList[i].getStart())/ ( 60 * 1000)+ 1;
+                vNumUnits = (vTaskList[i].getEnd()- vTaskList[i].getStart())/ (60 * 1000)+ 1;
         }
         else if (vFormat=='minute')
         {
-                vNumUnits = (vTaskList[i].getEnd()- vTaskList[i].getStart())/ ( 60 * 1000)+ 1;
+                vNumUnits = (vTaskList[i].getEnd()- vTaskList[i].getStart())/ (60 * 1000)+ 1;
         }
-          if(vTaskList[i].getVisible()== 0)
+          if(vTaskList[i].getVisible()== 0) {
                vRightTable += '<DIV id=childgrid_' + vID + ' style="position:relative;display:none;">';
-            else
+            }
+            else {
               vRightTable += '<DIV id=childgrid_' + vID + ' style="position:relative">';
-            if(vTaskList[i].getMile()){
+            }
+            if(vTaskList[i].getMile()) {
                vRightTable += '<DIV><TABLE style="position:relative;top:0px;width: ' + vChartWidth + 'px;" cellSpacing=0 cellPadding=0 border=0>' +
                   '<TR id=childrow_' + vID + ' class=yesdisplay style="HEIGHT: 20px" onMouseover=g.mouseOver(this,' + vID + ',"right","mile")onMouseout=g.mouseOut(this,' + vID + ',"right","mile")>' + vItemRowStr + '</TR></TABLE></DIV>';
                // Build date string for Title
@@ -812,22 +933,36 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
                vRightTable +=
                   '<div id=bardiv_' + vID + ' style="position:absolute;top:0px;left:' + Math.ceil((vTaskLeft * (vDayWidth)+ 1))+ 'px;height: 18px;width:160px;overflow:hidden;">' +
                   '  <div id=taskbar_' + vID + ' title="' + vTaskList[i].getName()+ ': ' + vDateRowStr + '" style="height: 16px;width:12px;overflow:hidden;cursor: pointer;" onclick=JSGantt.taskLink("' + vTaskList[i].getLink()+ '",300,200);>';
-               if(vTaskList[i].getCompVal()< 100)
-                  vRightTable += '&loz;</div>' ;
-               else
-                  vRightTable += '&diams;</div>' ;
-                        if(g.getCaptionType()){
+               if(vTaskList[i].getCompVal()< 100) {
+                  vRightTable += '&loz;</div>';
+               }
+               else {
+                  vRightTable += '&diams;</div>';
+                        if(g.getCaptionType()) {
                            vCaptionStr = '';
-                           switch(g.getCaptionType()){
-                              case 'Caption':    vCaptionStr = vTaskList[i].getCaption(); break;
-                              case 'Resource':   vCaptionStr = vTaskList[i].getResource(); break;
-                              case 'Duration':   vCaptionStr = vTaskList[i].getDuration(vFormat); break;
-                              case 'Complete':   vCaptionStr = vTaskList[i].getCompStr(); break;
+                           switch(g.getCaptionType()) {
+                              case 'Caption':
+                                vCaptionStr = vTaskList[i].getCaption();
+                                break;
+
+                              case 'Resource':
+                                vCaptionStr = vTaskList[i].getResource();
+                                break;
+
+                              case 'Duration':
+                                vCaptionStr = vTaskList[i].getDuration(vFormat);
+                                break;
+
+                              case 'Complete':
+                                vCaptionStr = vTaskList[i].getCompStr();
+                                break;
+
                           }
                            //vRightTable += '<div style="FONT-SIZE:12px;position:absolute;left: 6px;top:1px;">' + vCaptionStr + '</div>';
                            vRightTable += '<div style="FONT-SIZE:12px;position:absolute;top:2px;width:120px;left:12px">' + vCaptionStr + '</div>';
                    }
                vRightTable += '</div>';
+            }
             } else {
                // Build date string for Title.
                vDateRowStr = JSGantt.formatDateStr(vTaskStart,vDateDisplayFormat)+ ' - ' + JSGantt.formatDateStr(vTaskEnd,vDateDisplayFormat)
@@ -849,8 +984,9 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
                     {
                         var tTime=new Date();
                         tTime.setTime(Date.parse(vTaskList[i].getStart()));
-                        if (tTime.getMinutes()> 29)
+                        if (tTime.getMinutes()> 29) {
                             vTaskLeft+=.5
+                        }
                     }
                 }
                // Draw Group Bar  which has outer div with inner group div and
@@ -871,14 +1007,26 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
                         '<div style="Z-INDEX: -4;float:left;background-color:#000000;height:2px;overflow: hidden;width:1px;"></div>' +
                         '<div style="Z-INDEX: -4;float:right;background-color:#000000;height:2px;overflow: hidden;width:1px;"></div>' +
                         '<div style="Z-INDEX: -4;float:left;background-color:#000000;height:1px;overflow: hidden;width:1px;"></div>' +
-                        '<div style="Z-INDEX: -4;float:right;background-color:#000000;height:1px;overflow: hidden;width:1px;"></div>' ;
+                        '<div style="Z-INDEX: -4;float:right;background-color:#000000;height:1px;overflow: hidden;width:1px;"></div>';
                         if(g.getCaptionType()){
                            vCaptionStr = '';
                            switch(g.getCaptionType()){
-                              case 'Caption':    vCaptionStr = vTaskList[i].getCaption(); break;
-                              case 'Resource':   vCaptionStr = vTaskList[i].getResource(); break;
-                              case 'Duration':   vCaptionStr = vTaskList[i].getDuration(vFormat); break;
-                              case 'Complete':   vCaptionStr = vTaskList[i].getCompStr(); break;
+                              case 'Caption':
+                                vCaptionStr = vTaskList[i].getCaption();
+                                break;
+
+                              case 'Resource':
+                                vCaptionStr = vTaskList[i].getResource();
+                                break;
+
+                              case 'Duration':
+                                vCaptionStr = vTaskList[i].getDuration(vFormat);
+                                break;
+
+                              case 'Complete':
+                                vCaptionStr = vTaskList[i].getCompStr();
+                                break;
+
                           }
                            //vRightTable += '<div style="FONT-SIZE:12px;position:absolute;left: 6px;top:1px;">' + vCaptionStr + '</div>';
                            vRightTable += '<div style="FONT-SIZE:12px;position:absolute;top:-3px;width:120px;left:' + (Math.ceil((vTaskRight)* (vDayWidth)- 1)+ 6)+ 'px">' + vCaptionStr + '</div>';
@@ -897,15 +1045,27 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
                         if(g.getCaptionType()){
                            vCaptionStr = '';
                            switch(g.getCaptionType()){
-                              case 'Caption':    vCaptionStr = vTaskList[i].getCaption(); break;
-                              case 'Resource':   vCaptionStr = vTaskList[i].getResource(); break;
-                              case 'Duration':   vCaptionStr = vTaskList[i].getDuration(vFormat); break;
-                              case 'Complete':   vCaptionStr = vTaskList[i].getCompStr(); break;
+                              case 'Caption':
+                                vCaptionStr = vTaskList[i].getCaption();
+                                break;
+
+                              case 'Resource':
+                                vCaptionStr = vTaskList[i].getResource();
+                                break;
+
+                              case 'Duration':
+                                vCaptionStr = vTaskList[i].getDuration(vFormat);
+                                break;
+
+                              case 'Complete':
+                                vCaptionStr = vTaskList[i].getCompStr();
+                                break;
+
                           }
                            //vRightTable += '<div style="FONT-SIZE:12px;position:absolute;left: 6px;top:-3px;">' + vCaptionStr + '</div>';
                            vRightTable += '<div style="FONT-SIZE:12px;position:absolute;top:-3px;width:120px;left:' + (Math.ceil((vTaskRight)* (vDayWidth)- 1)+ 6)+ 'px">' + vCaptionStr + '</div>';
                    }
-                  vRightTable += '</div>' ;
+                  vRightTable += '</div>';
                }
             }
             vRightTable += '</DIV>';
@@ -914,18 +1074,28 @@ JSGantt.GanttChart = function(pGanttVar, pDiv, pFormat){
         vDiv.innerHTML = vMainTable;
       }
    } // this.draw.
-   this.mouseOver = function(pObj, pID, pPos, pType ){
-      if(pPos == 'right' ) vID = 'child_' + pID;
-      else vID = 'childrow_' + pID;
+   this.mouseOver = function(pObj, pID, pPos, pType){
+      if(pPos == 'right') {
+        vID = 'child_' + pID;
+      }
+      else {
+        vID = 'childrow_' + pID;
       pObj.bgColor = "#ffffaa";
       vRowObj = JSGantt.findObj(vID);
-      if (vRowObj)vRowObj.bgColor = "#ffffaa";
+      }
+      if (vRowObj) {
+        vRowObj.bgColor = "#ffffaa";
+      }
    }
-   this.mouseOut = function(pObj, pID, pPos, pType ){
-      if(pPos == 'right' ) vID = 'child_' + pID;
-      else vID = 'childrow_' + pID;
+   this.mouseOut = function(pObj, pID, pPos, pType){
+      if(pPos == 'right') {
+        vID = 'child_' + pID;
+      }
+      else {
+        vID = 'childrow_' + pID;
       pObj.bgColor = "#ffffff";
       vRowObj = JSGantt.findObj(vID);
+      }
       if (vRowObj){
          if(pType == "group"){
             pObj.bgColor = "#f3f3f3";
@@ -952,17 +1122,18 @@ JSGantt.processRows = function(pList, pID, pRow, pLevel, pOpen)
    var vVisible = pOpen;
    for (i = 0; i < pList.length; i++)
    {
-      if(pList[i].getParent()== pID){
+      if (pList[i].getParent()== pID) {
       vVisible = pOpen;
          pList[i].setVisible(vVisible);
-         if(vVisible==1 && pList[i].getOpen()== 0)
+         if(vVisible==1 && pList[i].getOpen()== 0) {
             vVisible = 0;
-         pList[i].setLevel(vLevel);
-         vNumKid++;
-         if(pList[i].getGroup()== 1){
+            pList[i].setLevel(vLevel);
+            vNumKid++;
+         }
+         if(pList[i].getGroup()== 1) {
             JSGantt.processRows(vList, pList[i].getID(), i, vLevel+1, vVisible);
          }
-         if(vMinSet==0 || pList[i].getStart()< vMinDate){
+         if(vMinSet==0 || pList[i].getStart()< vMinDate) {
             vMinDate = pList[i].getStart();
             vMinSet = 1;
          }
@@ -973,7 +1144,7 @@ JSGantt.processRows = function(pList, pID, pRow, pLevel, pOpen)
          vCompSum += pList[i].getCompVal();
       }
    }
-   if(pRow >= 0){
+   if(pRow >= 0) {
       pList[pRow].setStart(vMinDate);
       pList[pRow].setEnd(vMaxDate);
       pList[pRow].setNumKid(vNumKid);
@@ -987,8 +1158,9 @@ JSGantt.getMinDate = function getMinDate(pList, pFormat){
          // Parse all Task End dates to find min
          for (i = 0; i < pList.length; i++)
          {
-            if(Date.parse(pList[i].getStart())< Date.parse(vDate))
+            if(Date.parse(pList[i].getStart())< Date.parse(vDate)) {
                vDate.setFullYear(pList[i].getStart().getFullYear(), pList[i].getStart().getMonth(), pList[i].getStart().getDate());
+            }
          }
          if (pFormat== 'minute')
          {
@@ -1026,14 +1198,18 @@ JSGantt.getMinDate = function getMinDate(pList, pFormat){
          }
          else if (pFormat=='quarter')
          {
-            if(vDate.getMonth()==0 || vDate.getMonth()==1 || vDate.getMonth()==2 )
+            if(vDate.getMonth()==0 || vDate.getMonth()==1 || vDate.getMonth()==2) {
                vDate.setFullYear(vDate.getFullYear(), 0, 1);
-            else if(vDate.getMonth()==3 || vDate.getMonth()==4 || vDate.getMonth()==5 )
+            }
+            else if(vDate.getMonth()==3 || vDate.getMonth()==4 || vDate.getMonth()==5) {
                vDate.setFullYear(vDate.getFullYear(), 3, 1);
-            else if(vDate.getMonth()==6 || vDate.getMonth()==7 || vDate.getMonth()==8 )
+            }
+            else if(vDate.getMonth()==6 || vDate.getMonth()==7 || vDate.getMonth()==8) {
                vDate.setFullYear(vDate.getFullYear(), 6, 1);
-            else if(vDate.getMonth()==9 || vDate.getMonth()==10 || vDate.getMonth()==11 )
+            }
+            else if(vDate.getMonth()==9 || vDate.getMonth()==10 || vDate.getMonth()==11) {
                vDate.setFullYear(vDate.getFullYear(), 9, 1);
+            }
          }
          return(vDate);
       }
@@ -1089,14 +1265,18 @@ JSGantt.getMaxDate = function (pList, pFormat){
          // Set to last day of current Quarter
          if (pFormat=='quarter')
          {
-            if(vDate.getMonth()==0 || vDate.getMonth()==1 || vDate.getMonth()==2 )
+            if(vDate.getMonth()==0 || vDate.getMonth()==1 || vDate.getMonth()==2) {
                vDate.setFullYear(vDate.getFullYear(), 2, 31);
-            else if(vDate.getMonth()==3 || vDate.getMonth()==4 || vDate.getMonth()==5 )
+            }
+            else if(vDate.getMonth()==3 || vDate.getMonth()==4 || vDate.getMonth()==5) {
                vDate.setFullYear(vDate.getFullYear(), 5, 30);
-            else if(vDate.getMonth()==6 || vDate.getMonth()==7 || vDate.getMonth()==8 )
+            }
+            else if(vDate.getMonth()==6 || vDate.getMonth()==7 || vDate.getMonth()==8) {
                vDate.setFullYear(vDate.getFullYear(), 8, 30);
-            else if(vDate.getMonth()==9 || vDate.getMonth()==10 || vDate.getMonth()==11 )
+            }
+            else if(vDate.getMonth()==9 || vDate.getMonth()==10 || vDate.getMonth()==11) {
                vDate.setFullYear(vDate.getFullYear(), 11, 31);
+            }
          }
          return(vDate);
       }
@@ -1104,30 +1284,37 @@ JSGantt.getMaxDate = function (pList, pFormat){
 JSGantt.findObj = function (theObj, theDoc)
       {
          var p, i, foundObj;
-         if(!theDoc)theDoc = document;
+         if(!theDoc) {
+           theDoc = document;
+         }
          if((p = theObj.indexOf("?"))> 0 && parent.frames.length){
             theDoc = parent.frames[theObj.substring(p+1)].document;
             theObj = theObj.substring(0,p);
          }
-         if(!(foundObj = theDoc[theObj])&& theDoc.all)
+         if(!(foundObj = theDoc[theObj])&& theDoc.all) {
             foundObj = theDoc.all[theObj];
-         for (i=0; !foundObj && i < theDoc.forms.length; i++)
+         }
+         for (i=0; !foundObj && i < theDoc.forms.length; i++) {
             foundObj = theDoc.forms[i][theObj];
-         for(i=0; !foundObj && theDoc.layers && i < theDoc.layers.length; i++)
+         }
+         for(i=0; !foundObj && theDoc.layers && i < theDoc.layers.length; i++) {
             foundObj = JSGantt.findObj(theObj,theDoc.layers[i].document);
-         if(!foundObj && document.getElementById)
+         }
+         if(!foundObj && document.getElementById) {
             foundObj = document.getElementById(theObj);
+         }
          return foundObj;
       }
 JSGantt.changeFormat =      function(pFormat,ganttObj){
-        if(ganttObj)
+      if(ganttObj)
       {
       ganttObj.setFormat(pFormat);
       ganttObj.DrawDependencies();
       }
-        else
+      else {
            alert('Chart undefined');
       }
+}
       // Function to open/close and hide/show children of specified task.
 JSGantt.folder= function (pID,ganttObj){
    var vList = ganttObj.getList();
@@ -1137,17 +1324,22 @@ JSGantt.folder= function (pID,ganttObj){
          if(vList[i].getOpen()== 1){
             vList[i].setOpen(0);
             JSGantt.hide(pID,ganttObj);
-            if (JSGantt.isIE())
+            if (JSGantt.isIE()) {
                JSGantt.findObj('group_'+pID).innerText = '+';
-            else
+            }
+            else {
                JSGantt.findObj('group_'+pID).textContent = '+';
+            }
          } else {
             vList[i].setOpen(1);
             JSGantt.show(pID, 1, ganttObj);
-               if (JSGantt.isIE())
+               if (JSGantt.isIE()) {
                   JSGantt.findObj('group_'+pID).innerText = '–';
+               }
                else
+               {
                   JSGantt.findObj('group_'+pID).textContent = '–';
+               }
          }
       }
    }
@@ -1162,8 +1354,9 @@ JSGantt.hide=     function (pID,ganttObj){
          JSGantt.findObj('child_' + vID).style.display = "none";
          JSGantt.findObj('childgrid_' + vID).style.display = "none";
          vList[i].setVisible(0);
-         if(vList[i].getGroup()== 1)
+         if(vList[i].getGroup()== 1) {
             JSGantt.hide(vID,ganttObj);
+         }
       }
    }
 }
@@ -1206,16 +1399,27 @@ JSGantt.show =  function (pID, pTop, ganttObj){
                }
             }
          }
-         if(vList[i].getGroup()== 1)
+         if(vList[i].getGroup()== 1) {
             JSGantt.show(vID, 0,ganttObj);
+         }
       }
    }
 }
   // Function to open window to display task link.
 JSGantt.taskLink = function(pRef,pWidth,pHeight)
   {
-    if(pWidth) vWidth =pWidth; else vWidth =400;
-    if(pHeight)vHeight=pHeight;else vHeight=400;
+    if(pWidth) {
+      vWidth =pWidth;
+    }
+    else {
+      vWidth =400;
+    }
+    if(pHeight) {
+      vHeight=pHeight;
+    }
+    else {
+      vHeight=400;
+    }
     // Prevent forced opening of new window/tab
     //var OpenWindow=window.open(pRef, "newwin", "height="+vHeight+",width="+vWidth);
     var OpenWindow=window.location.href=pRef;
@@ -1229,14 +1433,17 @@ JSGantt.parseDateStr = function(pDateStr,pFormatStr){
       var vDateParts = pDateStr.split('/');
          vDate.setFullYear(parseInt(vDateParts[2], 10), parseInt(vDateParts[0], 10)- 1, parseInt(vDateParts[1], 10));
          break;
+
    case 'dd/mm/yyyy':
       var vDateParts = pDateStr.split('/');
          vDate.setFullYear(parseInt(vDateParts[2], 10), parseInt(vDateParts[1], 10)- 1, parseInt(vDateParts[0], 10));
          break;
+
    case 'yyyy-mm-dd':
       var vDateParts = pDateStr.split('-');
          vDate.setFullYear(parseInt(vDateParts[0], 10), parseInt(vDateParts[1], 10)- 1, parseInt(vDateParts[1], 10));
          break;
+
     }
     return(vDate);
 }
@@ -1248,21 +1455,21 @@ JSGantt.formatDateStr = function(pDate,pFormatStr){
       var vDateStr = "";
       switch(pFormatStr){
          case 'mm/dd/yyyy':
-               return(vMonthStr + '/' + vDayStr + '/' + vYear4Str );
+               return(vMonthStr + '/' + vDayStr + '/' + vYear4Str);
          case 'dd/mm/yyyy':
-               return(vDayStr + '/' + vMonthStr + '/' + vYear4Str );
+               return(vDayStr + '/' + vMonthStr + '/' + vYear4Str);
          case 'yyyy-mm-dd':
-               return(vYear4Str + '-' + vMonthStr + '-' + vDayStr );
+               return(vYear4Str + '-' + vMonthStr + '-' + vDayStr);
          case 'mm/dd/yy':
-               return(vMonthStr + '/' + vDayStr + '/' + vYear2Str );
+               return(vMonthStr + '/' + vDayStr + '/' + vYear2Str);
          case 'dd/mm/yy':
-               return(vDayStr + '/' + vMonthStr + '/' + vYear2Str );
+               return(vDayStr + '/' + vMonthStr + '/' + vYear2Str);
          case 'yy-mm-dd':
-               return(vYear2Str + '-' + vMonthStr + '-' + vDayStr );
+               return(vYear2Str + '-' + vMonthStr + '-' + vDayStr);
          case 'mm/dd':
-               return(vMonthStr + '/' + vDayStr );
+               return(vMonthStr + '/' + vDayStr);
          case 'dd/mm':
-               return(vDayStr + '/' + vMonthStr );
+               return(vDayStr + '/' + vMonthStr);
       }
 }
 
@@ -1303,7 +1510,7 @@ JSGantt.AddXMLTask = function(pGanttVar){
     // The number of tasks. IE gets this right, but mozilla add extra ones (Whitespace).
     var n = xmlDoc.documentElement.childNodes.length;
     for (var i=0; i<n; i++){
-      // Optional parameters may not have an entry (Whitespace from mozilla also returns an error )
+      // Optional parameters may not have an entry (Whitespace from mozilla also returns an error)
       // Task ID must NOT be zero other wise it will be skipped
       try { pID = Task[i].getElementsByTagName("pID")[0].childNodes[0].nodeValue;
       } catch (error){pID =0;}
@@ -1409,7 +1616,7 @@ JSGantt.ChromeXMLParse = function (pGanttVar){
           var te = Task.split(/<pCaption>/i)
           if(te.length> 2){var pCaption=te[1];} else {var pCaption = "";}
           // Finally add the task.
-          pGanttVar.AddTaskItem(new JSGantt.TaskItem(pID , pName, pStart, pEnd, pColor,  pLink, pMile, pRes,  pComp, pGroup, pParent, pOpen, pDepend,pCaption     ));
+          pGanttVar.AddTaskItem(new JSGantt.TaskItem(pID , pName, pStart, pEnd, pColor,  pLink, pMile, pRes,  pComp, pGroup, pParent, pOpen, pDepend,pCaption));
       }
     }
 }

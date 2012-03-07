@@ -409,6 +409,7 @@ function jiscpmbca_nodeapi(&$node, $op, $teaser, $page) {
         $node->projectpriority = $priority_list['default'];
       }
       break;
+
     case 'delete revision':
       db_query('DELETE FROM {jiscpmbca} WHERE nid = %d AND vid = %d', $node->nid, $node->vid);
       db_query('DELETE FROM {jiscpmbca_action} WHERE bca_nid = %d', $node->nid);
@@ -419,6 +420,7 @@ function jiscpmbca_nodeapi(&$node, $op, $teaser, $page) {
       db_query('DELETE FROM {jiscpmbca_running_cost_licensing} WHERE bca_nid = %d', $node->nid);
       db_query('DELETE FROM {jiscpmbca_running_cost_other} WHERE bca_nid = %d', $node->nid);
       break;
+
   }
 }
 /**
@@ -576,7 +578,13 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 1,
   );
-  $form['action_wrapper']['add_action']['new_action']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'action_wrapper', 'add_action', 'new_action', 'format'));
+  $form['action_wrapper']['add_action']['new_action']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'action_wrapper',
+    'add_action',
+    'new_action',
+    'format')
+  );
   // Project date start.
   if (module_exists('date_api') && module_exists('date_popup')) {
     $form['action_wrapper']['add_action']['new_action']['new_action_deliverydate'] = array(
@@ -769,7 +777,13 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 1,
   );
-  $form['training_cost_wrapper']['add_training_cost']['new_training_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'training_cost_wrapper', 'add_training_cost', 'new_training_cost', 'format'));
+  $form['training_cost_wrapper']['add_training_cost']['new_training_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'training_cost_wrapper',
+    'add_training_cost',
+    'new_training_cost',
+    'format')
+  );
   // Total cost.
   $form['training_cost_wrapper']['add_training_cost']['new_training_cost']['new_training_cost_total'] = array(
     '#type' => 'textfield',
@@ -861,7 +875,13 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 2,
   );
-  $form['equipment_cost_wrapper']['add_equipment_cost']['new_equipment_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 3, $parents = array('info', 'equipment_cost_wrapper', 'add_equipment_cost', 'new_equipment_cost', 'format'));
+  $form['equipment_cost_wrapper']['add_equipment_cost']['new_equipment_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 3, $parents = array(
+    'info',
+    'equipment_cost_wrapper',
+    'add_equipment_cost',
+    'new_equipment_cost',
+    'format')
+  );
   $form['equipment_cost_wrapper']['add_equipment_cost']['new_equipment_cost']['new_equipment_cost_total'] = array(
     '#type' => 'textfield',
     '#title' => t('Total Cost'),
@@ -951,7 +971,13 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 1,
   );
-  $form['other_cost_wrapper']['add_other_cost']['new_other_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'other_cost_wrapper', 'add_other_cost', 'new_other_cost', 'format'));
+  $form['other_cost_wrapper']['add_other_cost']['new_other_cost']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'other_cost_wrapper',
+    'add_other_cost',
+    'new_other_cost',
+    'format')
+  );
   $form['other_cost_wrapper']['add_other_cost']['new_other_cost']['new_other_cost_total'] = array(
     '#type' => 'textfield',
     '#title' => t('Total'),
@@ -1043,7 +1069,13 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 1,
   );
-  $form['running_cost_training_wrapper']['add_running_cost_training']['new_running_cost_training']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'running_cost_training_wrapper', 'add_running_cost_training', 'new_running_cost_training', 'format'));
+  $form['running_cost_training_wrapper']['add_running_cost_training']['new_running_cost_training']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'running_cost_training_wrapper',
+    'add_running_cost_training',
+    'new_running_cost_training',
+    'format')
+  );
   $form['running_cost_training_wrapper']['add_running_cost_training']['new_running_cost_training']['new_running_cost_training_total'] = array(
     '#type' => 'textfield',
     '#title' => t('Total Cost'),
@@ -1133,7 +1165,13 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 1,
   );
-  $form['running_cost_licensing_wrapper']['add_running_cost_licensing']['new_running_cost_licensing']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'running_cost_licensing_wrapper', 'add_running_cost_licensing', 'new_running_cost_licensing', 'format'));
+  $form['running_cost_licensing_wrapper']['add_running_cost_licensing']['new_running_cost_licensing']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'running_cost_licensing_wrapper',
+    'add_running_cost_licensing',
+    'new_running_cost_licensing',
+    'format')
+  );
   $form['running_cost_licensing_wrapper']['add_running_cost_licensing']['new_running_cost_licensing']['new_running_cost_licensing_total'] = array(
     '#type' => 'textfield',
     '#title' => t('Total Cost'),
@@ -1225,7 +1263,12 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 1,
   );
-  $form['running_cost_maintenance_wrapper']['add_running_cost_maintenance']['new_running_cost_maintenance']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'running_cost_maintenance_wrapper', 'add_running_cost_maintenance', 'new_running_cost_maintenance', 'format'));
+  $form['running_cost_maintenance_wrapper']['add_running_cost_maintenance']['new_running_cost_maintenance']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'running_cost_maintenance_wrapper',
+    'add_running_cost_maintenance',
+    'new_running_cost_maintenance',
+    'format'));
   $form['running_cost_maintenance_wrapper']['add_running_cost_maintenance']['new_running_cost_maintenance']['new_running_cost_maintenance_total'] = array(
     '#type' => 'textfield',
     '#title' => t('Total Cost'),
@@ -1316,7 +1359,13 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Description'),
     '#weight' => 1,
   );
-  $form['running_cost_other_wrapper']['add_running_cost_other']['new_running_cost_other']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'running_cost_other_wrapper', 'add_running_cost_other', 'new_running_cost_other', 'format'));
+  $form['running_cost_other_wrapper']['add_running_cost_other']['new_running_cost_other']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'running_cost_other_wrapper',
+    'add_running_cost_other',
+    'new_running_cost_other',
+    'format')
+  );
   $form['running_cost_other_wrapper']['add_running_cost_other']['new_running_cost_other']['new_running_cost_other_total'] = array(
     '#type' => 'textfield',
     '#title' => t('Total Cost'),
@@ -1356,7 +1405,12 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Project Strategies'),
     '#default_value' => $node->jiscpmbcas[0]['bca_strategies'],
   );
-  $form['group10']['strategies_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array('info', 'group10', 'strategies_fieldset', 'format'));
+  $form['group10']['strategies_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array(
+    'info',
+    'group10',
+    'strategies_fieldset',
+    'format')
+  );
   $form['group11'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1375,7 +1429,12 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Project Benefits'),
     '#default_value' => $node->jiscpmbcas[0]['bca_benefits'],
   );
-  $form['group11']['benefits_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array('info', 'group11', 'benefits_fieldset', 'format'));
+  $form['group11']['benefits_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array(
+    'info',
+    'group11',
+    'benefits_fieldset',
+    'format')
+  );
   $form['group12'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1394,7 +1453,12 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Implications of Not Undertaking Project'),
     '#default_value' => $node->jiscpmbcas[0]['bca_implications'],
   );
-  $form['group12']['implications_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array('info', 'group12', 'implications_fieldset', 'format'));
+  $form['group12']['implications_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array(
+    'info',
+    'group12',
+    'implications_fieldset',
+    'format')
+  );
   $form['group13'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1408,12 +1472,17 @@ function jiscpmbca_form(&$node, $form_state) {
     '#collapsible' => TRUE,
   );
   // Project alternatives.
-  $form['group13']['alternatives_fieldset'] ['bca_alternatives'] = array(
+  $form['group13']['alternatives_fieldset']['bca_alternatives'] = array(
     '#type' => 'textarea',
     '#title' => t('Project Alternatives'),
     '#default_value' => $node->jiscpmbcas[0]['bca_alternatives'],
   );
-  $form['group13']['alternatives_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array('info', 'group13', 'alternatives_fieldset', 'format'));
+  $form['group13']['alternatives_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array(
+    'info',
+    'group13',
+    'alternatives_fieldset',
+    'format')
+  );
   $form['group14'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1457,7 +1526,12 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('External Support Implications'),
     '#default_value' => $node->jiscpmbcas[0]['bca_external_support'],
   );
-  $form['group14']['organisational_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array('info', 'group14', 'organisational_fieldset', 'format'));
+  $form['group14']['organisational_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array(
+    'info',
+    'group14',
+    'organisational_fieldset',
+    'format')
+  );
   $form['group15'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -1476,7 +1550,12 @@ function jiscpmbca_form(&$node, $form_state) {
     '#title' => t('Project Payback'),
     '#default_value' => $node->jiscpmbcas[0]['bca_payback'],
   );
-  $form['group15']['payback_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array('info', 'group15', 'payback_fieldset', 'format'));
+  $form['group15']['payback_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, NULL, $parents = array(
+    'info',
+    'group15',
+    'payback_fieldset',
+    'format')
+  );
   return $form;
 }
 /**
@@ -2629,39 +2708,57 @@ function jiscpmbca_running_cost_training_display_form($delta, $running_cost_trai
   $form['running_cost_training_title'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_training_title,
-    '#parents' => array('running_cost_trainings', $delta, 'running_cost_training_title'),
+    '#parents' => array(
+      'running_cost_trainings',
+      $delta,
+      'running_cost_training_title'),
   );
   $form['running_cost_training_title_text'] = array(
     '#type' => 'item',
     '#title' => t('Title'),
     '#weight' => 1,
-    '#parents' => array('running_cost_trainings', $delta, 'running_cost_training_title'),
+    '#parents' => array(
+      'running_cost_trainings',
+      $delta,
+      'running_cost_training_title'),
     '#value' => $running_cost_training_title,
   );
   // Running_cost_training_description.
   $form['running_cost_training_description'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_training_description,
-    '#parents' => array('running_cost_trainings', $delta, 'running_cost_training_description'),
+    '#parents' => array(
+      'running_cost_trainings',
+      $delta,
+      'running_cost_training_description'),
   );
   $form['running_cost_training_description_text'] = array(
     '#type' => 'item',
     '#title' => t('Description'),
     '#weight' => 2,
-    '#parents' => array('running_cost_trainings', $delta, 'running_cost_training_description'),
+    '#parents' => array(
+      'running_cost_trainings',
+      $delta,
+      'running_cost_training_description'),
     '#value' => $running_cost_training_description,
   );
   // Running_cost_training_title.
   $form['running_cost_training_total'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_training_total,
-    '#parents' => array('running_cost_trainings', $delta, 'running_cost_training_total'),
+    '#parents' => array(
+      'running_cost_trainings',
+      $delta,
+      'running_cost_training_total'),
   );
   $form['running_cost_training_total_text'] = array(
     '#type' => 'item',
     '#title' => t('Total Cost'),
     '#weight' => 2,
-    '#parents' => array('running_cost_trainings', $delta, 'running_cost_training_total'),
+    '#parents' => array(
+      'running_cost_trainings',
+      $delta,
+      'running_cost_training_total'),
     '#value' => $running_cost_training_total,
   );
   // Remove button.
@@ -2671,7 +2768,10 @@ function jiscpmbca_running_cost_training_display_form($delta, $running_cost_trai
     '#value' => t('Remove'),
     '#weight' => 1,
     '#submit' => array('jiscpmbca_remove_row_submit'),
-    '#parents' => array('running_cost_trainings', $delta, 'remove_running_cost_training'),
+    '#parents' => array(
+      'running_cost_trainings',
+      $delta,
+      'remove_running_cost_training'),
     '#ahah' => array(
       'path' => 'jiscpmbca_running_cost_training/js/' . ($delta + 1),
       'wrapper' => 'jiscpmbca-running_cost_trainings',
@@ -2694,39 +2794,57 @@ function jiscpmbca_running_cost_licensing_display_form($delta, $running_cost_lic
   $form['running_cost_licensing_title'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_licensing_title,
-    '#parents' => array('running_cost_licensings', $delta, 'running_cost_licensing_title'),
+    '#parents' => array(
+      'running_cost_licensings',
+      $delta,
+      'running_cost_licensing_title'),
   );
   $form['running_cost_licensing_title_text'] = array(
     '#type' => 'item',
     '#title' => t('Title'),
     '#weight' => 1,
-    '#parents' => array('running_cost_licensings', $delta, 'running_cost_licensing_title'),
+    '#parents' => array(
+      'running_cost_licensings',
+      $delta,
+      'running_cost_licensing_title'),
     '#value' => $running_cost_licensing_title,
   );
   // Running_cost_licensing_description.
   $form['running_cost_licensing_description'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_licensing_description,
-    '#parents' => array('running_cost_licensings', $delta, 'running_cost_licensing_description'),
+    '#parents' => array(
+      'running_cost_licensings',
+      $delta,
+      'running_cost_licensing_description'),
   );
   $form['running_cost_licensing_description_text'] = array(
     '#type' => 'item',
     '#title' => t('Description'),
     '#weight' => 2,
-    '#parents' => array('running_cost_licensings', $delta, 'running_cost_licensing_description'),
+    '#parents' => array(
+      'running_cost_licensings',
+      $delta,
+      'running_cost_licensing_description'),
     '#value' => $running_cost_licensing_description,
   );
   // Running_cost_licensing_title.
   $form['running_cost_licensing_total'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_licensing_total,
-    '#parents' => array('running_cost_licensings', $delta, 'running_cost_licensing_total'),
+    '#parents' => array(
+      'running_cost_licensings',
+      $delta,
+      'running_cost_licensing_total'),
   );
   $form['running_cost_licensing_total_text'] = array(
     '#type' => 'item',
     '#title' => t('Total Cost'),
     '#weight' => 2,
-    '#parents' => array('running_cost_licensings', $delta, 'running_cost_licensing_total'),
+    '#parents' => array(
+      'running_cost_licensings',
+      $delta,
+      'running_cost_licensing_total'),
     '#value' => $running_cost_licensing_total,
   );
   // Remove button.
@@ -2736,7 +2854,10 @@ function jiscpmbca_running_cost_licensing_display_form($delta, $running_cost_lic
     '#value' => t('Remove'),
     '#weight' => 1,
     '#submit' => array('jiscpmbca_remove_row_submit'),
-    '#parents' => array('running_cost_licensings', $delta, 'remove_running_cost_licensing'),
+    '#parents' => array(
+      'running_cost_licensings',
+      $delta,
+      'remove_running_cost_licensing'),
     '#ahah' => array(
       'path' => 'jiscpmbca_running_cost_licensing/js/' . ($delta + 1),
       'wrapper' => 'jiscpmbca-running_cost_licensings',
@@ -2759,39 +2880,57 @@ function jiscpmbca_running_cost_maintenance_display_form($delta, $running_cost_m
   $form['running_cost_maintenance_title'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_maintenance_title,
-    '#parents' => array('running_cost_maintenances', $delta, 'running_cost_maintenance_title'),
+    '#parents' => array(
+      'running_cost_maintenances',
+      $delta,
+      'running_cost_maintenance_title'),
   );
   $form['running_cost_maintenance_title_text'] = array(
     '#type' => 'item',
     '#title' => t('Title'),
     '#weight' => 1,
-    '#parents' => array('running_cost_maintenances', $delta, 'running_cost_maintenance_title'),
+    '#parents' => array(
+      'running_cost_maintenances',
+      $delta,
+      'running_cost_maintenance_title'),
     '#value' => $running_cost_maintenance_title,
   );
   // Running_cost_maintenance_description.
   $form['running_cost_maintenance_description'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_maintenance_description,
-    '#parents' => array('running_cost_maintenances', $delta, 'running_cost_maintenance_description'),
+    '#parents' => array(
+      'running_cost_maintenances',
+      $delta,
+      'running_cost_maintenance_description'),
   );
   $form['running_cost_maintenance_description_text'] = array(
     '#type' => 'item',
     '#title' => t('Description'),
     '#weight' => 2,
-    '#parents' => array('running_cost_maintenances', $delta, 'running_cost_maintenance_description'),
+    '#parents' => array(
+      'running_cost_maintenances',
+      $delta,
+      'running_cost_maintenance_description'),
     '#value' => $running_cost_maintenance_description,
   );
   // Running_cost_maintenance_title.
   $form['running_cost_maintenance_total'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_maintenance_total,
-    '#parents' => array('running_cost_maintenances', $delta, 'running_cost_maintenance_total'),
+    '#parents' => array(
+      'running_cost_maintenances',
+      $delta,
+      'running_cost_maintenance_total'),
   );
   $form['running_cost_maintenance_total_text'] = array(
     '#type' => 'item',
     '#title' => t('Total Cost'),
     '#weight' => 2,
-    '#parents' => array('running_cost_maintenances', $delta, 'running_cost_maintenance_total'),
+    '#parents' => array(
+      'running_cost_maintenances',
+      $delta,
+      'running_cost_maintenance_total'),
     '#value' => $running_cost_maintenance_total,
   );
   // Remove button.
@@ -2801,7 +2940,10 @@ function jiscpmbca_running_cost_maintenance_display_form($delta, $running_cost_m
     '#value' => t('Remove'),
     '#weight' => 1,
     '#submit' => array('jiscpmbca_remove_row_submit'),
-    '#parents' => array('running_cost_maintenances', $delta, 'remove_running_cost_maintenance'),
+    '#parents' => array(
+      'running_cost_maintenances',
+      $delta,
+      'remove_running_cost_maintenance'),
     '#ahah' => array(
       'path' => 'jiscpmbca_running_cost_maintenance/js/' . ($delta + 1),
       'wrapper' => 'jiscpmbca-running_cost_maintenances',
@@ -2824,39 +2966,57 @@ function jiscpmbca_running_cost_other_display_form($delta, $running_cost_other_t
   $form['running_cost_other_title'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_other_title,
-    '#parents' => array('running_cost_others', $delta, 'running_cost_other_title'),
+    '#parents' => array(
+      'running_cost_others',
+      $delta,
+      'running_cost_other_title'),
   );
   $form['running_cost_other_title_text'] = array(
     '#type' => 'item',
     '#title' => t('Title'),
     '#weight' => 1,
-    '#parents' => array('running_cost_others', $delta, 'running_cost_other_title'),
+    '#parents' => array(
+      'running_cost_others',
+      $delta,
+      'running_cost_other_title'),
     '#value' => $running_cost_other_title,
   );
   // Running_cost_other_description.
   $form['running_cost_other_description'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_other_description,
-    '#parents' => array('running_cost_others', $delta, 'running_cost_other_description'),
+    '#parents' => array(
+      'running_cost_others',
+      $delta,
+      'running_cost_other_description'),
   );
   $form['running_cost_other_description_text'] = array(
     '#type' => 'item',
     '#title' => t('Description'),
     '#weight' => 2,
-    '#parents' => array('running_cost_others', $delta, 'running_cost_other_description'),
+    '#parents' => array(
+      'running_cost_others',
+      $delta,
+      'running_cost_other_description'),
     '#value' => $running_cost_other_description,
   );
   // Running_cost_other_title.
   $form['running_cost_other_total'] = array(
     '#type' => 'hidden',
     '#value' => $running_cost_other_total,
-    '#parents' => array('running_cost_others', $delta, 'running_cost_other_total'),
+    '#parents' => array(
+      'running_cost_others',
+      $delta,
+      'running_cost_other_total'),
   );
   $form['running_cost_other_total_text'] = array(
     '#type' => 'item',
     '#title' => t('Total Cost'),
     '#weight' => 2,
-    '#parents' => array('running_cost_others', $delta, 'running_cost_other_total'),
+    '#parents' => array(
+      'running_cost_others',
+      $delta,
+      'running_cost_other_total'),
     '#value' => $running_cost_other_total,
   );
   // Remove button.
@@ -2866,7 +3026,10 @@ function jiscpmbca_running_cost_other_display_form($delta, $running_cost_other_t
     '#value' => t('Remove'),
     '#weight' => 1,
     '#submit' => array('jiscpmbca_remove_row_submit'),
-    '#parents' => array('running_cost_others', $delta, 'remove_running_cost_other'),
+    '#parents' => array(
+      'running_cost_others',
+      $delta,
+      'remove_running_cost_other'),
     '#ahah' => array(
       'path' => 'jiscpmbca_running_cost_other/js/' . ($delta + 1),
       'wrapper' => 'jiscpmbca-running_cost_others',

@@ -1,6 +1,8 @@
 <?php
 /**
  * @file
+ * Administration file for JISC PM
+ * business caase assessments.
  */
 
 /**

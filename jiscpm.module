@@ -92,7 +92,12 @@ function jiscpm_theme() {
     ),
     'jiscpm_link' => array(
       'file'      => 'jiscpm.theme.inc',
-      'arguments' => array('source_module', 'destination_module', 'node_nid', 'weight'),
+      'arguments' => array(
+        'source_module',
+        'destination_module',
+        'node_nid',
+        'weight',
+      ),
     ),
     'jiscpm_list_report' => array(
       'file'      => 'jiscpm.theme.inc',
@@ -354,7 +359,7 @@ function jiscpm_icon_l($icon, $path, $title, $permission = '', $params = array()
     return '';
   }
   $icon = jiscpm_icon($icon, $title);
-  $attributes ['title'] = $title;
+  $attributes['title'] = $title;
   $query = '';
   if (array_key_exists('q', $params)) {
     $destination = $params['q'];
@@ -395,7 +400,11 @@ function jiscpm_icon_l($icon, $path, $title, $permission = '', $params = array()
     }
     $query .= $key . '=' . urlencode($value);
   }
-  $o = l($icon, $path, array('attributes' => $attributes, 'query' => $query, 'html' => TRUE));
+  $o = l($icon, $path, array(
+    'attributes' => $attributes,
+    'query' => $query,
+    'html' => TRUE,
+  ));
   return $o;
 }
 /**

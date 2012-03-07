@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Installation file for JISC PM attributes.
  */
 
 /**
@@ -414,10 +415,28 @@ function jiscpmattribute_schema() {
       'domain'        => array('type' => 'varchar', 'length' => 100),
       'akey'          => array('type' => 'varchar', 'length' => 100),
       'avalue'        => array('type' => 'varchar', 'length' => 100),
-      'parent_domain' => array('type' => 'varchar', 'length' => 100),
-      'weight'        => array('type' => 'int', 'not null' => FALSE, 'default' => 0, 'size' => 'small'),
-      'isdefault'     => array('type' => 'int', 'not null' => FALSE, 'default' => 0, 'size' => 'tiny'),
-      'isactive'      => array('type' => 'int', 'not null' => FALSE, 'default' => 1, 'size' => 'tiny'),
+      'parent_domain' => array(
+        'type' => 'varchar',
+        'length' => 100,
+      ),
+      'weight'        => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'size' => 'small',
+      ),
+      'isdefault'     => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'size' => 'tiny',
+      ),
+      'isactive'      => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 1,
+        'size' => 'tiny',
+      ),
     ),
     'primary key' => array('aid'),
   );

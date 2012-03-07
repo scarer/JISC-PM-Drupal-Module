@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Implements theme for JISC PM PPR.
  */
 
 /**

@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Installs and uninstalls JISC PM tasks.
  */
 
 /**
@@ -32,22 +33,74 @@ function jiscpmtask_uninstall() {
 function jiscpmtask_schema() {
   $schema['jiscpmtask'] = array(
     'fields'        => array(
-      'nid'                 => array('description' => 'The nid of a project task', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'         => array('description' => 'The nid for the project a task belongs to', 'type' => 'int'),
-      'stepno' => array('description' => 'The step number for a project task', 'type' => 'int'),
-      'taskcategory' => array('description' => 'The category a task belongs to', 'type' => 'text'),
-      'taskstatus' => array('description' => 'The status of a task', 'type' => 'text'),
-      'taskpriority' => array('description' => 'The priority of a task', 'type' => 'text'),
-      'weight' => array('description' => 'The weight of a task', 'type' => 'text'),
-      'datebegin'           => array('description' => 'The date a task begins', 'type' => 'int'),
-      'dateend'             => array('description' => 'The date a task ends', 'type' => 'int'),
-      'durationunit' => array('description' => 'The duration unit assigned to the time for a task', 'type' => 'int'),
-      'duration' => array('description' => 'The duration of a task', 'type' => 'float'),
-      'pricemode' => array('description' => 'The pricemode assigned to a task', 'type' => 'text'),
-      'price' => array('description' => 'The price of a task', 'type' => 'float'),
-      'currency' => array('description' => 'The currency assigned to a task', 'type' => 'text'),
-      'assigned_uid'        => array('description' => 'The uid of the assigned person to the task', 'type' => 'int'),
+      'nid'                 => array(
+        'description' => 'The nid of a project task',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'vid'                 => array(
+        'description' => 'The current {node_revisions}.vid version identifier',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'project_nid'         => array(
+        'description' => 'The nid for the project a task belongs to',
+        'type' => 'int',
+      ),
+      'stepno' => array(
+        'description' => 'The step number for a project task',
+        'type' => 'int',
+      ),
+      'taskcategory' => array(
+        'description' => 'The category a task belongs to',
+        'type' => 'text',
+      ),
+      'taskstatus' => array(
+        'description' => 'The status of a task',
+        'type' => 'text',
+      ),
+      'taskpriority' => array(
+        'description' => 'The priority of a task',
+        'type' => 'text',
+      ),
+      'weight' => array(
+        'description' => 'The weight of a task',
+        'type' => 'text',
+      ),
+      'datebegin'           => array(
+        'description' => 'The date a task begins',
+        'type' => 'int',
+      ),
+      'dateend'             => array(
+        'description' => 'The date a task ends',
+        'type' => 'int',
+      ),
+      'durationunit' => array(
+        'description' => 'The duration unit assigned to the time for a task',
+        'type' => 'int',
+      ),
+      'duration' => array(
+        'description' => 'The duration of a task',
+        'type' => 'float',
+      ),
+      'pricemode' => array(
+        'description' => 'The pricemode assigned to a task',
+        'type' => 'text',
+      ),
+      'price' => array(
+        'description' => 'The price of a task',
+        'type' => 'float',
+      ),
+      'currency' => array(
+        'description' => 'The currency assigned to a task',
+        'type' => 'text',
+      ),
+      'assigned_uid'        => array(
+        'description' => 'The uid of the assigned person to the task',
+        'type' => 'int',
+      ),
     ),
     'primary key' => array('nid', 'vid'),
   );

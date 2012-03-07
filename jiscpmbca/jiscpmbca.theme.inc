@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Theme file for JISC PM BCA module.
  */
 
 /**
@@ -119,7 +120,7 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
     '#collapsed' => TRUE,
     '#weight' => -21,
   );
-  $node->content['group18']['strategiesfieldset'] ['strategies'] = array(
+  $node->content['group18']['strategiesfieldset']['strategies'] = array(
     '#prefix' => '<div class="bca-strategies">',
     '#suffix' => '</div>',
     '#value' => check_markup($node->jiscpmbcas[0]['bca_strategies'], FILTER_FORMAT_DEFAULT, FALSE),
@@ -294,7 +295,7 @@ function theme_jiscpmbca_view($node, $teaser = FALSE, $page = FALSE) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $node->content['group13']['otherfieldset'] ['bcaothercosts'] = array(
+  $node->content['group13']['otherfieldset']['bcaothercosts'] = array(
     '#prefix' => '<div class="bcaothercosts"><h2>Other Costs</h2>',
     '#suffix' => '</div>',
     '#value' => t($othercosts),

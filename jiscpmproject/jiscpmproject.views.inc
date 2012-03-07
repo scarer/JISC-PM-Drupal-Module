@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * Implements views for JISC PM projects.
  */
 
 /**

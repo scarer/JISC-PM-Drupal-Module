@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Theme file for JISC PM attributes.
  */
 
 /**

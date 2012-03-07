@@ -8,7 +8,9 @@ dt.print_pdf {
 div.jiscpmbody {
   padding-top: 20px;
 }
-div.jiscpmfields div.label, div.jiscpmbody div.label, div.field div.field-label-inline-first {
+div.jiscpmfields div.label,
+div.jiscpmbody div.label,
+div.field div.field-label-inline-first {
   float: left;
   width: auto;
   text-align: left;

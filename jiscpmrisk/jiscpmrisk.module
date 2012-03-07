@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * JISC PM risk.
  */
 
 /**
@@ -334,7 +335,12 @@ function jiscpmrisk_form(&$node) {
     '#description' => t('The residual risk that remains after all management steps have been taken.'),
     '#weight' => 0,
   );
-  $form['group6']['risk_residual_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group6', 'risk_residual_wrapper', 'format'));
+  $form['group6']['risk_residual_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group6',
+    'risk_residual_wrapper',
+    'format')
+  );
   $form['group7'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -353,7 +359,12 @@ function jiscpmrisk_form(&$node) {
     '#default_value' => $node->jiscpmrisks[0]['risk_early_warning_signs'],
     '#weight' => 0,
   );
-  $form['group7']['risk_early_warning_signs_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group7', 'risk_early_warning_signs_wrapper', 'format'));
+  $form['group7']['risk_early_warning_signs_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group7',
+    'risk_early_warning_signs_wrapper',
+    'format')
+  );
   $form['group8'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -388,7 +399,12 @@ function jiscpmrisk_form(&$node) {
     '#title' => t('Risk Management Approach'),
     '#default_value' => $node->jiscpmrisks[0]['risk_management_approach'],
   );
-  $form['group9']['risk_management_approach_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group9', 'risk_management_approach_wrapper', 'format'));
+  $form['group9']['risk_management_approach_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group9',
+    'risk_management_approach_wrapper',
+    'format')
+  );
   return $form;
 }
 /**
@@ -426,12 +442,11 @@ function jiscpmrisk_update($node) {
  */
 function jiscpmrisk_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
-    case 'prepare':
-      break;
     case 'delete revision':
       // Notice that we're matching a single revision based on the node's vid.
       db_query('DELETE FROM {jiscpmrisk} WHERE vid = %d', $node->vid);
       break;
+
   }
 }
 /**

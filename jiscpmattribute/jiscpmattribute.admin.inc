@@ -1,6 +1,8 @@
 <?php
 /**
  * @file
+ * This file allows the display of a form for
+ * administrating attributes used in JISC PM.
  */
 
 /**
@@ -95,6 +97,7 @@ function jiscpmattribute_list() {
  * @function
  */
 function jiscpmattribute_list_form($form_id, $header, $attributes) {
+
   $form = array();
 
   $form['attributes']['#theme'] = 'jiscpmattribute_list';
@@ -108,29 +111,29 @@ function jiscpmattribute_list_form($form_id, $header, $attributes) {
     $i->type = 'jiscpmattribute';
 
     $form['attributes']['attributes'][$attribute->aid]['attribute_domain_' . $attribute->aid] = array(
-      '#value' => check_plain($attribute->domain),
+      '#value' => $attribute->domain,
     );
 
     $form['attributes']['attributes'][$attribute->aid]['attribute_akey_' . $attribute->aid] = array(
-      '#value' => check_plain($attribute->akey),
+      '#value' => $attribute->akey,
     );
 
     $form['attributes']['attributes'][$attribute->aid]['attribute_avalue_' . $attribute->aid] = array(
-      '#value' => check_plain($attribute->avalue),
+      '#value' => $attribute->avalue,
     );
 
     $form['attributes']['attributes'][$attribute->aid]['attribute_isactive_' . $attribute->aid] = array(
       '#type' => 'checkbox',
-      '#default_value' => check_plain($attribute->isactive),
+      '#value' => $attribute->isactive,
     );
 
     $form['attributes']['attributes'][$attribute->aid]['attribute_default_' . $attribute->aid] = array(
-      '#default_value' => check_plain($attribute->isdefault),
+      '#value' => $attribute->isdefault,
     );
 
     $form['attributes']['attributes'][$attribute->aid]['attribute_weight_' . $attribute->aid] = array(
       '#type' => 'weight',
-      '#default_value' => check_plain($attribute->weight),
+      '#value' => $attribute->weight,
     );
 
     $form['attributes']['attributes'][$attribute->aid]['attribute_operations_' . $attribute->aid] = array(
@@ -141,7 +144,7 @@ function jiscpmattribute_list_form($form_id, $header, $attributes) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#submit' => array('jiscpmattribute_list_submit'),
-    '#value' => check_plain(t('Save')),
+    '#value' => 'Save',
   );
   return $form;
 }

@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Installs and uninstalls JISC PM risks.
  */
 
 /**
@@ -31,18 +32,75 @@ function jiscpmrisk_uninstall() {
 function jiscpmrisk_schema() {
   $schema['jiscpmrisk'] = array(
     'fields'                => array(
-      'nid'                 => array('description' => 'The nid of a risk', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'    => array('description' => 'The nid for the project the risk belongs to', 'type' => 'int'),
-      'risk_probability'  => array('description' => 'The probability of the risk occurring', 'type' => 'varchar', 'length' => 100),
-      'risk_impact'  => array('description' => 'The impact of the risk', 'type' => 'varchar', 'length' => 100),
-      'risk_start'  => array('description' => 'The start date of the risk occurring', 'type' => 'int', 'default' => 0),
-      'risk_end'  => array('description' => 'The end date of the risk occurring', 'type' => 'int', 'default' => 0),
-      'risk_residual'  => array('description' => 'The residual of the risk once all measures to prevent its occurance have been taken', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'risk_early_warning_signs'  => array('description' => 'The early warning signs of the risk', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'risk_owner_uid'  => array('description' => 'The uid of the risk owner', 'type' => 'varchar', 'length' => 100),
-      'risk_category'  => array('description' => 'The category of the risk', 'type' => 'varchar', 'length' => 100),
-      'risk_management_approach'  => array('description' => 'The risk management approach', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'nid'                 => array(
+        'description' => 'The nid of a risk',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0),
+      'vid'                 => array(
+        'description' => 'The current {node_revisions}.vid version identifier',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'project_nid'    => array(
+        'description' => 'The nid for the project the risk belongs to',
+        'type' => 'int',
+      ),
+      'risk_probability'  => array(
+        'description' => 'The probability of the risk occurring',
+        'type' => 'varchar',
+        'length' => 100,
+      ),
+      'risk_impact'  => array(
+        'description' => 'The impact of the risk',
+        'type' => 'varchar',
+        'length' => 100,
+      ),
+      'risk_start'  => array(
+        'description' => 'The start date of the risk occurring',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'risk_end'  => array(
+        'description' => 'The end date of the risk occurring',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'risk_residual'  => array(
+        'description' => 'The residual of the risk once all measures to prevent its occurance have been taken',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'risk_early_warning_signs'  => array(
+        'description' => 'The early warning signs of the risk',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'risk_owner_uid'  => array(
+        'description' => 'The uid of the risk owner',
+        'type' => 'varchar',
+        'length' => 100,
+      ),
+      'risk_category'  => array(
+        'description' => 'The category of the risk',
+        'type' => 'varchar',
+        'length' => 100,
+      ),
+      'risk_management_approach'  => array(
+        'description' => 'The risk management approach',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
     ),
     'primary key' => array('nid', 'vid'),
   );

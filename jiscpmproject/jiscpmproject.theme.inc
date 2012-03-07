@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * JISC PM Project theme.
  */
 
 /**
@@ -374,26 +375,26 @@ function theme_jiscpmproject_view($node, $teaser = FALSE, $page = FALSE) {
     '#collapsed' => FALSE,
     '#weight' => -2,
   );
-  $node->content['projectcontrol'] ['projectissues'] = array(
+  $node->content['projectcontrol']['projectissues'] = array(
     '#type' => 'fieldset',
     '#title' => t('Project Issues'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#weight' => -2,
   );
-  $node->content['projectcontrol'] ['projectissues']['issues'] = array(
+  $node->content['projectcontrol']['projectissues']['issues'] = array(
     '#prefix' => '<div class="projectissues">',
     '#suffix' => '</div>',
     '#value' => $issues,
   );
-  $node->content['projectcontrol'] ['projectrfc'] = array(
+  $node->content['projectcontrol']['projectrfc'] = array(
     '#type' => 'fieldset',
     '#title' => t('Project Request For Change'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#weight' => -1,
   );
-  $node->content['projectcontrol'] ['projectrfc']['rfc'] = array(
+  $node->content['projectcontrol']['projectrfc']['rfc'] = array(
     '#prefix' => '<div class="projectrfc">',
     '#suffix' => '</div>',
     '#value' => $rfcs,

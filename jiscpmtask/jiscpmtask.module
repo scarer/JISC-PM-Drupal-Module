@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * JISC PM task module.
  */
 
 /**
@@ -159,7 +160,10 @@ function jiscpmtask_admin_settings() {
   $form['jiscpmtask_jsgantt_options'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Chart display options'),
-    '#default_value' => variable_get('jiscpmtask_jsgantt_options', array('ShowStartDate', 'ShowEndDate', 'ShowDur')),
+    '#default_value' => variable_get('jiscpmtask_jsgantt_options', array(
+      'ShowStartDate',
+      'ShowEndDate',
+      'ShowDur')),
     '#options' => array(
       'ShowStartDate' => t('Show Start Date'),
       'ShowEndDate' => t('Show End Date'),
@@ -559,10 +563,12 @@ function jiscpmtask_nodeapi(&$node, $op, $teaser, $page) {
         $node->currency = $currency_list['default'];
       }
       break;
+
     case 'delete revision':
       // Notice that we're matching a single revision based on the node's vid.
       db_query('DELETE FROM {jiscpmtask} WHERE nid = %d', $node->nid);
       break;
+
   }
 }
 /**

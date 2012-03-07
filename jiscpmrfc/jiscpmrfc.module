@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * JISC PM RFC module.
  */
 
 /**
@@ -258,7 +259,12 @@ function jiscpmrfc_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group3']['rfc_rationale_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group3', 'rfc_rationale_wrapper', 'format'));
+  $form['group3']['rfc_rationale_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group3',
+    'rfc_rationale_wrapper',
+    'format')
+  );
   return $form;
 }
 /**
@@ -292,12 +298,11 @@ function jiscpmrfc_update($node) {
  */
 function jiscpmrfc_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
-    case 'prepare':
-      break;
     case 'delete revision':
       // Notice that we're matching a single revision based on the node's vid.
       db_query('DELETE FROM {jiscpmrfc} WHERE nid = %d', $node->nid);
       break;
+
   }
 }
 /**

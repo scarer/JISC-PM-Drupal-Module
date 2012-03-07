@@ -80,7 +80,11 @@ function jiscpmproject_init() {
  * Implements hook_perm().
  */
 function jiscpmproject_perm() {
-  return array('edit own jiscpmproject', 'edit jiscpmproject', 'create jiscpmproject');
+  return array(
+    'edit own jiscpmproject',
+    'edit jiscpmproject',
+    'create jiscpmproject',
+  );
 }
 /**
  * @function
@@ -378,6 +382,7 @@ function jiscpmproject_nodeapi(&$node, $op, $teaser, $page) {
         $node->projectpriority = $priority_list['default'];
       }
       break;
+
     case 'delete revision':
       db_query('DELETE FROM {jiscpmproject} WHERE nid = %d AND vid = %d', $node->nid, $node->vid);
       db_query('DELETE FROM {jiscpmproject_relationship} WHERE project_nid = %d', $node->nid);
@@ -387,6 +392,7 @@ function jiscpmproject_nodeapi(&$node, $op, $teaser, $page) {
       db_query('DELETE FROM {jiscpmproject_constraint} WHERE project_nid = %d', $node->nid);
       db_query('DELETE FROM {jiscpmproject_milestone} WHERE project_nid = %d', $node->nid);
       break;
+
   }
 }
 /**
@@ -437,7 +443,8 @@ function jiscpmproject_form(&$node, $form_state) {
   // Get all users from the database for referencing.
   $r = db_query("SELECT u.uid, u.name FROM {users} u ORDER BY u.name");
   $people = array();
-  $people[-1] = '--SELECT A PERSON--';
+  $index = 1;
+  $people[$index] = '--SELECT A PERSON--';
   while ($person = db_fetch_object($r)) {
     $people[$person->uid] = check_plain($person->name);
   }
@@ -535,7 +542,13 @@ function jiscpmproject_form(&$node, $form_state) {
     '#title' => t('Relationship description'),
     '#weight' => 1,
   );
-  $form['relationship_wrapper']['add_relationship']['new_relationship']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'relationship_wrapper', 'add_relationship', 'new_relationship', 'format'));
+  $form['relationship_wrapper']['add_relationship']['new_relationship']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'relationship_wrapper',
+    'add_relationship',
+    'new_relationship',
+    'format')
+  );
   // We name our button 'jiscpmproject_relationship_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -619,7 +632,13 @@ function jiscpmproject_form(&$node, $form_state) {
     '#description' => t('Enter the scope for a phase'),
     '#weight' => 1,
   );
-  $form['phase_wrapper']['add_phase']['new_phase']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'phase_wrapper', 'add_phase', 'new_phase', 'format'));
+  $form['phase_wrapper']['add_phase']['new_phase']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'phase_wrapper',
+    'add_phase',
+    'new_phase',
+    'format')
+  );
   // Project date start.
   if (arg(0) == 'node' && arg(1) == 'add') {
     if (module_exists('date_api') && module_exists('date_popup')) {
@@ -784,7 +803,13 @@ function jiscpmproject_form(&$node, $form_state) {
     '#title' => t('Perceived attitudes and/or risks'),
     '#weight' => 1,
   );
-  $form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 5, $parents = array('info', 'stakeholder_wrapper', 'add_stakeholder', 'new_stakeholder', 'format'));
+  $form['stakeholder_wrapper']['add_stakeholder']['new_stakeholder']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 5, $parents = array(
+    'info',
+    'stakeholder_wrapper',
+    'add_stakeholder',
+    'new_stakeholder',
+    'format')
+  );
   // We name our button 'jiscpmproject_stakeholder_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -867,7 +892,13 @@ function jiscpmproject_form(&$node, $form_state) {
     '#title' => t('Critical success factor description'),
     '#weight' => 1,
   );
-  $form['factor_wrapper']['add_factor']['new_factor']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'factor_wrapper', 'add_factor', 'new_factor', 'format'));
+  $form['factor_wrapper']['add_factor']['new_factor']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'factor_wrapper',
+    'add_factor',
+    'new_factor',
+    'format')
+  );
   // We name our button 'jiscpmproject_factor_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -952,7 +983,13 @@ function jiscpmproject_form(&$node, $form_state) {
     '#title' => t('Assumption description'),
     '#weight' => 1,
   );
-  $form['assumption_wrapper']['add_assumption']['new_assumption']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'assumption_wrapper', 'add_assumption', 'new_assumption', 'format'));
+  $form['assumption_wrapper']['add_assumption']['new_assumption']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'assumption_wrapper',
+    'add_assumption',
+    'new_assumption',
+    'format')
+  );
   // We name our button 'jiscpmproject_assumption_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -1035,7 +1072,13 @@ function jiscpmproject_form(&$node, $form_state) {
     '#title' => t('Constraint description'),
     '#weight' => 1,
   );
-  $form['constraint_wrapper']['add_constraint']['new_constraint']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'constraint_wrapper', 'add_constraint', 'new_constraint', 'format'));
+  $form['constraint_wrapper']['add_constraint']['new_constraint']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'constraint_wrapper',
+    'add_constraint',
+    'new_constraint',
+    'format')
+  );
   // We name our button 'jiscpmproject_constraint_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -1118,7 +1161,13 @@ function jiscpmproject_form(&$node, $form_state) {
     '#weight' => 1,
     '#description' => t('Objectives of a goal are what the goal is expected to achieve'),
   );
-  $form['goal_wrapper']['add_goal']['new_goal']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'goal_wrapper', 'add_goal', 'new_goal', 'format'));
+  $form['goal_wrapper']['add_goal']['new_goal']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'goal_wrapper',
+    'add_goal',
+    'new_goal',
+    'format')
+  );
   // We name our button 'jiscpmproject_goal_more' to
   // avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -1347,7 +1396,11 @@ function jiscpmproject_form(&$node, $form_state) {
     '#default_value' => $node->jiscpmprojects[0]['out_of_scope'],
     '#description' => t('Any tasks/deliverables/outcomes that will not fall into the scope of the project but may be related to the project (worth mentioning)'),
   );
-  $form['scope']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'scope', 'format'));
+  $form['scope']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'scope',
+    'format')
+  );
   return $form;
 }
 /**
@@ -1768,9 +1821,15 @@ function theme_jiscpmproject_relationship_table($form) {
     // Build the table row.
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['relationship_nid']) . drupal_render($form[$key]['relationship_nid_text']), 'class' => 'relationship-title'),
-        array('data' => drupal_render($form[$key]['relationship_description']) . drupal_render($form[$key]['relationship_description_text']), 'class' => 'relationship-description'),
-        array('data' => drupal_render($form[$key]['remove_relationship']), 'class' => 'remove-relationship'),
+        array(
+          'data' => drupal_render($form[$key]['relationship_nid']) . drupal_render($form[$key]['relationship_nid_text']),
+          'class' => 'relationship-title'),
+        array(
+          'data' => drupal_render($form[$key]['relationship_description']) . drupal_render($form[$key]['relationship_description_text']),
+          'class' => 'relationship-description'),
+        array(
+          'data' => drupal_render($form[$key]['remove_relationship']),
+          'class' => 'remove-relationship'),
       ),
     );
     // Add additional attributes to the row, such as a class for this row.
@@ -1808,11 +1867,21 @@ function theme_jiscpmproject_phase_table($form) {
     // Build the table row.
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['phase_title']) . drupal_render($form[$key]['phase_title_text']), 'class' => 'phase-title'),
-        array('data' => drupal_render($form[$key]['phase_scope']) . drupal_render($form[$key]['phase_scope_text']), 'class' => 'phase-scope'),
-        array('data' => drupal_render($form[$key]['phase_datebegin']) . drupal_render($form[$key]['phase_datebegin_text']), 'class' => 'phase-datebegin'),
-        array('data' => drupal_render($form[$key]['phase_dateend']) . drupal_render($form[$key]['phase_dateend_text']), 'class' => 'phase-dateend'),
-        array('data' => drupal_render($form[$key]['remove_phase']), 'class' => 'remove-phase'),
+        array(
+          'data' => drupal_render($form[$key]['phase_title']) . drupal_render($form[$key]['phase_title_text']),
+          'class' => 'phase-title'),
+        array(
+          'data' => drupal_render($form[$key]['phase_scope']) . drupal_render($form[$key]['phase_scope_text']),
+          'class' => 'phase-scope'),
+        array(
+          'data' => drupal_render($form[$key]['phase_datebegin']) . drupal_render($form[$key]['phase_datebegin_text']),
+          'class' => 'phase-datebegin'),
+        array(
+          'data' => drupal_render($form[$key]['phase_dateend']) . drupal_render($form[$key]['phase_dateend_text']),
+          'class' => 'phase-dateend'),
+        array(
+          'data' => drupal_render($form[$key]['remove_phase']),
+          'class' => 'remove-phase'),
       ),
     );
     // Add additional attributes to the row, such as a class for this row.
@@ -1846,9 +1915,15 @@ function theme_jiscpmproject_stakeholder_table($form) {
     // Build the table row.
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['stakeholder_uid']) . drupal_render($form[$key]['stakeholder_uid_text']), 'class' => 'stakeholder-title'),
-        array('data' => drupal_render($form[$key]['stakeholder_stake_in_project']) . drupal_render($form[$key]['stakeholder_stake_in_project_text']), 'class' => 'stakeholder-stake-in-project'),
-        array('data' => drupal_render($form[$key]['remove_stakeholder']), 'class' => 'remove-stakeholder'),
+        array(
+          'data' => drupal_render($form[$key]['stakeholder_uid']) . drupal_render($form[$key]['stakeholder_uid_text']),
+          'class' => 'stakeholder-title'),
+        array(
+          'data' => drupal_render($form[$key]['stakeholder_stake_in_project']) . drupal_render($form[$key]['stakeholder_stake_in_project_text']),
+          'class' => 'stakeholder-stake-in-project'),
+        array(
+          'data' => drupal_render($form[$key]['remove_stakeholder']),
+          'class' => 'remove-stakeholder'),
       ),
     );
     // Add additional attributes to the row, such as a class for this row.
@@ -1882,9 +1957,15 @@ function theme_jiscpmproject_factor_table($form) {
     // Build the table row.
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['factor_title']) . drupal_render($form[$key]['factor_title_text']), 'class' => 'factor-title'),
-        array('data' => drupal_render($form[$key]['factor_description']) . drupal_render($form[$key]['factor_description_text']), 'class' => 'factor-description'),
-        array('data' => drupal_render($form[$key]['remove_factor']), 'class' => 'remove-factor'),
+        array(
+          'data' => drupal_render($form[$key]['factor_title']) . drupal_render($form[$key]['factor_title_text']),
+          'class' => 'factor-title'),
+        array(
+          'data' => drupal_render($form[$key]['factor_description']) . drupal_render($form[$key]['factor_description_text']),
+          'class' => 'factor-description'),
+        array(
+          'data' => drupal_render($form[$key]['remove_factor']),
+          'class' => 'remove-factor'),
       ),
     );
     // Add additional attributes to the row, such as a class for this row.
@@ -1918,9 +1999,15 @@ function theme_jiscpmproject_assumption_table($form) {
     // Build the table row.
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['assumption_title']) . drupal_render($form[$key]['assumption_title_text']), 'class' => 'assumption-title'),
-        array('data' => drupal_render($form[$key]['assumption_description']) . drupal_render($form[$key]['assumption_description_text']), 'class' => 'assumption-description'),
-        array('data' => drupal_render($form[$key]['remove_assumption']), 'class' => 'remove-assumption'),
+        array(
+          'data' => drupal_render($form[$key]['assumption_title']) . drupal_render($form[$key]['assumption_title_text']),
+          'class' => 'assumption-title'),
+        array(
+          'data' => drupal_render($form[$key]['assumption_description']) . drupal_render($form[$key]['assumption_description_text']),
+          'class' => 'assumption-description'),
+        array(
+          'data' => drupal_render($form[$key]['remove_assumption']),
+          'class' => 'remove-assumption'),
       ),
     );
     // Add additional attributes to the row, such as a class for this row.
@@ -1954,9 +2041,15 @@ function theme_jiscpmproject_constraint_table($form) {
     // Build the table row.
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['constraint_title']) . drupal_render($form[$key]['constraint_title_text']), 'class' => 'constraint-title'),
-        array('data' => drupal_render($form[$key]['constraint_description']) . drupal_render($form[$key]['constraint_description_text']), 'class' => 'constraint-description'),
-        array('data' => drupal_render($form[$key]['remove_constraint']), 'class' => 'remove-constraint'),
+        array(
+          'data' => drupal_render($form[$key]['constraint_title']) . drupal_render($form[$key]['constraint_title_text']),
+          'class' => 'constraint-title'),
+        array(
+          'data' => drupal_render($form[$key]['constraint_description']) . drupal_render($form[$key]['constraint_description_text']),
+          'class' => 'constraint-description'),
+        array(
+          'data' => drupal_render($form[$key]['remove_constraint']),
+          'class' => 'remove-constraint'),
       ),
     );
     // Add additional attributes to the row, such as a class for this row.
@@ -1990,9 +2083,15 @@ function theme_jiscpmproject_goal_table($form) {
     // Build the table row.
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['goal_title']) . drupal_render($form[$key]['goal_title_text']), 'class' => 'goal-title'),
-        array('data' => drupal_render($form[$key]['goal_objectives']) . drupal_render($form[$key]['goal_objectives_text']), 'class' => 'goal-objectives'),
-        array('data' => drupal_render($form[$key]['remove_goal']), 'class' => 'remove-goal'),
+        array(
+          'data' => drupal_render($form[$key]['goal_title']) . drupal_render($form[$key]['goal_title_text']),
+          'class' => 'goal-title'),
+        array(
+          'data' => drupal_render($form[$key]['goal_objectives']) . drupal_render($form[$key]['goal_objectives_text']),
+          'class' => 'goal-objectives'),
+        array(
+          'data' => drupal_render($form[$key]['remove_goal']),
+          'class' => 'remove-goal'),
       ),
     );
     // Add additional attributes to the row, such as a class for this row.
@@ -2026,9 +2125,15 @@ function theme_jiscpmproject_milestone_table($form) {
     // Build the table row.
     $row = array(
       'data' => array(
-        array('data' => drupal_render($form[$key]['milestone_title']) . drupal_render($form[$key]['milestone_title_text']), 'class' => 'milestone-title'),
-        array('data' => drupal_render($form[$key]['milestone_deliverydate']) . drupal_render($form[$key]['milestone_deliverydate_text']), 'class' => 'milestone-deliverydate'),
-        array('data' => drupal_render($form[$key]['remove_milestone']), 'class' => 'remove-milestone'),
+        array(
+          'data' => drupal_render($form[$key]['milestone_title']) . drupal_render($form[$key]['milestone_title_text']),
+          'class' => 'milestone-title'),
+        array(
+          'data' => drupal_render($form[$key]['milestone_deliverydate']) . drupal_render($form[$key]['milestone_deliverydate_text']),
+          'class' => 'milestone-deliverydate'),
+        array(
+          'data' => drupal_render($form[$key]['remove_milestone']),
+          'class' => 'remove-milestone'),
       ),
     );
     // Add additional attributes to the row, such as a class for this row.

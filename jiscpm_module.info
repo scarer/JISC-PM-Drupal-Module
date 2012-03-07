@@ -1,1 +1,4 @@
-name = JISCPM MOdule
+name = JISCPM Module
+description = "Provides base module for JISC PM"
+core = 6.x
+package = JISC Project Management

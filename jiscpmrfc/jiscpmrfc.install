@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Installs and uninstalls JISC PM RFC.
  */
 
 /**
@@ -31,11 +32,35 @@ function jiscpmrfc_uninstall() {
 function jiscpmrfc_schema() {
   $schema['jiscpmrfc'] = array(
     'fields'                => array(
-      'nid'                 => array('description' => 'The nid of a request for change', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_nid'    => array('description' => 'The nid for the project the request for change belongs to', 'type' => 'int'),
-      'rfc_rationale' => array('description' => 'The rationale for the request for change', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'rfc_requestor_uid'  => array('description' => 'The uid for the user who made the request for change', 'type' => 'varchar', 'length' => 100),
+      'nid'                 => array(
+        'description' => 'The nid of a request for change',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'vid'                 => array(
+        'description' => 'The current {node_revisions}.vid version identifier',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'project_nid'    => array(
+        'description' => 'The nid for the project the request for change belongs to',
+        'type' => 'int',
+      ),
+      'rfc_rationale' => array(
+        'description' => 'The rationale for the request for change',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'rfc_requestor_uid'  => array(
+        'description' => 'The uid for the user who made the request for change',
+        'type' => 'varchar',
+        'length' => 100,
+      ),
     ),
     'primary key' => array('nid', 'vid'),
   );

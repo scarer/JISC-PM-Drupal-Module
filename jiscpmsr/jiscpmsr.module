@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * JISC PM status reports.
  */
 
 /**
@@ -13,6 +14,7 @@ function jiscpmsr_help($path, $arg) {
     case "admin/help#jiscpmsr":
       $o = '<p>' . t("Provides Status Report support for jiscpm") . '</p>';
       break;
+
   }
   return $o;
 }
@@ -283,7 +285,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#description' => t('A short overview of the project/programme that the status report is addressing.'),
     '#weight' => 0,
   );
-  $form['group5']['sr_overview_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group5', 'sr_overview_wrapper', 'format'));
+  $form['group5']['sr_overview_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group5',
+    'sr_overview_wrapper',
+    'format')
+  );
   $form['group6'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -304,7 +311,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#description' => t('An overview of the project/programme milestones and how they might have changed or remained constant.'),
     '#weight' => 0,
   );
-  $form['group6']['sr_milestone_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group6', 'sr_milestone_report_wrapper', 'format'));
+  $form['group6']['sr_milestone_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group6',
+    'sr_milestone_report_wrapper',
+    'format')
+  );
   $form['group7'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -325,7 +337,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#description' => t('An overview of the project/programme risks and how they might have changed or remained constant.'),
     '#weight' => 0,
   );
-  $form['group7']['sr_risk_management_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group7', 'sr_risk_management_report_wrapper', 'format'));
+  $form['group7']['sr_risk_management_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group7',
+    'sr_risk_management_report_wrapper',
+    'format')
+  );
   $form['group8'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -346,7 +363,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#description' => t('An overview of the project/programme issues and how they might have changed or remained constant.'),
     '#weight' => 0,
   );
-  $form['group8']['sr_issues_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group8', 'sr_issues_report_wrapper', 'format'));
+  $form['group8']['sr_issues_report_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group8',
+    'sr_issues_report_wrapper',
+    'format')
+  );
   $form['group9'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -418,7 +440,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#description' => t('The overall status of the project/programme.'),
     '#weight' => 0,
   );
-  $form['group10']['sr_overall_status_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group10', 'sr_overall_status_wrapper', 'format'));
+  $form['group10']['sr_overall_status_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group10',
+    'sr_overall_status_wrapper',
+    'format')
+  );
   $form['group11'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -439,7 +466,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#default_value' => check_markup($node->jiscpmsrs[0]['sr_project_summary'], FILTER_FORMAT_DEFAULT, FALSE),
     '#weight' => 0,
   );
-  $form['group11']['sr_project_summery_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group11', 'sr_project_summery_wrapper', 'format'));
+  $form['group11']['sr_project_summery_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group11',
+    'sr_project_summery_wrapper',
+    'format')
+  );
   // Insert milestone mds for the last period.
   $milestones = array();
   $results = db_query("SELECT milestone_id, milestone_title FROM {jiscpmproject_milestone}");
@@ -552,7 +584,13 @@ function jiscpmsr_form(&$node, $form_state) {
     '#title' => t('Deliverable Status'),
     '#weight' => 3,
   );
-  $form['md_wrapper']['add_md']['new_md']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 4, $parents = array('info', 'md_wrapper', 'add_md', 'new_md', 'format'));
+  $form['md_wrapper']['add_md']['new_md']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 4, $parents = array(
+    'info',
+    'md_wrapper',
+    'add_md',
+    'new_md',
+    'format')
+  );
   $form['md_wrapper']['add_md']['new_md']['new_md_current_sr'] = array(
     '#type' => 'select',
     '#title' => t('Current or next status report'),
@@ -601,7 +639,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#description' => t('A summary of the current recommendations for the project.'),
     '#weight' => 0,
   );
-  $form['group16']['sr_project_recommendations_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group16', 'sr_project_recommendations_wrapper', 'format'));
+  $form['group16']['sr_project_recommendations_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group16',
+    'sr_project_recommendations_wrapper',
+    'format')
+  );
   $form['group17'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -622,7 +665,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#description' => t('A summary of the objectives expected to be discussed and obtained in the next Status Report.'),
     '#weight' => 0,
   );
-  $form['group17']['sr_objectives_for_next_sr_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group17', 'sr_objectives_for_next_sr_wrapper', 'format'));
+  $form['group17']['sr_objectives_for_next_sr_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group17',
+    'sr_objectives_for_next_sr_wrapper',
+    'format')
+  );
   $form['group18'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -643,7 +691,12 @@ function jiscpmsr_form(&$node, $form_state) {
     '#description' => t('A summary of related project information. For example, other projects that may be demanding the time of team members etc.'),
     '#weight' => 0,
   );
-  $form['group18']['sr_related_project_info_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group18', 'sr_related_project_info_wrapper', 'format'));
+  $form['group18']['sr_related_project_info_wrapper']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group18',
+    'sr_related_project_info_wrapper',
+    'format')
+  );
   return $form;
 }
 /**
@@ -699,13 +752,12 @@ function jiscpmsr_update($node) {
  */
 function jiscpmsr_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
-    case 'prepare':
-      break;
     case 'delete revision':
       // Notice that we're matching a single revision based on the node's vid.
       db_query('DELETE FROM {jiscpmsr} WHERE vid = %d', $node->vid);
       db_query('DELETE FROM {jiscpmsr_md} WHERE sr_nid = %d', $node->nid);
       break;
+
   }
 }
 /**

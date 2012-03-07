@@ -17,7 +17,9 @@ function jiscpmtask_project_tasks(_organization_select_id, _project_select, _tas
 
   var organization_select = $("#" + _organization_select_id).get(0);
   var organization_nid = organization_select.value;
-  if (!organization_nid) organization_nid=0;
+  if (!organization_nid) {
+    organization_nid=0;
+  }
   var assign_select = $("#" + _assign_select_id).get(0);
   if (assign_select) {
     jiscpm_empty_select(assign_select);

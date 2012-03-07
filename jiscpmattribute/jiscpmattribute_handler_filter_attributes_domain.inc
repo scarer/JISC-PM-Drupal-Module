@@ -12,8 +12,8 @@ class Jiscpmattributehandlerfilterattributesdomain extends views_handler_filter_
    */
   function getvalueoptions() {
     if (!isset($this->value_options)) {
-      $this->value_options = check_plain(jiscpmattributeattributesbydomain($this->definition['domain']));
-      $this->value_options = check_plain($this->value_options['values']);
+      $this->value_options = jiscpmattributeattributesbydomain($this->definition['domain']);
+      $this->value_options = $this->value_options['values'];
     }
   }
 }

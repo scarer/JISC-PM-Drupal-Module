@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Administration of JISC PM issue module.
  */
 
 /**

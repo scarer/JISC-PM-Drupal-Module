@@ -12,8 +12,8 @@ class Jiscpmattributehandlerfieldattributesdomain extends views_handler_field {
    * Render the values.
    */
   function render($values) {
-    $key = check_plain($values->{$this->field_alias});
-    $value = check_plain(jiscpmattribute_value($this->definition['domain'], $key));
-    return check_plain($value);
+    $key = $values->{$this->field_alias};
+    $value = jiscpmattribute_value($this->definition['domain'], $key);
+    return $value;
   }
 }

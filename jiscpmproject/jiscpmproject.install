@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Installs and un-installs JISCPM Project.
  */
 
 /**
@@ -32,96 +33,374 @@ function jiscpmproject_uninstall() {
 function jiscpmproject_schema() {
   $schema['jiscpmproject'] = array(
     'fields'                => array(
-      'nid'                 => array('description' => 'The primary identifier for a node', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'vid'                 => array('description' => 'The current {node_revisions}.vid version identifier', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'project_manager_uid'    => array('description' => 'The uid for the project manager', 'type' => 'int'),
-      'client_uid'    => array('description' => 'The uid for the client', 'type' => 'int'),
-      'projectstatus'       => array('description' => 'The current status of a project', 'type' => 'varchar', 'length' => 20),
-      'projectcategory'     => array('description' => 'The category of a project', 'type' => 'varchar', 'length' => 20),
-      'projectpriority'     => array('description' => 'The priority of a project', 'type' => 'varchar', 'length' => 20),
-      'datebegin'           => array('description' => 'The date a project begins', 'type' => 'int', 'default' => 0),
-      'dateend'             => array('description' => 'The date a project ends', 'type' => 'int', 'default' => 0),
-      'organisational_scope' => array('description' => 'The organisational scope of a project', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'logical_scope' => array('description' => 'The logical scope of a project', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'out_of_scope' => array('description' => 'A description of anything that is out of the project scope', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'nid'                 => array(
+        'description' => 'The primary identifier for a node',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'vid'                 => array(
+        'description' => 'The current {node_revisions}.vid version identifier',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'project_manager_uid'    => array(
+        'description' => 'The uid for the project manager',
+        'type' => 'int',
+      ),
+      'client_uid'    => array(
+        'description' => 'The uid for the client',
+        'type' => 'int',
+      ),
+      'projectstatus'       => array(
+        'description' => 'The current status of a project',
+        'type' => 'varchar',
+        'length' => 20,
+      ),
+      'projectcategory'     => array(
+        'description' => 'The category of a project',
+        'type' => 'varchar',
+        'length' => 20,
+      ),
+      'projectpriority'     => array(
+        'description' => 'The priority of a project',
+        'type' => 'varchar',
+        'length' => 20,
+      ),
+      'datebegin'           => array(
+        'description' => 'The date a project begins',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'dateend'             => array(
+        'description' => 'The date a project ends',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'organisational_scope' => array(
+        'description' => 'The organisational scope of a project',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'logical_scope' => array(
+        'description' => 'The logical scope of a project',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'out_of_scope' => array(
+        'description' => 'A description of anything that is out of the project scope',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
     ),
     'primary key' => array('nid', 'vid'),
   );
   $schema['jiscpmproject_stakeholder'] = array(
     'fields'                => array(
-      'stakeholder_id'                 => array('description' => 'The primary identifier for a project stakeholder', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'stakeholder_uid' => array('description' => 'The uid for the project stakeholder', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'project_nid'    => array('description' => 'The nid for the project the stakeholder belongs to', 'type' => 'int'),
-      'stakeholder_stake_in_project' => array('description' => 'The stake a stakeholder has in a project', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'stakeholder_management_strategy' => array('description' => 'The way a stakeholder will be managed in a project', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'stakeholder_potential_impact' => array('description' => 'The potential impact of a stakeholder in a project', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'stakeholder_expectations' => array('description' => 'The expectations of a stakeholder in a project', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'stakeholder_attitudes_risks' => array('description' => 'The attitudes and risks a stakeholder has in a project', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'stakeholder_id'                 => array(
+        'description' => 'The primary identifier for a project stakeholder',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'stakeholder_uid' => array(
+        'description' => 'The uid for the project stakeholder',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'project_nid'    => array(
+        'description' => 'The nid for the project the stakeholder belongs to',
+        'type' => 'int',
+      ),
+      'stakeholder_stake_in_project' => array(
+        'description' => 'The stake a stakeholder has in a project',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'stakeholder_management_strategy' => array(
+        'description' => 'The way a stakeholder will be managed in a project',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'stakeholder_potential_impact' => array(
+        'description' => 'The potential impact of a stakeholder in a project',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'stakeholder_expectations' => array(
+        'description' => 'The expectations of a stakeholder in a project',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'stakeholder_attitudes_risks' => array(
+        'description' => 'The attitudes and risks a stakeholder has in a project',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
     ),
     'primary key' => array('stakeholder_id'),
   );
   $schema['jiscpmproject_milestone'] = array(
     'fields'                => array(
-      'milestone_id'                 => array('description' => 'The primary identifier for a milestone', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'project_nid'                 => array('description' => 'The nid for the project the milestone belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'milestone_title' => array('description' => 'The title for a project milestone', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'milestone_deliverydate'             => array('description' => 'The delivery date of a project milestone', 'type' => 'int', 'default' => 0),
+      'milestone_id'                 => array(
+        'description' => 'The primary identifier for a milestone',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'project_nid'                 => array(
+        'description' => 'The nid for the project the milestone belongs to',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'milestone_title' => array(
+        'description' => 'The title for a project milestone',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'milestone_deliverydate'             => array(
+        'description' => 'The delivery date of a project milestone',
+        'type' => 'int',
+        'default' => 0,
+      ),
     ),
     'primary key' => array('milestone_id'),
   );
   $schema['jiscpmproject_phase'] = array(
     'fields'                => array(
-      'phase_id'                 => array('description' => 'The primary identifier for a project phase', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'project_nid'                 => array('description' => 'The nid for the project the project phase belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'phase_title' => array('description' => 'The title for a project phase', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'phase_scope' => array('description' => 'The scope of a phase in a project', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'phase_datebegin'           => array('description' => 'The date a project phase begins', 'type' => 'int', 'default' => 0),
-      'phase_dateend'             => array('description' => 'The date a project phase ends', 'type' => 'int', 'default' => 0),
+      'phase_id'                 => array(
+        'description' => 'The primary identifier for a project phase',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'project_nid'                 => array(
+        'description' => 'The nid for the project the project phase belongs to',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'phase_title' => array(
+        'description' => 'The title for a project phase',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'phase_scope' => array(
+        'description' => 'The scope of a phase in a project',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'phase_datebegin'           => array(
+        'description' => 'The date a project phase begins',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'phase_dateend'             => array(
+        'description' => 'The date a project phase ends',
+        'type' => 'int',
+        'default' => 0,
+      ),
     ),
     'primary key' => array('phase_id'),
   );
   $schema['jiscpmproject_relationship'] = array(
     'fields'                => array(
-      'relationship_id'                 => array('description' => 'The primary identifier for a project relationship', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'project_nid'                 => array('description' => 'The nid for the project the project relationship belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'relationship_nid'                 => array('description' => 'The nid of the related project node', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'relationship_description' => array('description' => 'The description of how the two projects are related', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'relationship_id'                 => array(
+        'description' => 'The primary identifier for a project relationship',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'project_nid'                 => array(
+        'description' => 'The nid for the project the project relationship belongs to',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'relationship_nid'                 => array(
+        'description' => 'The nid of the related project node',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'relationship_description' => array(
+        'description' => 'The description of how the two projects are related',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
     ),
     'primary key' => array('relationship_id'),
   );
   $schema['jiscpmproject_constraint'] = array(
     'fields'                => array(
-      'constraint_id'                 => array('description' => 'The primary identifier for a project constraint', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'project_nid'                 => array('description' => 'The nid for the project the project constraint belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'constraint_title' => array('description' => 'The title for a project constraint', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'constraint_description' => array('description' => 'The description of a project constraint', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'constraint_id'                 => array(
+        'description' => 'The primary identifier for a project constraint',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'project_nid'                 => array(
+        'description' => 'The nid for the project the project constraint belongs to',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'constraint_title' => array(
+        'description' => 'The title for a project constraint',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'constraint_description' => array(
+        'description' => 'The description of a project constraint',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
     ),
     'primary key' => array('constraint_id'),
   );
   $schema['jiscpmproject_goal'] = array(
     'fields'                => array(
-      'goal_id'                 => array('description' => 'The primary identifier for a project goal', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'project_nid'                 => array('description' => 'The nid for the project the project goal belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'goal_title' => array('description' => 'The title for a project goal', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'goal_objectives' => array('description' => 'The objectives of a project goal', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'goal_id'                 => array(
+        'description' => 'The primary identifier for a project goal',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'project_nid'                 => array(
+        'description' => 'The nid for the project the project goal belongs to',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'goal_title' => array(
+        'description' => 'The title for a project goal',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'goal_objectives' => array(
+        'description' => 'The objectives of a project goal',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
     ),
     'primary key' => array('goal_id'),
   );
   $schema['jiscpmproject_factor'] = array(
     'fields'                => array(
-      'factor_id'                 => array('description' => 'The primary identifier for a project factor', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'project_nid'                 => array('description' => 'The nid for the project the project factor belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'factor_title' => array('description' => 'The title for a project factor', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'factor_description' => array('description' => 'The description of a project factor', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'factor_id'                 => array(
+        'description' => 'The primary identifier for a project factor',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'project_nid'                 => array(
+        'description' => 'The nid for the project the project factor belongs to',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'factor_title' => array(
+        'description' => 'The title for a project factor',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'factor_description' => array(
+        'description' => 'The description of a project factor',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
     ),
     'primary key' => array('factor_id'),
   );
   $schema['jiscpmproject_assumption'] = array(
     'fields'                => array(
-      'assumption_id'                 => array('description' => 'The primary identifier for a project assumption', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
-      'project_nid'                 => array('description' => 'The nid for the project the project assumption belongs to', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'assumption_title' => array('description' => 'The title for a project assumption', 'type' => 'text', 'size' => 'normal', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
-      'assumption_description' => array('description' => 'The description of a project assumption', 'type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => TRUE, 'views' => TRUE),
+      'assumption_id'                 => array(
+        'description' => 'The primary identifier for a project assumption',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'project_nid'                 => array(
+        'description' => 'The nid for the project the project assumption belongs to',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'assumption_title' => array(
+        'description' => 'The title for a project assumption',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
+      'assumption_description' => array(
+        'description' => 'The description of a project assumption',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => TRUE,
+        'views' => TRUE,
+      ),
     ),
     'primary key' => array('assumption_id'),
   );

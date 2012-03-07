@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Implementation of JISC PM PPR module.
  */
 
 /**
@@ -299,7 +300,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group3']['summary_objectives']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group3', 'summary_objectives', 'format'));
+  $form['group3']['summary_objectives']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group3',
+    'summary_objectives',
+    'format')
+  );
   // Benefits achieved.
   $form['group4'] = array(
     '#type' => 'markup',
@@ -317,7 +323,12 @@ function jiscpmppr_form(&$node) {
     '#default_value' => $node->pprs[0]['ppr_benefits_achieved'],
     '#weight' => 0,
   );
-  $form['group4']['benefits_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group4', 'benefits_achieved', 'format'));
+  $form['group4']['benefits_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group4',
+    'benefits_achieved',
+    'format')
+  );
   // Benefits not achieved.
   $form['group5'] = array(
     '#type' => 'markup',
@@ -336,7 +347,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group5']['benefits_not_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group5', 'benefits_not_achieved', 'format'));
+  $form['group5']['benefits_not_achieved']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group5',
+    'benefits_not_achieved',
+    'format')
+  );
   // Negative benefits factors.
   $form['group6'] = array(
     '#type' => 'markup',
@@ -355,7 +371,11 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group6']['negative_benefits_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group6', 'negative_benefits_factors', 'format'));
+  $form['group6']['negative_benefits_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group6',
+    'negative_benefits_factors',
+    'format'));
   // Underestimated tasks.
   $form['group7'] = array(
     '#type' => 'markup',
@@ -374,7 +394,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group7']['underestimated_tasks']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group7', 'underestimated_tasks', 'format'));
+  $form['group7']['underestimated_tasks']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group7',
+    'underestimated_tasks',
+    'format')
+  );
   // Overestimated tasks.
   $form['group8'] = array(
     '#type' => 'markup',
@@ -393,7 +418,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group8']['overestimated_tasks']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group8', 'overestimated_tasks', 'format'));
+  $form['group8']['overestimated_tasks']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group8',
+    'overestimated_tasks',
+    'format')
+  );
   // Negative time factors.
   $form['group9'] = array(
     '#type' => 'markup',
@@ -412,7 +442,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group9']['negative_time_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group9', 'negative_time_factors', 'format'));
+  $form['group9']['negative_time_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group9',
+    'negative_time_factors',
+    'format')
+  );
   // Underestimated costs.
   $form['group10'] = array(
     '#type' => 'markup',
@@ -431,7 +466,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group10']['underestimated_costs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group10', 'underestimated_costs', 'format'));
+  $form['group10']['underestimated_costs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group10',
+    'underestimated_costs',
+    'format')
+  );
   // Overestimated costs.
   $form['group11'] = array(
     '#type' => 'markup',
@@ -450,7 +490,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group11']['overestimated_costs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group11', 'overestimated_costs', 'format'));
+  $form['group11']['overestimated_costs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group11',
+    'overestimated_costs',
+    'format')
+  );
   // Negative cost factors.
   $form['group12'] = array(
     '#type' => 'markup',
@@ -469,7 +514,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group12']['negative_cost_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group12', 'negative_cost_factors', 'format'));
+  $form['group12']['negative_cost_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group12',
+    'negative_cost_factors',
+    'format')
+  );
   // Negative quality factors.
   $form['group13'] = array(
     '#type' => 'markup',
@@ -488,7 +538,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group13']['negative_quality_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group13', 'negative_quality_factors', 'format'));
+  $form['group13']['negative_quality_factors']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group13',
+    'negative_quality_factors',
+    'format')
+  );
   // Delivered outputs.
   $form['group14'] = array(
     '#type' => 'markup',
@@ -507,7 +562,11 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group14']['delivered_outputs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group14', 'delivered_outputs', 'format'));
+  $form['group14']['delivered_outputs']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group14',
+    'delivered_outputs',
+    'format'));
   // Unexpected outcomes.
   $form['group15'] = array(
     '#type' => 'markup',
@@ -526,7 +585,11 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group15']['unexpected_outcomes']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group15', 'unexpected_outcomes', 'format'));
+  $form['group15']['unexpected_outcomes']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group15',
+    'unexpected_outcomes',
+    'format'));
   // Outcomes not fit.
   $form['group16'] = array(
     '#type' => 'markup',
@@ -545,7 +608,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group16']['outputs_not_fit']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group16', 'outputs_not_fit', 'format'));
+  $form['group16']['outputs_not_fit']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group16',
+    'outputs_not_fit',
+    'format')
+  );
   // Lessons learned.
   $form['group17'] = array(
     '#type' => 'markup',
@@ -564,7 +632,11 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group17']['lessons_learned']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group17', 'lessons_learned', 'format'));
+  $form['group17']['lessons_learned']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group17',
+    'lessons_learned',
+    'format'));
   // Recommendations for project.
   $form['group18'] = array(
     '#type' => 'markup',
@@ -583,7 +655,11 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group18']['recommendations_for_project']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group18', 'recommendations_for_project', 'format'));
+  $form['group18']['recommendations_for_project']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group18',
+    'recommendations_for_project',
+    'format'));
   // Recommendations for future projects.
   $form['group19'] = array(
     '#type' => 'markup',
@@ -602,7 +678,12 @@ function jiscpmppr_form(&$node) {
     '#process' => array('jiscpm_dependent_select_process'),
     '#weight' => 0,
   );
-  $form['group19']['recommendations_for_future_projects']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group19', 'recommendations_for_future_projects', 'format'));
+  $form['group19']['recommendations_for_future_projects']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group19',
+    'recommendations_for_future_projects',
+    'format')
+  );
   return $form;
 }
 /**
@@ -637,12 +718,11 @@ function jiscpmppr_update($node) {
  */
 function jiscpmppr_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
-    case 'prepare':
-      break;
     case 'delete revision':
       // Notice that we're matching a single revision based on the node's vid.
       db_query('DELETE FROM {jiscpmppr} WHERE nid = %d', $node->nid);
       break;
+
   }
 }
 /**

@@ -1,6 +1,8 @@
 
 function jiscpm_empty_select(_select) {
-  if(_select == undefined) return;
+  if(_select == undefined) {
+    return;
+  }
   $(_select).html('');
 };
 
@@ -17,7 +19,9 @@ function jiscpm_fill_select(_select, _items, _with_all_option, _all_text) {
       output += '<optgroup label="' + key + '">' + jiscpm_fill_select(undefined, _items[key], false, _all_text) + '</optgroup>';
     }
   }
-  if(_select == undefined) return output;
+  if(_select == undefined) {
+    return output;
+  }
   $(_select).html(output);
 };
 
@@ -33,27 +37,29 @@ function jiscpm_popup(sender, name, title, width, height, content_id, position) 
     case 'l':
       left = left-width;
     break;
+
     case 'lt':
       left = left - width;
       top = top - height;
     break;
+
     case 't':
       left = left - Math.floor(width / 2);
       top = top - height;
     break;
+
     case 'rt':
       top = top - height;
     break;
-    case 'r':
-    break;
-    case 'rb':
-    break;
+
     case 'b':
       left = left - Math.floor(width / 2);
     break;
+
     case 'lb':
       left = left-width;
     break;
+
   }
 
   $("#" + p_name).remove();

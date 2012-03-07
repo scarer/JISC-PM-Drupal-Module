@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Implements JISC PM RFC theme.
  */
 
 /**

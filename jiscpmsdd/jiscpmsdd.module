@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * JISC PM SDD module.
  */
 
 /**
@@ -13,6 +14,7 @@ function jiscpmsdd_help($path, $arg) {
     case "admin/help#jiscpmsdd":
       $o = '<p>' . t("Provides System Design Document support for jiscpm") . '</p>';
       break;
+
   }
   return $o;
 }
@@ -267,7 +269,11 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#default_value' => $node->jiscpmsdds[0]['system_overview'],
     '#description' => t('An overview of the system. For example, "This website serves as a portal for academics etc...".'),
   );
-  $form['group2']['system_overview_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group2', 'system_overview_fieldset', 'format'));
+  $form['group2']['system_overview_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group2',
+    'system_overview_fieldset',
+    'format'));
   $form['group3'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -287,7 +293,12 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#weight' => 0,
     '#description' => t('An overview of the system architecture e.g. one virtual machine running linux red hat etc...'),
   );
-  $form['group3']['system_architecture_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group3', 'system_architecture_fieldset', 'format'));
+  $form['group3']['system_architecture_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group3',
+    'system_architecture_fieldset',
+    'format')
+  );
   $form['group4'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -307,7 +318,12 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#description' => t('An overview of the data design e.g. one database that stores etc...'),
     '#weight' => 0,
   );
-  $form['group4']['data_design_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group4', 'data_design_fieldset', 'format'));
+  $form['group4']['data_design_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group4',
+    'data_design_fieldset',
+    'format')
+  );
   $form['group5'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -327,7 +343,12 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#description' => t('In this section include pseudocode for functional elements.'),
     '#weight' => 0,
   );
-  $form['group5']['component_design_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group5', 'component_design_fieldset', 'format'));
+  $form['group5']['component_design_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group5',
+    'component_design_fieldset',
+    'format')
+  );
   $form['group6'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -347,7 +368,12 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#description' => t('Describe user interfaces that will be designed/used including relevant screenshots/wireframes.'),
     '#weight' => 0,
   );
-  $form['group6']['user_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group6', 'user_interfaces_fieldset', 'format'));
+  $form['group6']['user_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group6',
+    'user_interfaces_fieldset',
+    'format')
+  );
   $form['group7'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -367,7 +393,12 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#description' => t('Describe hardware interfaces that will be designed/used including relevant diagrams.'),
     '#weight' => 0,
   );
-  $form['group7']['hardware_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group7', 'hardware_interfaces_fieldset', 'format'));
+  $form['group7']['hardware_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group7',
+    'hardware_interfaces_fieldset',
+    'format')
+  );
   $form['group8'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -387,7 +418,12 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#description' => t('Describe software interfaces that will be designed/used including relevant images.'),
     '#weight' => 0,
   );
-  $form['group8']['software_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group8', 'software_interfaces_fieldset', 'format'));
+  $form['group8']['software_interfaces_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group8',
+    'software_interfaces_fieldset',
+    'format')
+  );
   $form['group9'] = array(
     '#type' => 'markup',
     '#theme' => 'jiscpm_form_group',
@@ -407,7 +443,12 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#description' => t('Describe the user documentation that will be generated to support system operations.'),
     '#weight' => 0,
   );
-  $form['group9']['user_documentation_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array('info', 'group9', 'user_documentation_fieldset', 'format'));
+  $form['group9']['user_documentation_fieldset']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 1, $parents = array(
+    'info',
+    'group9',
+    'user_documentation_fieldset',
+    'format')
+  );
   // Add ajax form elements for adding user classes.
   $form['userclass_wrapper'] = array(
     '#tree' => FALSE,
@@ -473,7 +514,13 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#title' => t('User class description'),
     '#weight' => 1,
   );
-  $form['userclass_wrapper']['add_userclass']['new_userclass']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'userclass_wrapper', 'add_userclass', 'new_userclass', 'format'));
+  $form['userclass_wrapper']['add_userclass']['new_userclass']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'userclass_wrapper',
+    'add_userclass',
+    'new_userclass',
+    'format')
+  );
   // We name our button 'jiscpmsdd_userclass_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -554,7 +601,13 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#title' => t('Functional Requirement Implementation'),
     '#weight' => 1,
   );
-  $form['functional_wrapper']['add_functional']['new_functional']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'functional_wrapper', 'add_functional', 'new_functional', 'format'));
+  $form['functional_wrapper']['add_functional']['new_functional']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'functional_wrapper',
+    'add_functional',
+    'new_functional',
+    'format')
+  );
   // We name our button 'jiscpmsdd_functional_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -637,7 +690,13 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#title' => t('Non Functional Requirement Implementation'),
     '#weight' => 1,
   );
-  $form['non_functional_wrapper']['add_non_functional']['new_non_functional']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'non_functional_wrapper', 'add_non_functional', 'new_non_functional', 'format'));
+  $form['non_functional_wrapper']['add_non_functional']['new_non_functional']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'non_functional_wrapper',
+    'add_non_functional',
+    'new_non_functional',
+    'format')
+  );
   // We name our button 'jiscpmsdd_non_functional_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -718,7 +777,13 @@ function jiscpmsdd_form(&$node, $form_state) {
     '#title' => t('The definition of the term'),
     '#weight' => 1,
   );
-  $form['definition_wrapper']['add_definition']['new_definition']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array('info', 'definition_wrapper', 'add_definition', 'new_definition', 'format'));
+  $form['definition_wrapper']['add_definition']['new_definition']['format'] = filter_form(FILTER_FORMAT_DEFAULT, 2, $parents = array(
+    'info',
+    'definition_wrapper',
+    'add_definition',
+    'new_definition',
+    'format')
+  );
   // We name our button 'jiscpmsdd_definition_more'
   // to avoid conflicts with other modules using
   // AHAH-enabled buttons with the id 'more'.
@@ -1311,8 +1376,6 @@ function jiscpmsdd_update($node) {
  */
 function jiscpmsdd_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
-    case 'prepare':
-      break;
     case 'delete revision':
       // Notice that we're matching a single revision based on the node's vid.
       db_query('DELETE FROM {jiscpmsdd} WHERE vid = %d', $node->vid);
@@ -1321,6 +1384,7 @@ function jiscpmsdd_nodeapi(&$node, $op, $teaser, $page) {
       db_query('DELETE FROM {jiscpmsdd_non_functional} WHERE sdd_nid = %d', $node->nid);
       db_query('DELETE FROM {jiscpmsdd_definitions} WHERE sdd_nid = %d', $node->nid);
       break;
+
   }
 }
 /**
